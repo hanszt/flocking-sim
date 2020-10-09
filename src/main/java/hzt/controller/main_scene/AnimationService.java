@@ -1,13 +1,15 @@
 package hzt.controller.main_scene;
 
+import hzt.controller.utils.PhysicsEngine;
 import hzt.model.entity.Ball2D;
 import hzt.model.entity.BallGroup;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
+
+import java.util.Set;
 
 public class AnimationService {
 
@@ -36,15 +38,17 @@ public class AnimationService {
         if (start) timeline.play();
     }
 
-    public void run(BallGroup group, double accelerationMultiplier, double frictionFactor) {
+    public void run(BallGroup group, double accelerationMultiplier, double frictionFactor, boolean gravity) {
         group.getChildren().forEach(ball2D -> {
             Ball2D ball = (Ball2D) ball2D;
             ball.update(timeline.getCycleDuration(), accelerationMultiplier);
             ball.addFriction(frictionFactor);
+            Set<Ball2D> ballsSet = ball.getBallsInPerceptionRadiusMap().keySet();
+            if (gravity) ball.setAcceleration(PhysicsEngine.getTotalAccelerationByMassAndOtherBallsInPerceptionRadius(ball, ballsSet));
         });
         Ball2D selected = mainSceneController.getBallGroup().getSelectedBall();
-        statisticsService.addStatisticsAboutSelectedBall(selected);
-        statisticsService.addGlobalStatistics(frictionFactor, timeline.getCycleDuration(), group.getChildren().size());
+        statisticsService.showStatisticsAboutSelectedBall(selected);
+        statisticsService.showGlobalStatistics(frictionFactor, timeline.getCycleDuration(), group.getChildren().size(), mainSceneController.getAppManager().getRunTimeSim());
     }
 
     public void removeKeyFrameFromTimeline(KeyFrame keyFrame) {

@@ -1,22 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ColorPicker?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SeparatorMenuItem?>
-<?import javafx.scene.control.Slider?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.ToggleButton?>
-<?import javafx.scene.effect.ColorAdjust?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hzt.controller.main_scene.MainSceneController">
     <children>
@@ -49,7 +37,7 @@
             <children>
                 <SplitPane fx:id="mainSplitPane" dividerPositions="0.7182628062360802" layoutX="201.0" layoutY="165.0" nodeOrientation="LEFT_TO_RIGHT" pickOnBounds="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
-                        <SplitPane dividerPositions="0.7626527050610821" orientation="VERTICAL">
+                        <SplitPane fx:id="sliderSplitPane" dividerPositions="0.7626527050610821" orientation="VERTICAL">
                             <items>
                                 <AnchorPane fx:id="animationPane" minHeight="150.0" prefHeight="3000.0" prefWidth="10000.0">
                                     <effect>
@@ -62,8 +50,10 @@
                                             <children>
                                                 <Label text="Friction" />
                                                 <Slider fx:id="frictionSlider" majorTickUnit=".1" max=".2" minorTickCount="1" showTickLabels="true" showTickMarks="true" />
-                                                <Label text="Acceleration" />
-                                                <Slider fx:id="accelerationSlider" min="1" showTickLabels="true" showTickMarks="true" value="5" />
+                                                <Label text="Speed" />
+                                                <Slider fx:id="speedSlider" min="1" showTickLabels="true" showTickMarks="true" value="5" />
+                                                <Label layoutX="15.0" layoutY="70.0" text="Acceleration" />
+                                                <Slider fx:id="accelerationSlider" layoutX="15.0" layoutY="87.0" min="1" showTickLabels="true" showTickMarks="true" value="5" />
                                             </children>
                                             <padding>
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -74,7 +64,9 @@
                                                 <Label text="Number of balls" />
                                                 <Slider fx:id="numberOfBallsSlider" majorTickUnit="10.0" max="200" minorTickCount="5" showTickLabels="true" showTickMarks="true" value="10.0" />
                                                 <Label text="Perception radius" />
-                                                <Slider fx:id="perceptionRadiusSlider" max="10" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                                <Slider fx:id="perceptionRadiusSlider" max="200" showTickLabels="true" showTickMarks="true" value="1.0" />
+                                                <Label layoutX="15.0" layoutY="70.0" text="Gravity" />
+                                                <Slider fx:id="gravitySlider" layoutX="15.0" layoutY="87.0" min="1e-11" max="2" showTickLabels="true" showTickMarks="true" value="1e-6" />
                                             </children>
                                             <padding>
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -87,8 +79,8 @@
                         <VBox fx:id="mainControlPanel" maxWidth="300.0" prefWidth="250.0" spacing="4.0">
                             <children>
                                 <Label text="Physics Engine Settings" />
-                                <ComboBox fx:id="dropDown1" onAction="#dropDownMenu1Action" prefWidth="300.0" promptText="DropdownMenu1" />
-                                <ComboBox fx:id="dropDown2" onAction="#dropDownMenu2Action" prefWidth="300.0" promptText="DropDownMenu2" />
+                                <ComboBox fx:id="dropDown1" onAction="#dropDownMenu1Action" prefWidth="300.0" promptText="Gravity settings" />
+                                <ComboBox fx:id="dropDown2" onAction="#dropDownMenu2Action" prefWidth="300.0" promptText="Ball group settings" />
                                 <Label text="Choose animation settings" />
                                 <HBox prefWidth="1000.0">
                                     <children>
@@ -96,9 +88,10 @@
                                             <children>
                                                 <Button mnemonicParsing="false" onAction="#reset" prefWidth="1000.0" text="Reset" />
                                                 <Button mnemonicParsing="false" onAction="#button3Action" prefWidth="1000.0" text="Button3" />
-                                    <ToggleButton layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#pauseSim" prefWidth="1000.0" text="Pause" />
-                                                <ToggleButton mnemonicParsing="false" onAction="#pauseSim" prefWidth="1000.0" text="Pause" />
-                                                <ToggleButton mnemonicParsing="false" onAction="#setTransparent" prefWidth="1000.0" text="Transparent" />
+                                                <ToggleButton layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#pauseSim" prefWidth="1000.0" text="Pause" />
+                                                <ToggleButton mnemonicParsing="false" onAction="#showConnections" prefWidth="1000.0" text="Show connections" />
+                                                <ToggleButton mnemonicParsing="false" onAction="#showBalls" prefWidth="1000.0" text="Show balls" />
+                                                <ToggleButton layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#bounceOfWalls" prefWidth="1000.0" text="Bounce of walls" />
                                             </children>
                                             <padding>
                                                 <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
@@ -106,11 +99,12 @@
                                         </VBox>
                                         <VBox prefWidth="150.0" spacing="4.0">
                                             <children>
-                                                <Button mnemonicParsing="false" onAction="#newInstance" prefWidth="1000.0" text="Button2" />
+                                                <Button mnemonicParsing="false" prefWidth="1000.0" text="Button2" />
                                                 <Button mnemonicParsing="false" onAction="#button4Action" prefWidth="1000.0" text="Button4" />
-                                                <ToggleButton  mnemonicParsing="false" onAction="#toggleButton2Action" prefWidth="1000.0" text="Uniform Color" />
-                                                <ToggleButton  mnemonicParsing="false" onAction="#toggleButton4Action" prefWidth="1000.0" text="Gravity" />
-                                    <ToggleButton  layoutX="14.0" layoutY="72.0" mnemonicParsing="false" prefWidth="1000.0" text="Uniform Color" />
+                                                <ToggleButton mnemonicParsing="false" onAction="#setTransparent" prefWidth="1000.0" text="Transparent" />
+                                                <ToggleButton fx:id="gravityButton" mnemonicParsing="false" prefWidth="1000.0" text="Gravity" />
+                                                <ToggleButton layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#showPerception" prefWidth="1000.0" text="Show perception" />
+                                                <ToggleButton layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#showTrails" prefWidth="1000.0" text="Show trails" />
                                             </children>
                                             <padding>
                                                 <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
@@ -145,62 +139,62 @@
                                         </VBox>
                                     </children>
                                 </HBox>
-                        <VBox fx:id="statisticsPanel" prefHeight="200.0" prefWidth="100.0">
-                           <children>
-                                      <Label text="Global statistics:">
-                                          <font>
-                                              <Font name="System Bold" size="12.0" />
-                                          </font>
-                                      </Label>
-                                      <HBox>
-                                          <children>
-                                              <VBox prefWidth="100.0">
-                                                  <children>
-                                                      <Label text="Friction: " />
-                                                      <Label text="Framerate:" />
-                                                      <Label text="#Balls:" />
-                                                      <Label text="Runtime:" />
-                                                  </children>
-                                              </VBox>
-                                              <VBox layoutX="10.0" layoutY="10.0">
-                                                  <children>
-                                                      <Label fx:id="frictionStatsLabel" text="NaN" />
-                                                      <Label fx:id="frameRateStatsLabel" text="NaN" />
-                                                      <Label fx:id="numberOfBallsLabel" text="NaN" />
-                                                      <Label fx:id="runTimeLabel" text="NaN" />
-                                                  </children>
-                                              </VBox>
-                                          </children>
-                                      </HBox>
-                                      <Label text="Statistics about selected ball:">
-                                          <font>
-                                              <Font name="System Bold" size="12.0" />
-                                          </font>
-                                      </Label>
-                                      <HBox>
-                                          <children>
-                                              <VBox prefWidth="100.0">
-                                                  <children>
-                                                      <Label text="Name:" />
-                                                      <Label text="Position:" />
-                                                      <Label text="Velocity:" />
-                                                      <Label text="Acceleration:" />
-                                                      <Label text="#Near balls: " />
-                                                  </children>
-                                              </VBox>
-                                              <VBox layoutX="10.0" layoutY="10.0" prefWidth="188.0">
-                                                  <children>
-                                                      <Label fx:id="ballNameLabel" text="Unknown" />
-                                                      <Label fx:id="positionStatsLabel" text="(x = NaN, y = NaN) (p)" />
-                                                      <Label fx:id="velocityStatsLabel" text="(x = NaN, y = NaN) (p/2)" />
-                                                      <Label fx:id="accelerationStatsLabel" text="(x = NaN, y = NaN) (p/s^2)" />
-                                                      <Label fx:id="nrOfBallsInPerceptionRadiusLabel" text="0" />
-                                                  </children>
-                                              </VBox>
-                                          </children>
-                                      </HBox>
-                           </children>
-                        </VBox>
+                                <VBox fx:id="statisticsPanel" prefHeight="200.0" prefWidth="100.0">
+                                    <children>
+                                        <Label text="Global statistics:">
+                                            <font>
+                                                <Font name="System Bold" size="12.0" />
+                                            </font>
+                                        </Label>
+                                        <HBox>
+                                            <children>
+                                                <VBox prefWidth="100.0">
+                                                    <children>
+                                                        <Label text="Friction: " />
+                                                        <Label text="Framerate:" />
+                                                        <Label text="#Balls:" />
+                                                        <Label text="Runtime:" />
+                                                    </children>
+                                                </VBox>
+                                                <VBox layoutX="10.0" layoutY="10.0">
+                                                    <children>
+                                                        <Label fx:id="frictionStatsLabel" text="NaN" />
+                                                        <Label fx:id="frameRateStatsLabel" text="NaN" />
+                                                        <Label fx:id="numberOfBallsLabel" text="NaN" />
+                                                        <Label fx:id="runTimeLabel" text="NaN" />
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
+                                        <Label text="Statistics about selected ball:">
+                                            <font>
+                                                <Font name="System Bold" size="12.0" />
+                                            </font>
+                                        </Label>
+                                        <HBox>
+                                            <children>
+                                                <VBox prefWidth="100.0">
+                                                    <children>
+                                                        <Label text="Name:" />
+                                                        <Label text="Position:" />
+                                                        <Label text="Velocity:" />
+                                                        <Label text="Acceleration:" />
+                                                        <Label text="#Near balls: " />
+                                                    </children>
+                                                </VBox>
+                                                <VBox layoutX="10.0" layoutY="10.0" prefWidth="188.0">
+                                                    <children>
+                                                        <Label fx:id="ballNameLabel" text="Unknown" />
+                                                        <Label fx:id="positionStatsLabel" text="(x = NaN, y = NaN) (p)" />
+                                                        <Label fx:id="velocityStatsLabel" text="(x = NaN, y = NaN) (p/2)" />
+                                                        <Label fx:id="accelerationStatsLabel" text="(x = NaN, y = NaN) (p/s^2)" />
+                                                        <Label fx:id="nrOfBallsInPerceptionRadiusLabel" text="0" />
+                                                    </children>
+                                                </VBox>
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
                             </children>
                             <padding>
                                 <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />

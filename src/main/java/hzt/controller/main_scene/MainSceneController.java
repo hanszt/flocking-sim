@@ -2,6 +2,7 @@ package hzt.controller.main_scene;
 
 import hzt.controller.AbstractSceneController;
 import hzt.controller.AppManager;
+import hzt.controller.utils.PhysicsEngine;
 import hzt.model.entity.Ball2D;
 import hzt.model.entity.BallGroup;
 import javafx.event.ActionEvent;
@@ -33,33 +34,32 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private SplitPane mainSplitPane;
     @FXML
+    public SplitPane sliderSplitPane;
+    @FXML
     private AnchorPane animationPane;
     @FXML
-    public VBox mainControlPanel;
+    private VBox mainControlPanel;
     @FXML
-    public HBox slidersPane;
+    public VBox statisticsPanel;
     @FXML
-    private AnchorPane sliderPanel;
+    private HBox slidersPane;
+
     @FXML
     private ComboBox<?> dropDown1;
     @FXML
     private ComboBox<?> dropDown2;
     @FXML
-    private ComboBox<?> dropDown3;
-    @FXML
-    private ToggleButton toggleButton1;
-    @FXML
-    private ToggleButton toggleButton3;
-    @FXML
-    private ToggleButton toggleButton2;
-    @FXML
-    private ToggleButton toggleButton4;
+    private ToggleButton gravityButton;
     @FXML
     private Slider numberOfBallsSlider;
     @FXML
     private Slider perceptionRadiusSlider;
     @FXML
     private Slider frictionSlider;
+    @FXML
+    private Slider gravitySlider;
+    @FXML
+    private Slider speedSlider;
     @FXML
     private Slider accelerationSlider;
 
@@ -80,7 +80,7 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private Label numberOfBallsLabel;
     @FXML
-    public Label runTimeLabel;
+    private Label runTimeLabel;
 
     @Override
     public void setup() {
@@ -89,15 +89,17 @@ public class MainSceneController extends AbstractSceneController {
         animationPane.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
         EventHandler<ActionEvent> animationLoop = e -> {
             double friction = frictionSlider.getValue();
+            double speedAdder = accelerationSlider.getValue();
             double accelerationMultiplier = accelerationSlider.getValue();
-            as.run(ballGroup, accelerationMultiplier, friction);
+            as.run(ballGroup, accelerationMultiplier, friction, gravityButton.isSelected());
         };
         as.addAnimationLoopToTimeline(animationLoop, true);
         addListenersToSliders();
     }
 
     private void setupBallGroup() {
-        ballGroup.controlBallAmount((int) numberOfBallsSlider.getValue(), perceptionRadiusSlider.getValue(), new Dimension2D(scene.getWidth(), scene.getHeight()));
+        ballGroup.controlBallAmount((int) numberOfBallsSlider.getValue(),
+                perceptionRadiusSlider.getValue(), new Dimension2D(scene.getWidth(), scene.getHeight()));
     }
 
 
@@ -106,9 +108,10 @@ public class MainSceneController extends AbstractSceneController {
         perceptionRadiusSlider.valueProperty().addListener((oldVal, curVal, newVal) -> {
             for (Node n : ballGroup.getChildren()) {
                 Ball2D ball = (Ball2D) n;
-                ball.getPerceptionCircle().setRadius(ball.getBody().getRadius() * newVal.doubleValue());
+                ball.setPerceptionRadius(ball.getBody().getRadius() * newVal.doubleValue());
             }
         });
+        gravitySlider.valueProperty().addListener((oldVal, curVal, newVal) -> PhysicsEngine.setGravity(newVal.doubleValue()));
     }
 
 
@@ -133,7 +136,8 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     public void button4Action(ActionEvent actionEvent) {
-        System.out.println(((Ball2D) ballGroup.getChildren().get(0)).getChildren().size());
+        Ball2D ball = ballGroup.getSelectedBall();
+        System.out.println((ball.getChildren().size()));
     }
 
     public void reset(ActionEvent actionEvent) {
@@ -148,15 +152,32 @@ public class MainSceneController extends AbstractSceneController {
         else as.startTimeline();
     }
 
-    public void toggleButton2Action(ActionEvent actionEvent) {
-    }
-
     public void setTransparent(ActionEvent actionEvent) {
         if (!((ToggleButton) actionEvent.getSource()).isSelected()) getAppManager().getStage().setOpacity(1);
         else getAppManager().getStage().setOpacity(STAGE_OPACITY);
     }
 
-    public void toggleButton4Action(ActionEvent actionEvent) {
+    public void showConnections(ActionEvent actionEvent) {
+        for (Node node : ballGroup.getChildren()) {
+            Ball2D ball2D = (Ball2D) node;
+            ball2D.setShowConnections(((ToggleButton) actionEvent.getSource()).isSelected());
+        }
+
+    }
+
+    public void showBalls(ActionEvent actionEvent) {
+    }
+
+    public void bounceOfWalls(ActionEvent actionEvent) {
+    }
+
+    public void enableGravity(ActionEvent actionEvent) {
+    }
+
+    public void showPerception(ActionEvent actionEvent) {
+    }
+
+    public void showTrails(ActionEvent actionEvent) {
     }
 
     public void dropDownMenu1Action(ActionEvent actionEvent) {
@@ -165,15 +186,8 @@ public class MainSceneController extends AbstractSceneController {
     public void dropDownMenu2Action(ActionEvent actionEvent) {
     }
 
-    public void dropDownMenu3Action(ActionEvent actionEvent) {
-    }
-
     protected AbstractSceneController getBean() {
         return this;
-    }
-
-    public AnimationService getAs() {
-        return as;
     }
 
     public BallGroup getBallGroup() {
@@ -212,8 +226,9 @@ public class MainSceneController extends AbstractSceneController {
         return numberOfBallsLabel;
     }
 
-    public Slider getPerceptionRadiusSlider() {
-        return perceptionRadiusSlider;
+    public Label getRunTimeLabel() {
+        return runTimeLabel;
     }
+
 
 }

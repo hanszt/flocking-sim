@@ -25,12 +25,12 @@ public class BallGroup extends AnchorPane {
         this.as = as;
     }
 
-    public void controlBallAmount(int numberOfBalls, double perceptionRadius, Dimension2D parentDimension) {
+    public void controlBallAmount(int numberOfBalls, double perceptionRadiusRatio, Dimension2D parentDimension) {
         while (this.getChildren().size() != numberOfBalls) {
             if (this.getChildren().size() < numberOfBalls) {
-                Ball2D ball2D = new Ball2D();
+                Ball2D ball2D = new Ball2D(); // with random color and radius
                 ball2D.setCenterPosition(getRandomPositionOnParent(parentDimension.getWidth(), parentDimension.getHeight()));
-                ball2D.setPerceptionRadius(perceptionRadius);
+                ball2D.setPerceptionRadius(ball2D.getBody().getRadius() * perceptionRadiusRatio);
                 addMouseFunctionality(ball2D);
                 this.getChildren().add(ball2D);
             } else {

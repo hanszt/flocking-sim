@@ -12,7 +12,7 @@ public class StatisticsService {
         this.mc = mc;
     }
 
-    public void addStatisticsAboutSelectedBall(Ball2D selected) {
+    public void showStatisticsAboutSelectedBall(Ball2D selected) {
         double positionX, positionY, velocityX, velocityY, accelerationX, accelerationY;
         int ballsInPerceptionRadius;
         if (selected != null) {
@@ -29,18 +29,20 @@ public class StatisticsService {
         }
         //selected ball statistics
         mc.getBallNameLabel().setText(String.format("%s", selected != null ? selected.getName() : "No ball selected"));
-        mc.getPositionStatsLabel().setText(String.format("x = %-4.2f p, x = %-4.2f p",
+        mc.getPositionStatsLabel().setText(String.format("x = %-4.2f p, y = %-4.2f p",
                 positionX, positionY));
-        mc.getVelocityStatsLabel().setText(String.format("x = %-4.2f p/s, x = %-4.2f p/s",
+        mc.getVelocityStatsLabel().setText(String.format("x = %-4.2f p/s, y = %-4.2f p/s",
                 velocityX, velocityY));
-        mc.getAccelerationStatsLabel().setText(String.format("x = %-4.2f p/s^2, x = %-4.2f p/s^2",
+        mc.getAccelerationStatsLabel().setText(String.format("x = %-4.2f p/s^2, y = %-4.2f p/s^2",
                 accelerationX, accelerationY));
         mc.getNrOfBallsInPerceptionRadiusLabel().setText(String.format("%-3d", ballsInPerceptionRadius));
+
     }
 
-    public void addGlobalStatistics(double friction, Duration cycleDuration, int size) {
+    public void showGlobalStatistics(double friction, Duration cycleDuration, int size, Duration runTimeSim) {
         mc.getFrictionStatsLabel().setText(String.format("%-1.2f", friction));
         mc.getFrameRateStatsLabel().setText(String.format("%-4.2f f/s", 1 / cycleDuration.toSeconds()));
         mc.getNumberOfBallsLabel().setText(String.format("%-3d", size));
+        mc.getRunTimeLabel().setText(String.format("%-3f", Double.NaN));
     }
 }

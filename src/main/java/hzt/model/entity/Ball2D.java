@@ -16,13 +16,14 @@ import javafx.util.Duration;
 
 import java.util.*;
 
+import static hzt.controller.utils.PhysicsEngine.*;
 import static hzt.controller.utils.RandomGenerator.getRandomColor;
 import static hzt.controller.utils.RandomGenerator.getRandomDouble;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
 public class Ball2D extends Group {
 
-    public static final int MIN_RADIUS = 4, MAX_RADIUS = 20;
+    public static final int MIN_RADIUS = 20, MAX_RADIUS = 100;
 
     private static int next = 0;
 
@@ -31,24 +32,31 @@ public class Ball2D extends Group {
     private final Circle perceptionCircle;
     private final Map<Ball2D, Line> ballsInPerceptionRadiusMap;
 
-    private double mass; // kg
+    private double densityMaterial; // kg
     private Point2D velocity = Point2D.ZERO; // m/s
     private Point2D acceleration = Point2D.ZERO; // m/s^2
     private Point2D forceResultant = Point2D.ZERO; // m/s^2
     private double keyPressedAccIncrement;
-
+    private boolean showConnections;
 
     public Ball2D(String name, double radius, Paint paint) {
         this.name = name;
-        this.body = new Circle(radius, paint);
+        this.body = new Circle(radius, paint); // m
         this.perceptionCircle = new Circle();
+        this.densityMaterial = DENSITY_IRON;
         ballsInPerceptionRadiusMap = new HashMap<>();
         perceptionCircle.setStrokeType(StrokeType.OUTSIDE);
+        perceptionCircle.setDisable(true); //ignores user input
         perceptionCircle.setStroke(paint);
         perceptionCircle.setFill(TRANSPARENT);
         perceptionCircle.centerXProperty().bind(body.centerXProperty());
         perceptionCircle.centerYProperty().bind(body.centerYProperty());
         super.getChildren().addAll(perceptionCircle, body);
+    }
+
+    private double getMassByDensityAndRadius() {
+        double volume = 4 * Math.PI * Math.pow(body.getRadius(), 3) / 3;
+        return densityMaterial * volume;
     }
 
     public Ball2D(double radius, Paint paint) {
@@ -60,7 +68,7 @@ public class Ball2D extends Group {
     }
 
     public Point2D getResultantForce() {
-        return acceleration.multiply(mass);
+        return acceleration.multiply(getMassByDensityAndRadius());
     }
 
     public String getName() {
@@ -68,11 +76,11 @@ public class Ball2D extends Group {
     }
 
     public double getMass() {
-        return mass;
+        return getMassByDensityAndRadius();
     }
 
-    public void setMass(double mass) {
-        this.mass = mass;
+    public void setDensityMaterial(double densityMaterial) {
+        this.densityMaterial = densityMaterial;
     }
 
     public Point2D getCenterPosition() {
@@ -118,11 +126,11 @@ public class Ball2D extends Group {
         this.getScene().removeEventFilter(KeyEvent.KEY_RELEASED, keyReleased);
     }
 
-    public void update(Duration deltaT, double multiplier) {
-        keyPressedAccIncrement = multiplier / deltaT.toSeconds();
+    public void update(Duration deltaT, double accelerationMultiplier) {
+        keyPressedAccIncrement = accelerationMultiplier / deltaT.toSeconds();
         updatePositionAndVelocityBasedOnAcceleration(deltaT);
         updateBallsInPerceptionRadiusMap();
-        strokeConnections();
+        if (showConnections) strokeConnections();
     }
 
     private void strokeConnections() {
@@ -131,6 +139,7 @@ public class Ball2D extends Group {
             Line lineToOther = other.getValue();
             double distance = otherBall.getCenterPosition().subtract(this.getCenterPosition()).magnitude();
             lineToOther.setStroke(this.body.getFill());
+            lineToOther.setDisable(true); // ignores user input
             lineToOther.setOpacity(1 - distance / this.perceptionCircle.getRadius());
             lineToOther.setStartX(this.body.getCenterX());
             lineToOther.setStartY(this.body.getCenterY());
@@ -142,16 +151,18 @@ public class Ball2D extends Group {
 
     private void updateBallsInPerceptionRadiusMap() {
         ObservableList<Node> allBalls = this.getParent().getChildrenUnmodifiable();
-        for (Node n : allBalls) {
-            if (!n.equals(this)) {
-                Ball2D ball2D = (Ball2D) n;
+        for (Node node : allBalls) {
+            if (!node.equals(this)) {
+                Ball2D ball2D = (Ball2D) node;
                 double distance = ball2D.getCenterPosition().subtract(this.getCenterPosition()).magnitude();
                 if (distance <= perceptionCircle.getRadius()) {
-                    ballsInPerceptionRadiusMap.put(ball2D, new Line());
+                    if (!ballsInPerceptionRadiusMap.containsKey(ball2D)) {
+                        ballsInPerceptionRadiusMap.put(ball2D, new Line());
+                    }
                 } else {
-                    ballsInPerceptionRadiusMap.remove(ball2D);
                     Line lineToOther = ballsInPerceptionRadiusMap.get(ball2D);
                     this.getChildren().remove(lineToOther);
+                    ballsInPerceptionRadiusMap.remove(ball2D);
                 }
             }
         }
@@ -163,8 +174,9 @@ public class Ball2D extends Group {
 
     private void updatePositionAndVelocityBasedOnAcceleration(Duration deltaT) {
         Point2D position = getCenterPosition();
-        velocity = velocity.add(acceleration.multiply(deltaT.toSeconds()));
-        position = position.add(velocity.multiply(deltaT.toSeconds()));
+        double deltaTSeconds = deltaT.toSeconds();
+        velocity = velocity.add(acceleration.multiply(deltaTSeconds));
+        position = position.add(velocity.multiply(deltaTSeconds));
         setCenterPosition(position);
 //        System.out.printf("position: %2.3f\nvelocity: %2.3f\nacceleration: %2.3f\ndeltaT: %2.3f seconds\n\n",
 //                position.magnitude(), velocity.magnitude(), acceleration.magnitude(), deltaT.toSeconds());
@@ -233,15 +245,19 @@ public class Ball2D extends Group {
         return ballsInPerceptionRadiusMap;
     }
 
+    public void setShowConnections(boolean showConnections) {
+        this.showConnections = showConnections;
+    }
+
+
     @Override
     public String toString() {
-        return "Ball{" +
-                "centerPosition=" + getCenterPosition() +
+        return "Ball2D{" +
                 "acceleration=" + acceleration +
-                ", mass=" + mass +
+                ", body=" + body +
+                ", densityMaterial=" + densityMaterial +
                 ", name='" + name + '\'' +
                 ", velocity=" + velocity +
                 '}';
     }
-
 }
