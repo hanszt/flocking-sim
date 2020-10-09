@@ -2,37 +2,30 @@ package hzt.controller.main_scene;
 
 import hzt.controller.AbstractSceneController;
 import hzt.controller.AppManager;
-import hzt.controller.services.AnimationService;
-import hzt.controller.services.PhysicsEngine;
 import hzt.model.entity.Ball2D;
-import javafx.animation.KeyFrame;
+import hzt.model.entity.BallGroup;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
-import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-import static hzt.controller.AppConstants.Scene.ABOUT_SCENE;
+import static hzt.controller.AppConstants.STAGE_OPACITY;
 import static hzt.controller.AppConstants.Scene.MAIN_SCENE;
-import static hzt.controller.services.AnimationService.INIT_FRAME_DURATION;
 
 public class MainSceneController extends AbstractSceneController {
 
-    private final MainSceneService ms;
+    private final BallGroup ballGroup;
     private final AnimationService as;
-    private final PhysicsEngine pe;
 
     public MainSceneController(AppManager appManager) {
         super(MAIN_SCENE.getEnglishDescription(), MAIN_SCENE.getFxmlFileName(), appManager);
-        as = new AnimationService();
-        ms = new MainSceneService(as);
-        pe = new PhysicsEngine();
+        as = new AnimationService(this);
+        ballGroup = new BallGroup(as);
     }
 
     @FXML
@@ -40,9 +33,13 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private SplitPane mainSplitPane;
     @FXML
-    private AnchorPane controlsPane;
+    private AnchorPane animationPane;
     @FXML
-    private AnchorPane sliderPane;
+    public VBox mainControlPanel;
+    @FXML
+    public HBox slidersPane;
+    @FXML
+    private AnchorPane sliderPanel;
     @FXML
     private ComboBox<?> dropDown1;
     @FXML
@@ -60,15 +57,14 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private Slider numberOfBallsSlider;
     @FXML
-    private Slider zoomSlider;
+    private Slider perceptionRadiusSlider;
     @FXML
-    private Slider FrictionSlider;
+    private Slider frictionSlider;
     @FXML
     private Slider accelerationSlider;
+
     @FXML
-    private AnchorPane animationPane;
-    @FXML
-    private Group ballGroup;
+    private Label ballNameLabel;
     @FXML
     private Label positionStatsLabel;
     @FXML
@@ -79,37 +75,42 @@ public class MainSceneController extends AbstractSceneController {
     private Label frictionStatsLabel;
     @FXML
     private Label frameRateStatsLabel;
+    @FXML
+    private Label nrOfBallsInPerceptionRadiusLabel;
+    @FXML
+    private Label numberOfBallsLabel;
+    @FXML
+    public Label runTimeLabel;
 
     @Override
     public void setup() {
+        setupBallGroup();
+        animationPane.getChildren().add(ballGroup);
         animationPane.setBackground(new Background(new BackgroundFill(Color.BLACK, CornerRadii.EMPTY, Insets.EMPTY)));
-        ms.setupBallsAndAddToBallGroup(ballGroup, mainSplitPane, appManager.getStage(), 30);
-        EventHandler<ActionEvent> eventHandler = e -> pe.run(as.getTimeline().getCycleDuration(), ballGroup);
-        KeyFrame physicsEngineKeyframe = new KeyFrame(INIT_FRAME_DURATION, "Physics engine keyframe", eventHandler);
-        as.addKeyframeToTimeline(physicsEngineKeyframe, true);
-        setupSliders();
+        EventHandler<ActionEvent> animationLoop = e -> {
+            double friction = frictionSlider.getValue();
+            double accelerationMultiplier = accelerationSlider.getValue();
+            as.run(ballGroup, accelerationMultiplier, friction);
+        };
+        as.addAnimationLoopToTimeline(animationLoop, true);
+        addListenersToSliders();
     }
 
-    private void setupSliders() {
-        numberOfBallsSlider.valueProperty().addListener((oldVal, curVal, newVal) -> {
-           ms.setupBallsAndAddToBallGroup(ballGroup, mainSplitPane, appManager.getStage(), newVal.intValue());
+    private void setupBallGroup() {
+        ballGroup.controlBallAmount((int) numberOfBallsSlider.getValue(), perceptionRadiusSlider.getValue(), new Dimension2D(scene.getWidth(), scene.getHeight()));
+    }
+
+
+    private void addListenersToSliders() {
+        numberOfBallsSlider.valueProperty().addListener((oldVal, curVal, newVal) -> setupBallGroup());
+        perceptionRadiusSlider.valueProperty().addListener((oldVal, curVal, newVal) -> {
+            for (Node n : ballGroup.getChildren()) {
+                Ball2D ball = (Ball2D) n;
+                ball.getPerceptionCircle().setRadius(ball.getBody().getRadius() * newVal.doubleValue());
+            }
         });
     }
 
-    @FXML
-    void exitProgram() {
-        appManager.getStage().close();
-    }
-
-    @FXML
-    void showAbout(ActionEvent event) {
-        appManager.setupScene(ABOUT_SCENE);
-    }
-
-    @FXML
-    void showPreferences(ActionEvent event) {
-
-    }
 
     @FXML
     void setColor1(ActionEvent event) {
@@ -131,13 +132,8 @@ public class MainSceneController extends AbstractSceneController {
 
     }
 
-    public void newInstance() {
-    }
-
     public void button4Action(ActionEvent actionEvent) {
-    }
-
-    public void button6Action(ActionEvent actionEvent) {
+        System.out.println(((Ball2D) ballGroup.getChildren().get(0)).getChildren().size());
     }
 
     public void reset(ActionEvent actionEvent) {
@@ -145,9 +141,6 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     public void button3Action(ActionEvent actionEvent) {
-    }
-
-    public void button5Action(ActionEvent actionEvent) {
     }
 
     public void pauseSim(ActionEvent actionEvent) {
@@ -158,7 +151,9 @@ public class MainSceneController extends AbstractSceneController {
     public void toggleButton2Action(ActionEvent actionEvent) {
     }
 
-    public void toggleButton3Action(ActionEvent actionEvent) {
+    public void setTransparent(ActionEvent actionEvent) {
+        if (!((ToggleButton) actionEvent.getSource()).isSelected()) getAppManager().getStage().setOpacity(1);
+        else getAppManager().getStage().setOpacity(STAGE_OPACITY);
     }
 
     public void toggleButton4Action(ActionEvent actionEvent) {
@@ -180,4 +175,45 @@ public class MainSceneController extends AbstractSceneController {
     public AnimationService getAs() {
         return as;
     }
+
+    public BallGroup getBallGroup() {
+        return ballGroup;
+    }
+
+    public Label getBallNameLabel() {
+        return ballNameLabel;
+    }
+
+    public Label getPositionStatsLabel() {
+        return positionStatsLabel;
+    }
+
+    public Label getVelocityStatsLabel() {
+        return velocityStatsLabel;
+    }
+
+    public Label getAccelerationStatsLabel() {
+        return accelerationStatsLabel;
+    }
+
+    public Label getFrictionStatsLabel() {
+        return frictionStatsLabel;
+    }
+
+    public Label getFrameRateStatsLabel() {
+        return frameRateStatsLabel;
+    }
+
+    public Label getNrOfBallsInPerceptionRadiusLabel() {
+        return nrOfBallsInPerceptionRadiusLabel;
+    }
+
+    public Label getNumberOfBallsLabel() {
+        return numberOfBallsLabel;
+    }
+
+    public Slider getPerceptionRadiusSlider() {
+        return perceptionRadiusSlider;
+    }
+
 }

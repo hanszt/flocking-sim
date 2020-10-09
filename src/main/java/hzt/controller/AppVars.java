@@ -1,6 +1,5 @@
 package hzt.controller;
 
-import javafx.animation.Timeline;
 import javafx.stage.Stage;
 
 import java.util.HashMap;
@@ -21,7 +20,4 @@ public abstract class AppVars {
         return stage;
     }
 
-    public AbstractSceneController getCurSceneController() {
-        return curSceneController;
-    }
 }

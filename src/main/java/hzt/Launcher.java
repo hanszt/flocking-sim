@@ -15,11 +15,10 @@ public class Launcher extends Application {
 
     @Override
     public void start(Stage stage) {
-        System.out.println("Starting " + TITLE + "...");
         AppManager appManager = new AppManager(stage);
         appManager.configureStage(stage);
-        appManager.setupScene(MAIN_SCENE);
         stage.show();
+        appManager.setupScene(MAIN_SCENE);
     }
 
 }

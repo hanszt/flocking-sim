@@ -1,12 +1,17 @@
 package hzt.controller;
 
+import hzt.Launcher;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 
 import static hzt.controller.AppConstants.FXML_FILE_LOCATION;
+import static hzt.controller.AppConstants.Scene.ABOUT_SCENE;
 
 public abstract class AbstractSceneController implements Controller {
 
@@ -34,6 +39,31 @@ public abstract class AbstractSceneController implements Controller {
     private void setControllerFactory(FXMLLoader loader) {
         loader.setControllerFactory(c -> getBean());
         loader.setLocation(getClass().getResource(FXML_FILE_LOCATION + getFxmlFileName()));
+    }
+
+    @FXML
+    public void newInstance() {
+        new Launcher().start(new Stage());
+    }
+
+    @FXML
+    void quitInstance() {
+        appManager.getStage().close();
+    }
+
+    @FXML
+    void exitProgram() {
+        System.exit(0);
+    }
+
+    @FXML
+    void showAbout(ActionEvent event) {
+        appManager.setupScene(ABOUT_SCENE);
+    }
+
+    @FXML
+    void showPreferences(ActionEvent event) {
+
     }
 
     public String getSceneName() {
