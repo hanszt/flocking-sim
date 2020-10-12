@@ -2,10 +2,9 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.effect.*?>
+<?import javafx.scene.effect.ColorAdjust?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-
+<?import javafx.scene.text.Font?>
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hzt.controller.main_scene.MainSceneController">
     <children>
         <MenuBar prefHeight="0.0" prefWidth="602.0" VBox.vgrow="NEVER">
@@ -39,59 +38,94 @@
                     <items>
                         <SplitPane fx:id="sliderSplitPane" dividerPositions="0.7626527050610821" orientation="VERTICAL">
                             <items>
-                                <AnchorPane fx:id="animationPane" minHeight="150.0" prefHeight="3000.0" prefWidth="10000.0">
+                                <AnchorPane fx:id="animationPane" prefHeight="3000.0" prefWidth="10000.0">
                                     <effect>
-                                        <ColorAdjust brightness="0.33" contrast="-0.07" />
+                                        <ColorAdjust brightness="0.33" contrast="-0.07"/>
                                     </effect>
                                 </AnchorPane>
                                 <HBox fx:id="slidersPane" maxHeight="150.0" prefHeight="150.0" SplitPane.resizableWithParent="false">
                                     <children>
                                         <VBox prefWidth="3000.0">
                                             <children>
-                                                <Label text="Friction" />
-                                                <Slider fx:id="frictionSlider" majorTickUnit=".1" max=".2" minorTickCount="1" showTickLabels="true" showTickMarks="true" />
-                                                <Label text="Speed" />
-                                                <Slider fx:id="speedSlider" min="1" showTickLabels="true" showTickMarks="true" value="5" />
-                                                <Label layoutX="15.0" layoutY="70.0" text="Acceleration" />
-                                                <Slider fx:id="accelerationSlider" layoutX="15.0" layoutY="87.0" min="1" showTickLabels="true" showTickMarks="true" value="5" />
+                                                <Label text="Number of balls"/>
+                                                <Slider fx:id="numberOfBallsSlider" majorTickUnit="10.0" max="250.0"
+                                                        minorTickCount="5" showTickLabels="true" showTickMarks="true"
+                                                        value="150.0"/>
+                                                <Label layoutX="15.0" layoutY="70.0" text="Max ball size"/>
+                                                <Slider fx:id="maxBallSizeSlider" layoutX="15.0" layoutY="87.0" min="1"
+                                                        showTickLabels="true" showTickMarks="true" value="5" max="50"/>
+                                                <Label text="Perception radius"/>
+                                                <Slider fx:id="perceptionRadiusSlider" max="200.0" showTickLabels="true"
+                                                        showTickMarks="true" value="25.0"/>
                                             </children>
                                             <padding>
-                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                             </padding>
                                         </VBox>
                                         <VBox prefWidth="3000.0">
                                             <children>
-                                                <Label text="Number of balls" />
-                                                <Slider fx:id="numberOfBallsSlider" majorTickUnit="10.0" max="200" minorTickCount="5" showTickLabels="true" showTickMarks="true" value="10.0" />
-                                                <Label text="Perception radius" />
-                                                <Slider fx:id="perceptionRadiusSlider" max="200" showTickLabels="true" showTickMarks="true" value="1.0" />
-                                                <Label layoutX="15.0" layoutY="70.0" text="Gravity" />
-                                                <Slider fx:id="gravitySlider" layoutX="15.0" layoutY="87.0" min="1e-11" max="2" showTickLabels="true" showTickMarks="true" value="1e-6" />
+                                                <Label layoutX="15.0" layoutY="70.0" text="Attraction factor"/>
+                                                <Slider fx:id="attractionSlider" layoutX="15.0" layoutY="87.0" max="20"
+                                                        showTickLabels="true" showTickMarks="true" value="3"/>
+                                                <Label text="Repel factor"/>
+                                                <Slider fx:id="repelFactorSlider" max="20" showTickLabels="true"
+                                                        showTickMarks="true" value="10"/>
+                                                <Label text="Friction"/>
+                                                <Slider fx:id="frictionSlider" majorTickUnit=".1" max=".2"
+                                                        minorTickCount="1" showTickLabels="true" showTickMarks="true"/>
                                             </children>
                                             <padding>
-                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                                            </padding>
+                                        </VBox>
+                                        <VBox layoutX="10.0" layoutY="10.0" prefWidth="3000.0">
+                                            <children>
+                                                <Label text="Repel distance"/>
+                                                <Slider fx:id="repelDistanceSlider" max="10.0" showTickLabels="true"
+                                                        showTickMarks="true" value="3.0"/>
+                                                <Label layoutX="15.0" layoutY="70.0" text="Acceleration selected ball"/>
+                                                <Slider fx:id="accelerationSlider" layoutX="15.0" layoutY="87.0" min="1"
+                                                        showTickLabels="true" showTickMarks="true" value="5"/>
+                                                <Label text="Max speed"/>
+                                                <Slider fx:id="maxSpeedSlider" value="300" max="1000"
+                                                        showTickLabels="true" showTickMarks="true" />
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                                             </padding>
                                         </VBox>
                                     </children>
                                 </HBox>
                             </items>
                         </SplitPane>
-                        <VBox fx:id="mainControlPanel" maxWidth="300.0" prefWidth="250.0" spacing="4.0">
+                        <VBox fx:id="mainControlPanel" maxWidth="350.0" prefWidth="300.0" spacing="4.0">
                             <children>
-                                <Label text="Physics Engine Settings" />
-                                <ComboBox fx:id="dropDown1" onAction="#dropDownMenu1Action" prefWidth="300.0" promptText="Gravity settings" />
-                                <ComboBox fx:id="dropDown2" onAction="#dropDownMenu2Action" prefWidth="300.0" promptText="Ball group settings" />
-                                <Label text="Choose animation settings" />
+                                <Label text="Physics Engine Settings"/>
+                                <ComboBox fx:id="ballSelectorDropdown" onAction="#ballSelectorMenuAction"
+                                          prefWidth="300.0"
+                                          promptText="Select ball from list"/>
+                                <ComboBox fx:id="flockSettingsComboBox" onAction="#flockSettingsDropdownAction"
+                                          prefWidth="300.0"
+                                          promptText="Flock settings"/>
+                                <Label text="Choose animation settings"/>
                                 <HBox prefWidth="1000.0">
                                     <children>
                                         <VBox prefWidth="150.0" spacing="4.0">
                                             <children>
-                                                <Button mnemonicParsing="false" onAction="#reset" prefWidth="1000.0" text="Reset" />
-                                                <Button mnemonicParsing="false" onAction="#button3Action" prefWidth="1000.0" text="Button3" />
-                                                <ToggleButton layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#pauseSim" prefWidth="1000.0" text="Pause" />
-                                                <ToggleButton mnemonicParsing="false" onAction="#showConnections" prefWidth="1000.0" text="Show connections" />
-                                                <ToggleButton mnemonicParsing="false" onAction="#showBalls" prefWidth="1000.0" text="Show balls" />
-                                                <ToggleButton layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#bounceOfWalls" prefWidth="1000.0" text="Bounce of walls" />
+                                                <Button mnemonicParsing="false" onAction="#reset" prefWidth="1000.0"
+                                                        text="Reset"/>
+                                                <ToggleButton layoutX="14.0" layoutY="72.0" mnemonicParsing="false"
+                                                              onAction="#pauseSim" prefWidth="1000.0" text="Pause"/>
+                                                <ToggleButton fx:id="bounceWallsButton" layoutX="14.0" layoutY="72.0"
+                                                              mnemonicParsing="false"
+                                                              prefWidth="1000.0" selected="true"
+                                                              text="Bounce of walls"/>
+                                                <ToggleButton fx:id="showConnectionsButton" mnemonicParsing="false"
+                                                              onAction="#showConnections" prefWidth="1000.0"
+                                                              text="Show connections"/>
+                                                <ToggleButton fx:id="showPathButton" mnemonicParsing="false"
+                                                              onAction="#showPathSelectedBall" prefWidth="1000.0"
+                                                              text="Show path selected"/>
                                             </children>
                                             <padding>
                                                 <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
@@ -99,12 +133,19 @@
                                         </VBox>
                                         <VBox prefWidth="150.0" spacing="4.0">
                                             <children>
-                                                <Button mnemonicParsing="false" prefWidth="1000.0" text="Button2" />
-                                                <Button mnemonicParsing="false" onAction="#button4Action" prefWidth="1000.0" text="Button4" />
-                                                <ToggleButton mnemonicParsing="false" onAction="#setTransparent" prefWidth="1000.0" text="Transparent" />
-                                                <ToggleButton fx:id="gravityButton" mnemonicParsing="false" prefWidth="1000.0" text="Gravity" />
-                                                <ToggleButton layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#showPerception" prefWidth="1000.0" text="Show perception" />
-                                                <ToggleButton layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#showTrails" prefWidth="1000.0" text="Show trails" />
+                                                <Button mnemonicParsing="false" prefWidth="1000.0" text="New instance"/>
+                                                <ToggleButton mnemonicParsing="false" onAction="#setTransparent"
+                                                              prefWidth="1000.0" text="Transparent"/>
+                                                <ToggleButton fx:id="showPerceptionButton" layoutX="14.0" layoutY="72.0"
+                                                              mnemonicParsing="false" onAction="#showPerception"
+                                                              prefWidth="1000.0" text="Show perception"/>
+                                                <ToggleButton fx:id="velocityButton" mnemonicParsing="false"
+                                                              prefWidth="1000.0" text="Show velocities"
+                                                              onAction="#showVelocityVector"/>
+                                                <ToggleButton fx:id="showAccelerationVectorButton" layoutX="14.0"
+                                                              layoutY="72.0"
+                                                              mnemonicParsing="false" onAction="#showAccelerationVector"
+                                                              prefWidth="1000.0" text="Show accelerations"/>
                                             </children>
                                             <padding>
                                                 <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
@@ -117,10 +158,10 @@
                                     <children>
                                         <VBox prefWidth="150.0" spacing="4.0">
                                             <children>
-                                                <Label text="ColorPicker1" />
-                                                <ColorPicker onAction="#setColor1" prefWidth="1000.0" />
-                                                <Label text="ColorPicker3" />
-                                                <ColorPicker onAction="#setColor3" prefWidth="1000.0" />
+                                                <Label text="Background color"/>
+                                                <ColorPicker fx:id="backgroundColorPicker"
+                                                             onAction="#setBackgroundColor" prefWidth="1000.0"/>
+                                                <Label/>
                                             </children>
                                             <padding>
                                                 <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
@@ -128,10 +169,10 @@
                                         </VBox>
                                         <VBox prefWidth="150.0" spacing="4.0">
                                             <children>
-                                                <Label text="ColorPicker2" />
-                                                <ColorPicker onAction="#setColor2" prefWidth="1000.0" />
-                                                <Label text="ColorPicker4" />
-                                                <ColorPicker onAction="#setColor4" prefWidth="1000.0" />
+                                                <Label text="Selected ball color"/>
+                                                <ColorPicker fx:id="ballColorPicker"
+                                                             onAction="#setSelectedBallColor" prefWidth="1000.0"/>
+                                                <Label/>
                                             </children>
                                             <padding>
                                                 <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />

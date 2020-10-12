@@ -7,13 +7,11 @@ import java.util.Set;
 
 public class PhysicsEngine {
 
-    private static final double G_EARTH = 9.81; // m/s^2
-    private static final double GRAVITATION_CONSTANT = 6.67e-11; //m^3/(kg * s^2)
+    public static final double DENSITY = 100; // kg/m^3
 
-    public static final double DENSITY_IRON = 7.870; // kg/m^3
-
-    private static double gravity = GRAVITATION_CONSTANT;
-
+    private static float pullFactor;
+    private static float repelFactor;
+    private static double repelDistanceFactor;
     /*
      * Fg = (G * m_self * m_other) / r^2
      * F_res = m_self * a ->
@@ -23,18 +21,37 @@ public class PhysicsEngine {
      * a = (G * m_other) / r^2
      */
 
-    private static Point2D getAccelerationCausedByBallInPerceptionRadius(Ball2D self, Ball2D other) {
-        Point2D dirAcceleration = other.getCenterPosition().subtract(self.getCenterPosition()).normalize();
+    private static Point2D getAccelerationProfile1(Ball2D self, Ball2D other) {
+        Point2D unitVectorInAccDir = other.getCenterPosition().subtract(self.getCenterPosition()).normalize();
         double distance = self.getCenterPosition().subtract(other.getCenterPosition()).magnitude();
-        double accelerationMagnitude = gravity * other.getMass() / (distance * distance);
-        return dirAcceleration.multiply(accelerationMagnitude);
-
+        double attractionMagnitude = pullFactor * other.getMass() / (distance * distance);
+        double repelMagnitude = repelFactor * other.getMass() / (distance * distance);
+        Point2D acceleration;
+        if (distance <= (self.getBody().getRadius() + other.getBody().getRadius()) * repelDistanceFactor) {
+            acceleration = unitVectorInAccDir.multiply(-repelMagnitude);
+        } else acceleration = unitVectorInAccDir.multiply(attractionMagnitude);
+        return acceleration;
     }
 
-    public static Point2D getTotalAccelerationByMassAndOtherBallsInPerceptionRadius(Ball2D self, Set<Ball2D> ballsInPerceptionRadius) {
+    private static Point2D getAccelerationProfile2(Ball2D self, Ball2D other) {
+        Point2D unitVectorInAccDir = other.getCenterPosition().subtract(self.getCenterPosition()).normalize();
+        float distance = (float) self.getCenterPosition().subtract(other.getCenterPosition()).magnitude();
+
+        float threshHold = (float) ((self.getBody().getRadius() + other.getBody().getRadius()) * repelDistanceFactor);
+        float curveFitConstant = (float) (other.getMass() * (pullFactor + repelFactor) / (threshHold * threshHold));
+        float attractionMagnitude = pullFactor * (float) other.getMass() / (distance * distance);
+        float repelMagnitude = -repelFactor * (float) other.getMass() / (distance * distance) + curveFitConstant;
+        Point2D acceleration;
+        if (distance <= threshHold) {
+            acceleration = unitVectorInAccDir.multiply(repelMagnitude);
+        } else acceleration = unitVectorInAccDir.multiply(attractionMagnitude);
+        return acceleration;
+    }
+
+    public static Point2D getAccelerationOfBall(Ball2D self, Set<Ball2D> ballsInPerceptionRadius) {
         Point2D totalAcceleration = Point2D.ZERO;
         for (Ball2D other : ballsInPerceptionRadius) {
-            Point2D acceleration = getAccelerationCausedByBallInPerceptionRadius(self, other);
+            Point2D acceleration = getAccelerationProfile1(self, other);
             totalAcceleration = totalAcceleration.add(acceleration);
         }
         return totalAcceleration;
@@ -46,7 +63,15 @@ public class PhysicsEngine {
      *
      */
 
-    public static void setGravity(double gravity) {
-        PhysicsEngine.gravity = gravity;
+    public static void setPullFactor(double pullFactor) {
+        PhysicsEngine.pullFactor = (float) pullFactor;
+    }
+
+    public static void setRepelFactor(double repelFactor) {
+        PhysicsEngine.repelFactor = (float) repelFactor;
+    }
+
+    public static void setRepelDistanceFactor(double repelDistanceFactor) {
+        PhysicsEngine.repelDistanceFactor = repelDistanceFactor;
     }
 }

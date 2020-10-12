@@ -66,10 +66,6 @@ public abstract class AbstractSceneController implements Controller {
 
     }
 
-    public String getSceneName() {
-        return sceneName;
-    }
-
     public String getFxmlFileName() {
         return fxmlFileName;
     }
