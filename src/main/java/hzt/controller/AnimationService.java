@@ -1,20 +1,24 @@
-package hzt.controller.main_scene;
+package hzt.controller;
 
-import hzt.controller.utils.PhysicsEngine;
+import hzt.controller.main_scene.MainSceneController;
+import hzt.controller.main_scene.StatisticsService;
 import hzt.model.entity.Ball2D;
-import hzt.model.entity.BallGroup;
+import hzt.model.entity.Flock;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Node;
 import javafx.util.Duration;
 
-import java.util.Set;
+import java.time.LocalTime;
 
 public class AnimationService {
 
-    public static final int INIT_FRAME_RATE = 60; // f/s
+    public static final int INIT_FRAME_RATE = 30; // f/s
     public static final Duration INIT_FRAME_DURATION = Duration.seconds(1. / INIT_FRAME_RATE); // s/f
+
+    public static final int LINE_STROKE_WIDTH = 2;
 
     private final MainSceneController mainSceneController;
     private final StatisticsService statisticsService;
@@ -38,29 +42,24 @@ public class AnimationService {
         if (start) timeline.play();
     }
 
-    public void run(BallGroup group, double accelerationMultiplier, double frictionFactor, boolean gravity) {
-        group.getChildren().forEach(ball2D -> {
-            Ball2D ball = (Ball2D) ball2D;
-            ball.update(timeline.getCycleDuration(), accelerationMultiplier);
-            ball.addFriction(frictionFactor);
-            Set<Ball2D> ballsSet = ball.getBallsInPerceptionRadiusMap().keySet();
-            if (gravity) ball.setAcceleration(PhysicsEngine.getTotalAccelerationByMassAndOtherBallsInPerceptionRadius(ball, ballsSet));
-        });
+    public void run(Flock flock, double accelerationMultiplier, double frictionFactor, boolean bounce, double maxSpeed) {
         Ball2D selected = mainSceneController.getBallGroup().getSelectedBall();
         statisticsService.showStatisticsAboutSelectedBall(selected);
-        statisticsService.showGlobalStatistics(frictionFactor, timeline.getCycleDuration(), group.getChildren().size(), mainSceneController.getAppManager().getRunTimeSim());
-    }
-
-    public void removeKeyFrameFromTimeline(KeyFrame keyFrame) {
-        timeline.getKeyFrames().remove(keyFrame);
+        LocalTime startTimeSim = mainSceneController.getAppManager().startTimeSim, stopTimeSim = LocalTime.now();
+        Duration runTimeSim = Duration.millis((stopTimeSim.toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
+        statisticsService.showGlobalStatistics(frictionFactor, timeline.getCycleDuration(),
+                flock.getChildren().size(), runTimeSim);
+        for (Node ball2D : flock.getChildren()) {
+            Ball2D ball = (Ball2D) ball2D;
+            ball.addFriction(frictionFactor);
+            if (bounce) ball.bounceOfEdges(mainSceneController.getAnimationWindowDimension());
+            else ball.floatThroughEdges(mainSceneController.getAnimationWindowDimension());
+            ball.update(timeline.getCycleDuration(), accelerationMultiplier, maxSpeed);
+        }
     }
 
     public void startTimeline() {
         timeline.play();
-    }
-
-    public void stopTimeline() {
-        timeline.stop();
     }
 
     public void pauseTimeline() {

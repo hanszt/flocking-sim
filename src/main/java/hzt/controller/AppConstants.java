@@ -1,6 +1,9 @@
 package hzt.controller;
 
-public abstract class AppConstants {
+public class AppConstants {
+
+    public AppConstants() {
+    }
 
     public static final String FXML_FILE_LOCATION = "/hzt/view/fxml/";
 
@@ -10,7 +13,7 @@ public abstract class AppConstants {
     private static final String ANSI_GREEN = "\u001B[32m";
     private static final String ANSI_BRIGHT_RED = "\u001B[91m";
 
-    public static final String TITLE = "2DDynamicsSim";
+    public static final String TITLE = "Flocking Simulation";
     public static final String DOTTED_LINE = "----------------------------------------------------------------------------------------\n";
     public static final String CLOSING_MESSAGE = ANSI_BLUE +
             "See you next Time! :)" +

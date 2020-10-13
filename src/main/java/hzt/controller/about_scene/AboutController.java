@@ -2,7 +2,6 @@ package hzt.controller.about_scene;
 
 import hzt.controller.AbstractSceneController;
 import hzt.controller.AppManager;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 
 import static hzt.controller.AppConstants.Scene.ABOUT_SCENE;
@@ -11,7 +10,7 @@ import static hzt.controller.AppConstants.Scene.MAIN_SCENE;
 public class AboutController extends AbstractSceneController {
 
     public AboutController(AppManager appManager) {
-        super(ABOUT_SCENE.getEnglishDescription(), ABOUT_SCENE.getFxmlFileName(), appManager);
+        super(ABOUT_SCENE.getFxmlFileName(), appManager);
     }
 
     @Override
@@ -21,7 +20,8 @@ public class AboutController extends AbstractSceneController {
 
     @FXML
     public void goBack() {
-        appManager.setupScene(MAIN_SCENE);
+        AbstractSceneController mc = appManager.getSceneControllerMap().get(MAIN_SCENE);
+        appManager.getStage().setScene(mc.getScene());
     }
 
     protected AbstractSceneController getBean() {
