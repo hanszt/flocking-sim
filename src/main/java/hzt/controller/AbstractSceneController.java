@@ -1,7 +1,6 @@
 package hzt.controller;
 
 import hzt.Launcher;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,13 +14,11 @@ import static hzt.controller.AppConstants.Scene.ABOUT_SCENE;
 
 public abstract class AbstractSceneController implements Controller {
 
-    private final String sceneName;
     private final String fxmlFileName;
     protected final AppManager appManager;
     protected Scene scene;
 
-    public AbstractSceneController(String sceneName, String fxmlFileName, AppManager appManager) {
-        this.sceneName = sceneName;
+    public AbstractSceneController(String fxmlFileName, AppManager appManager) {
         this.fxmlFileName = fxmlFileName;
         this.appManager = appManager;
         FXMLLoader fxmlLoader = new FXMLLoader();
@@ -57,13 +54,8 @@ public abstract class AbstractSceneController implements Controller {
     }
 
     @FXML
-    void showAbout(ActionEvent event) {
+    void showAbout() {
         appManager.setupScene(ABOUT_SCENE);
-    }
-
-    @FXML
-    void showPreferences(ActionEvent event) {
-
     }
 
     public String getFxmlFileName() {

@@ -34,18 +34,11 @@
             <menus>
                 <Menu mnemonicParsing="false" text="File">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#showPreferences" text="Preferences…"/>
                         <MenuItem mnemonicParsing="false" onAction="#newInstance" text="New instance…"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem mnemonicParsing="false" onAction="#quitInstance" text="Quit instance"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem mnemonicParsing="false" onAction="#exitProgram" text="Exit"/>
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Tools">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="show statistics"/>
-                        <MenuItem mnemonicParsing="false" text="show charts"/>
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="Help">
@@ -163,7 +156,8 @@
                                         </VBox>
                                         <VBox prefWidth="150.0" spacing="4.0">
                                             <children>
-                                                <Button mnemonicParsing="false" prefWidth="1000.0" text="New instance"/>
+                                                <Button mnemonicParsing="false" onAction="#newInstance"
+                                                        prefWidth="1000.0" text="New instance"/>
                                                 <ToggleButton mnemonicParsing="false" onAction="#setTransparent"
                                                               prefWidth="1000.0" text="Transparent"/>
                                                 <ToggleButton fx:id="showPerceptionButton" layoutX="14.0" layoutY="72.0"

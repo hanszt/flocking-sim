@@ -30,7 +30,7 @@ public class MainSceneController extends AbstractSceneController {
     private final AnimationService as;
 
     public MainSceneController(AppManager appManager) {
-        super(MAIN_SCENE.getEnglishDescription(), MAIN_SCENE.getFxmlFileName(), appManager);
+        super(MAIN_SCENE.getFxmlFileName(), appManager);
         as = new AnimationService(this);
         flock = new Flock(as);
     }

@@ -20,4 +20,7 @@ public abstract class AppVars {
         return stage;
     }
 
+    public Map<AppConstants.Scene, AbstractSceneController> getSceneControllerMap() {
+        return sceneControllerMap;
+    }
 }
