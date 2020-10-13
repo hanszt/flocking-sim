@@ -10,7 +10,9 @@ import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.*;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.StrokeType;
 import javafx.util.Duration;
 
 import java.util.HashMap;
@@ -19,8 +21,8 @@ import java.util.Set;
 import java.util.Stack;
 
 import static hzt.controller.AnimationService.LINE_STROKE_WIDTH;
-import static hzt.controller.utils.PhysicsEngine.DENSITY;
-import static hzt.controller.utils.PhysicsEngine.getAccelerationOfBall;
+import static hzt.controller.main_scene.MainSceneController.ENGINE_TYPE_1;
+import static hzt.controller.utils.PhysicsEngine.*;
 import static hzt.model.entity.Flock.*;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
@@ -41,8 +43,6 @@ public class Ball2D extends Group {
     private Point2D velocity; // pixel/s
     private Point2D acceleration; // pixel/s^2
 
-    private double keyPressedAccIncrement;
-
     public Ball2D(String name, double radius, Paint initPaint) {
         this.name = name;
         this.initPaint = initPaint;
@@ -60,10 +60,13 @@ public class Ball2D extends Group {
         perceptionCircle.setFill(TRANSPARENT);
         perceptionCircle.centerXProperty().bind(body.centerXProperty());
         perceptionCircle.centerYProperty().bind(body.centerYProperty());
+        path.setPathVisible(false);
         configureLine(visibleVelocityVector);
         configureLine(visibleAccelerationVector);
-        path.setVisible(false);
         updatePaint(initPaint);
+    }
+
+    public void addComponents() {
         super.getChildren().addAll(body, perceptionCircle, visibleVelocityVector, visibleAccelerationVector, path);
     }
 
@@ -83,10 +86,13 @@ public class Ball2D extends Group {
         Flock flock = (Flock) this.getParent();
         keyPressedAccIncrement = accelerationMultiplier / deltaT.toSeconds();
         Set<Ball2D> ballsSet = ballsInPerceptionRadiusMap.keySet();
-        prevAttractionComponent = addComponentToAcceleration(getAccelerationOfBall(this, ballsSet), prevAttractionComponent);
+        Point2D physicsEngineAcceleration = flock.getPhysicsEngine().equals(ENGINE_TYPE_1) ?
+                getAccProfile1(this, ballsSet) : getAccProfile2(this, ballsSet);
+        prevAttractionComponent = addComponentToAcceleration(physicsEngineAcceleration, prevAttractionComponent);
         updateBallsInPerceptionRadiusMap();
         updateVisibleVector(visibleVelocityVector, velocity, MAX_VISIBLE_SPEED_VECTOR_LENGTH);
         updateVisibleVector(visibleAccelerationVector, acceleration, MAX_VISIBLE_ACCELERATION_VECTOR_LENGTH);
+        updatePath();
         perceptionCircle.setVisible(flock.isShowPerceptionCircle());
         visibleVelocityVector.setVisible(flock.isShowVelocityVector());
         visibleAccelerationVector.setVisible(flock.isShowAccelerationVector());
@@ -121,18 +127,13 @@ public class Ball2D extends Group {
             lineToOther.setEndX(otherBall.getBody().getCenterX());
             lineToOther.setEndY(otherBall.getBody().getCenterY());
             if (!this.getChildren().contains(lineToOther)) this.getChildren().add(lineToOther);
-            updatePath();
         }
     }
 
     private void updatePath() {
         int size = path.getElements().size();
-        path.getElements().add(new MoveTo(prevCenterPosition.getX(), prevCenterPosition.getY()));
-        path.getElements().add(new LineTo(body.getCenterX(), body.getCenterY()));
-        if (size >= MAX_PATH_SIZE) {
-            path.getElements().remove(size - 1);
-            path.getElements().remove(size - 2);
-        }
+        path.addLine(getCenterPosition(), prevCenterPosition);
+        if (size >= MAX_PATH_SIZE) path.removeLine(0);
     }
 
     private void updateBallsInPerceptionRadiusMap() {
@@ -248,6 +249,7 @@ public class Ball2D extends Group {
         addKeyControlForAcceleration(KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D);
     }
 
+    private double keyPressedAccIncrement;
     private boolean upPressed, downPressed, leftPressed, rightPressed;
 
     public void addKeyControlForAcceleration(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {

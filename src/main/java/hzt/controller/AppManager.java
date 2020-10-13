@@ -21,7 +21,7 @@ public class AppManager extends AppVars {
 
     public AppManager(Stage stage) {
         super(stage);
-        startTimeSim= LocalTime.now();
+        startTimeSim = LocalTime.now();
         System.out.printf("Starting instance %d of %s at %s...\n", instance, TITLE, startTimeSim.toString().substring(0, 5));
         sceneControllerMap.put(MAIN_SCENE, new MainSceneController(this));
         sceneControllerMap.put(ABOUT_SCENE, new AboutController(this));

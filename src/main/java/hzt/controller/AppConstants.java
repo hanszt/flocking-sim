@@ -1,6 +1,9 @@
 package hzt.controller;
 
-public abstract class AppConstants {
+public class AppConstants {
+
+    public AppConstants() {
+    }
 
     public static final String FXML_FILE_LOCATION = "/hzt/view/fxml/";
 

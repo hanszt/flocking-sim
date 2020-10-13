@@ -11,7 +11,7 @@ public class PhysicsEngine {
 
     private static float pullFactor;
     private static float repelFactor;
-    private static double repelDistanceFactor;
+    private static float repelDistanceFactor;
     /*
      * Fg = (G * m_self * m_other) / r^2
      * F_res = m_self * a ->
@@ -20,35 +20,7 @@ public class PhysicsEngine {
      * <p>
      * a = (G * m_other) / r^2
      */
-
-    private static Point2D getAccelerationProfile1(Ball2D self, Ball2D other) {
-        Point2D unitVectorInAccDir = other.getCenterPosition().subtract(self.getCenterPosition()).normalize();
-        double distance = self.getCenterPosition().subtract(other.getCenterPosition()).magnitude();
-        double attractionMagnitude = pullFactor * other.getMass() / (distance * distance);
-        double repelMagnitude = repelFactor * other.getMass() / (distance * distance);
-        Point2D acceleration;
-        if (distance <= (self.getBody().getRadius() + other.getBody().getRadius()) * repelDistanceFactor) {
-            acceleration = unitVectorInAccDir.multiply(-repelMagnitude);
-        } else acceleration = unitVectorInAccDir.multiply(attractionMagnitude);
-        return acceleration;
-    }
-
-    private static Point2D getAccelerationProfile2(Ball2D self, Ball2D other) {
-        Point2D unitVectorInAccDir = other.getCenterPosition().subtract(self.getCenterPosition()).normalize();
-        float distance = (float) self.getCenterPosition().subtract(other.getCenterPosition()).magnitude();
-
-        float threshHold = (float) ((self.getBody().getRadius() + other.getBody().getRadius()) * repelDistanceFactor);
-        float curveFitConstant = (float) (other.getMass() * (pullFactor + repelFactor) / (threshHold * threshHold));
-        float attractionMagnitude = pullFactor * (float) other.getMass() / (distance * distance);
-        float repelMagnitude = -repelFactor * (float) other.getMass() / (distance * distance) + curveFitConstant;
-        Point2D acceleration;
-        if (distance <= threshHold) {
-            acceleration = unitVectorInAccDir.multiply(repelMagnitude);
-        } else acceleration = unitVectorInAccDir.multiply(attractionMagnitude);
-        return acceleration;
-    }
-
-    public static Point2D getAccelerationOfBall(Ball2D self, Set<Ball2D> ballsInPerceptionRadius) {
+    public static Point2D getAccProfile1(Ball2D self, Set<Ball2D> ballsInPerceptionRadius) {
         Point2D totalAcceleration = Point2D.ZERO;
         for (Ball2D other : ballsInPerceptionRadius) {
             Point2D acceleration = getAccelerationProfile1(self, other);
@@ -56,12 +28,44 @@ public class PhysicsEngine {
         }
         return totalAcceleration;
     }
+    private static Point2D getAccelerationProfile1(Ball2D self, Ball2D other) {
+        Point2D vectorSelfToOther = other.getCenterPosition().subtract(self.getCenterPosition());
+        Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
+        float distance = (float) vectorSelfToOther.magnitude();
+        float part2Formula = (float) other.getMass() / (distance * distance);
+        float threshHold = (float) (self.getBody().getRadius() + other.getBody().getRadius()) * repelDistanceFactor;
+        float attractionMagnitude = pullFactor * part2Formula;
+        float repelMagnitude = repelFactor * part2Formula;
 
-    /*
-     *
-     *
-     *
-     */
+        Point2D acceleration;
+        if (distance <= threshHold) acceleration = unitVectorInAccDir.multiply(-repelMagnitude);
+        else acceleration = unitVectorInAccDir.multiply(attractionMagnitude);
+        return acceleration;
+    }
+
+    public static Point2D getAccProfile2(Ball2D self, Set<Ball2D> ballsInPerceptionRadius) {
+        Point2D totalAcceleration = Point2D.ZERO;
+        for (Ball2D other : ballsInPerceptionRadius) {
+            Point2D acceleration = getAccelerationProfile2(self, other);
+            totalAcceleration = totalAcceleration.add(acceleration);
+        }
+        return totalAcceleration;
+    }
+
+    private static Point2D getAccelerationProfile2(Ball2D self, Ball2D other) {
+        Point2D vectorSelfToOther = other.getCenterPosition().subtract(self.getCenterPosition());
+        Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
+        float distance = (float) vectorSelfToOther.magnitude();
+        float part2Formula = (float) other.getMass() / (distance * distance);
+        float threshHold = (float) ((self.getBody().getRadius() + other.getBody().getRadius()) * repelDistanceFactor);
+        float curveFitConstant = (float) (other.getMass() * (pullFactor + repelFactor) / (threshHold * threshHold));
+        float attractionMagnitude = pullFactor * part2Formula;
+        float repelMagnitude = -repelFactor * part2Formula + curveFitConstant;
+        Point2D acceleration;
+        if (distance <= threshHold) acceleration = unitVectorInAccDir.multiply(repelMagnitude);
+        else acceleration = unitVectorInAccDir.multiply(attractionMagnitude);
+        return acceleration;
+    }
 
     public static void setPullFactor(double pullFactor) {
         PhysicsEngine.pullFactor = (float) pullFactor;
@@ -72,6 +76,6 @@ public class PhysicsEngine {
     }
 
     public static void setRepelDistanceFactor(double repelDistanceFactor) {
-        PhysicsEngine.repelDistanceFactor = repelDistanceFactor;
+        PhysicsEngine.repelDistanceFactor = (float) repelDistanceFactor;
     }
 }

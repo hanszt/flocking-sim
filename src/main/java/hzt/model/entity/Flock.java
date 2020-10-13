@@ -1,9 +1,11 @@
 package hzt.model.entity;
 
 import hzt.controller.AnimationService;
+import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 
@@ -16,19 +18,20 @@ import static hzt.controller.utils.RandomGenerator.*;
 public class Flock extends Pane {
 
     public static final int MIN_RADIUS = 3, MAX_RADIUS = 10;
-    static final int MAX_PATH_SIZE = 5000;
+    static final int MAX_PATH_SIZE = 200;
     static final int MAX_VISIBLE_VECTOR_LENGTH = 100;
     public static final double MAX_VISIBLE_SPEED_VECTOR_LENGTH = 300, MAX_VISIBLE_ACCELERATION_VECTOR_LENGTH = 1000;
-    public static final Color INIT_UNIFORM_BALL_COLOR = Color.ORANGE;
+    public static final Color INIT_UNIFORM_BALL_COLOR = Color.ORANGE, INIT_SELECTED_BALL_COLOR = Color.RED;
 
     private final AnimationService as;
 
     private Ball2D selectedBall;
     double perceptionRadiusRatio;
-    private boolean showConnections, showPerceptionCircle, showVelocityVector, showAccelerationVector;
+    private boolean showConnections, showPerceptionCircle, showVelocityVector, showAccelerationVector, showPath;
     private double maxBallSize = MAX_RADIUS;
     private Color uniformBallColor = INIT_UNIFORM_BALL_COLOR;
-    private String flockType;
+    private Color selectedBallColor = INIT_SELECTED_BALL_COLOR;
+    private String flockType, physicsEngine;
 
     public Flock(AnimationService as) {
         //Size is zero so it does not influence the rest of the layout when balls are moved
@@ -45,6 +48,7 @@ public class Flock extends Pane {
                 ball2D.setPerceptionRadius(ball2D.getBody().getRadius() * perceptionRadiusRatio);
                 addMouseFunctionality(ball2D);
                 this.getChildren().add(ball2D);
+                ball2D.addComponents();
             } else {
                 Node ball2D = this.getChildren().get(0);
                 this.getChildren().remove(ball2D);
@@ -59,26 +63,36 @@ public class Flock extends Pane {
     }
 
     public void addMouseFunctionality(Ball2D ball) {
-        ball.getBody().setOnMousePressed(e -> {
-            ball.updatePaint(Color.RED);
-            ball.setCenterPosition(e.getX(), e.getY());
+        ball.getBody().setOnMousePressed(onMousePressed(ball));
+        Stack<Point2D> dragPoints = new Stack<>();
+        ball.getBody().setOnMouseDragged(onMouseDragged(ball, dragPoints));
+        ball.getBody().setOnMouseReleased(e -> ball.setSpeedBasedOnMouseDrag(dragPoints, as.getTimeline().getCycleDuration()));
+    }
+
+    private EventHandler<MouseEvent> onMousePressed(Ball2D ball) {
+        return mouseEvent -> {
+            ball.updatePaint(selectedBallColor);
+            ball.setCenterPosition(mouseEvent.getX(), mouseEvent.getY());
             ball.setVelocity(Point2D.ZERO);
+            ball.getPath().setVisible(showPath);
             if (!ball.equals(selectedBall)) {
                 ball.addKeyControlForAcceleration();
                 if (selectedBall != null) {
                     selectedBall.removeKeyControlsForAcceleration();
+                    selectedBall.getPath().setPathVisible(false);
                     selectedBall.updatePaint(selectedBall.getInitPaint());
                 }
                 selectedBall = ball;
             }
-        });
-        Stack<Point2D> dragPoints = new Stack<>();
-        ball.getBody().setOnMouseDragged(e -> {
+        };
+    }
+
+    private EventHandler<MouseEvent> onMouseDragged(Ball2D ball, Stack<Point2D> dragPoints) {
+        return e -> {
             ball.getBody().setCenterX(e.getX());
             ball.getBody().setCenterY(e.getY());
             dragPoints.add(ball.getCenterPosition());
-        });
-        ball.getBody().setOnMouseReleased(e -> ball.setSpeedBasedOnMouseDrag(dragPoints, as.getTimeline().getCycleDuration()));
+        };
     }
 
     public Ball2D getSelectedBall() {
@@ -121,31 +135,31 @@ public class Flock extends Pane {
         this.showAccelerationVector = showAccelerationVector;
     }
 
-    public double getMaxBallSize() {
-        return maxBallSize;
-    }
-
     public void setMaxBallSize(double maxBallSize) {
         this.maxBallSize = maxBallSize;
-    }
-
-    public Color getUniformBallColor() {
-        return uniformBallColor;
-    }
-
-    public String getFlockType() {
-        return flockType;
     }
 
     public void setFlockType(String flockType) {
         this.flockType = flockType;
     }
 
+    public void setSelectedBallColor(Color selectedBallColor) {
+        this.selectedBallColor = selectedBallColor;
+    }
+
     public void setUniformBallColor(Color uniformBallColor) {
         this.uniformBallColor = uniformBallColor;
     }
 
-    public void reset() {
+    public void setShowPath(boolean showPath) {
+        this.showPath = showPath;
     }
 
+    public String getPhysicsEngine() {
+        return physicsEngine;
+    }
+
+    public void setPhysicsEngine(String physicsEngine) {
+        this.physicsEngine = physicsEngine;
+    }
 }
