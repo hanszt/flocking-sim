@@ -1,4 +1,4 @@
-# 2DDynamicsSim
+# Flocking Simulation
 
 A program to practice, simulating 2D motions
 
@@ -16,19 +16,39 @@ source: https://openjfx.io/openjfx-docs/#IDE-Intellij
 
 ## Requirements
 
-## Input
+## Screenshots
 
-## About
-
-## Definition
+screenshot 1  A preview of the application
+![FlockingSim](src/main/resources/images/example1.jpg)
 
 ## Background
-In the physical science of dynamics, rigid-body dynamics studies the movement of systems of interconnected bodies under the action of external forces. The assumption that the bodies are rigid (i.e. they do not deform under the action of applied forces) simplifies analysis, by reducing the parameters that describe the configuration of the system to the translation and rotation of reference frames attached to each body.[1][2] This excludes bodies that display fluid, highly elastic, and plastic behavior.
+Boids is an artificial life program, developed by Craig Reynolds in 1986, which simulates the flocking behaviour of birds. His paper on this topic was published in 1987 in the proceedings of the ACM SIGGRAPH conference. [1] The name "boid" corresponds to a shortened version of "bird-oid object", which refers to a bird-like object.[2] Incidentally, "boid" is also a New York Metropolitan dialect pronunciation for "bird".
+Rules applied in simple Boids
+Separation
+Alignment
+Cohesion
 
-The dynamics of a rigid body system is described by the laws of kinematics and by the application of Newton's second law (kinetics) or their derivative form, Lagrangian mechanics. The solution of these equations of motion provides a description of the position, the motion and the acceleration of the individual components of the system, and overall the system itself, as a function of time. The formulation and solution of rigid body dynamics is an important tool in the computer simulation of mechanical systems. 
+As with most artificial life simulations, Boids is an example of emergent behavior; that is, the complexity of Boids arises from the interaction of individual agents (the boids, in this case) adhering to a set of simple rules. The rules applied in the simplest Boids world are as follows:
 
+    separation: steer to avoid crowding local flockmates
+    alignment: steer towards the average heading of local flockmates
+    cohesion: steer to move towards the average position (center of mass) of local flockmates
+
+More complex rules can be added, such as obstacle avoidance and goal seeking.
+
+The basic model has been extended in several different ways since Reynolds proposed it. For instance, Delgado-Mata et al.[3] extended the basic model to incorporate the effects of fear. Olfaction was used to transmit emotion between animals, through pheromones modelled as particles in a free expansion gas. Hartman and Benes[4] introduced a complementary force to the alignment that they call the change of leadership. This steer defines the chance of the boid to become a leader and try to escape.
+
+The movement of Boids can be characterized as either chaotic (splitting groups and wild behaviour) or orderly. Unexpected behaviours, such as splitting flocks and reuniting after avoiding obstacles, can be considered emergent.
+
+The boids framework is often used in computer graphics, providing realistic-looking representations of flocks of birds and other creatures, such as schools of fish or herds of animals. It was for instance used in the 1998 video game Half-Life for the flying bird-like creatures seen at the end of the game on Xen, named "boid" in the game files.
+
+The Boids model can be used for direct control and stabilization of teams of simple Unmanned Ground Vehicles (UGV)[5] or Micro Aerial Vehicles (MAV)[6] in swarm robotics. For stabilization of heterogeneous UAV-UGV teams, the model was adapted for using onboard relative localization by Saska et al.[7]
+
+At the time of proposal, Reynolds' approach represented a giant step forward compared to the traditional techniques used in computer animation for motion pictures. The first animation created with the model was Stanley and Stella in: Breaking the Ice (1987), followed by a feature film debut in Tim Burton's film Batman Returns (1992) with computer generated bat swarms and armies of penguins marching through the streets of Gotham City.[8]
+
+The boids model has been used for other interesting applications. It has been applied to automatically program Internet multi-channel radio stations.[9] It has also been used for visualizing information[10] and for optimization tasks.[11] 
 ## Motivation
 
 ## Sources
-[Rigid body dynamics wiki](https://en.wikipedia.org/wiki/Rigid_body_dynamics)
+[Flocking sim](https://en.wikipedia.org/wiki/Boids)
 
