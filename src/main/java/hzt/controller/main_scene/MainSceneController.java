@@ -3,7 +3,7 @@ package hzt.controller.main_scene;
 import hzt.controller.AbstractSceneController;
 import hzt.controller.AnimationService;
 import hzt.controller.AppManager;
-import hzt.controller.utils.PhysicsEngine;
+import hzt.controller.utils.Engine;
 import hzt.model.entity.Ball2D;
 import hzt.model.entity.Flock;
 import javafx.event.ActionEvent;
@@ -15,6 +15,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.util.StringConverter;
 
 import static hzt.controller.AppConstants.STAGE_OPACITY;
 import static hzt.controller.AppConstants.Scene.MAIN_SCENE;
@@ -28,9 +29,11 @@ public class MainSceneController extends AbstractSceneController {
 
     private final Flock flock;
     private final AnimationService as;
+    private final Engine engine;
 
     public MainSceneController(AppManager appManager) {
         super(MAIN_SCENE.getFxmlFileName(), appManager);
+        engine = new Engine();
         as = new AnimationService(this);
         flock = new Flock(as);
     }
@@ -77,7 +80,7 @@ public class MainSceneController extends AbstractSceneController {
     private HBox slidersPane;
 
     @FXML
-    private ComboBox<String> physicsEngineComboBox;
+    private ComboBox<Engine.FlockingSim> physicsEngineComboBox;
     @FXML
     private ComboBox<String> flockSettingsComboBox;
 
@@ -89,6 +92,8 @@ public class MainSceneController extends AbstractSceneController {
     private ToggleButton showPathButton;
     @FXML
     private ToggleButton showPerceptionButton;
+    @FXML
+    private ToggleButton showRepelCircleButton;
     @FXML
     private ToggleButton showAccelerationVectorButton;
     @FXML
@@ -150,9 +155,8 @@ public class MainSceneController extends AbstractSceneController {
         configureColorPickers();
         configureComboBoxes();
         setupFlock();
-        PhysicsEngine.setPullFactor(attractionSlider.getValue());
-        PhysicsEngine.setRepelFactor(repelFactorSlider.getValue());
-        PhysicsEngine.setRepelDistanceFactor(repelDistanceSlider.getValue());
+        engine.setPullFactor(attractionSlider.getValue());
+        engine.setRepelFactor(repelFactorSlider.getValue());
         animationPane.getChildren().add(flock);
         animationPane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
         EventHandler<ActionEvent> animationLoop = initializeAnimationLoop();
@@ -160,13 +164,28 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     public static final String RANDOM_FLOCK = "Random flock", UNIFORM_FLOCK = "Uniform Flock";
-    public static final String ENGINE_TYPE_1 = "Engine type 1", ENGINE_TYPE_2 = "Engine type 2";
 
     private void configureComboBoxes() {
         flockSettingsComboBox.getItems().addAll(RANDOM_FLOCK, UNIFORM_FLOCK);
         flockSettingsComboBox.setValue(RANDOM_FLOCK);
-        physicsEngineComboBox.getItems().addAll(ENGINE_TYPE_1, ENGINE_TYPE_2);
-        physicsEngineComboBox.setValue(ENGINE_TYPE_1);
+        physicsEngineComboBox.getItems().addAll(engine.getType1(), engine.getType2());
+        physicsEngineComboBox.setConverter(getStringConverter());
+        physicsEngineComboBox.setValue(engine.getType1());
+    }
+
+    private StringConverter<Engine.FlockingSim> getStringConverter() {
+
+        return new StringConverter<>() {
+            @Override
+            public String toString(Engine.FlockingSim item) {
+                return item.getName();
+            }
+
+            @Override
+            public Engine.FlockingSim fromString(String id) {
+                return null;
+            }
+        };
     }
 
     private EventHandler<ActionEvent> initializeAnimationLoop() {
@@ -197,14 +216,16 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     private void setupFlock() {
+        flock.setEngine(engine.getType1());
         flock.setShowVelocityVector(velocityButton.isSelected());
         flock.setShowAccelerationVector(showAccelerationVectorButton.isSelected());
         flock.setShowPerceptionCircle(showPerceptionButton.isSelected());
+        flock.setShowRepelCircle(showRepelCircleButton.isSelected());
         flock.setShowConnections(showConnectionsButton.isSelected());
         flock.setPerceptionRadiusRatio(perceptionRadiusSlider.getValue());
+        flock.setRepelRadiusRatio(repelDistanceSlider.getValue());
         flock.setMaxBallSize(maxBallSizeSlider.getValue());
         flock.setFlockType(flockSettingsComboBox.getValue());
-        flock.setPhysicsEngine(physicsEngineComboBox.getValue());
         var parentDimension = getAnimationWindowDimension();
         var numberOfBalls = (int) numberOfBallsSlider.getValue();
         flock.controlFlockSize(numberOfBalls, parentDimension);
@@ -218,9 +239,15 @@ public class MainSceneController extends AbstractSceneController {
                 ball.setPerceptionRadius(ball.getBody().getRadius() * newVal.doubleValue());
             }
         });
-        attractionSlider.valueProperty().addListener((oldVal, curVal, newVal) -> PhysicsEngine.setPullFactor(newVal.doubleValue()));
-        repelFactorSlider.valueProperty().addListener((oldVal, curVal, newVal) -> PhysicsEngine.setRepelFactor(newVal.doubleValue()));
-        repelDistanceSlider.valueProperty().addListener((oldVal, curVal, newVal) -> PhysicsEngine.setRepelDistanceFactor(newVal.doubleValue()));
+        repelDistanceSlider.valueProperty().addListener((oldVal, curVal, newVal) -> {
+            for (Node n : flock.getChildren()) {
+                Ball2D ball = (Ball2D) n;
+                ball.setRepelRadius(ball.getBody().getRadius() * newVal.doubleValue());
+            }
+        });
+        attractionSlider.valueProperty().addListener((oldVal, curVal, newVal) -> engine.setPullFactor(newVal.doubleValue()));
+        repelFactorSlider.valueProperty().addListener((oldVal, curVal, newVal) -> engine.setRepelFactor(newVal.doubleValue()));
+
     }
 
     public void reset() {
@@ -229,6 +256,7 @@ public class MainSceneController extends AbstractSceneController {
         flock.setShowConnections(showConnectionsButton.isSelected());
         flock.setShowVelocityVector(velocityButton.isSelected());
         flock.setShowPerceptionCircle(showPerceptionButton.isSelected());
+        flock.setShowRepelCircle(showRepelCircleButton.isSelected());
     }
 
     private void resetControls() {
@@ -295,6 +323,11 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     @FXML
+    private void showRepelCircles(ActionEvent actionEvent) {
+        flock.setShowRepelCircle(((ToggleButton) actionEvent.getSource()).isSelected());
+    }
+
+    @FXML
     private void showVelocityVector(ActionEvent actionEvent) {
         flock.setShowVelocityVector(((ToggleButton) actionEvent.getSource()).isSelected());
     }
@@ -314,7 +347,7 @@ public class MainSceneController extends AbstractSceneController {
 
     @FXML
     private void physicsEngineComboBoxAction(ActionEvent event) {
-        flock.setPhysicsEngine((String) ((ComboBox<?>) event.getSource()).getValue());
+        flock.setEngine((Engine.FlockingSim) ((ComboBox<?>) event.getSource()).getValue());
     }
 
     @FXML
@@ -370,5 +403,4 @@ public class MainSceneController extends AbstractSceneController {
     public Label getRunTimeLabel() {
         return runTimeLabel;
     }
-
 }

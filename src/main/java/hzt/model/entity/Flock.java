@@ -1,6 +1,7 @@
 package hzt.model.entity;
 
 import hzt.controller.AnimationService;
+import hzt.controller.utils.Engine;
 import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
@@ -23,21 +24,21 @@ public class Flock extends Pane {
     public static final double MAX_VISIBLE_SPEED_VECTOR_LENGTH = 300, MAX_VISIBLE_ACCELERATION_VECTOR_LENGTH = 1000;
     public static final Color INIT_UNIFORM_BALL_COLOR = Color.ORANGE, INIT_SELECTED_BALL_COLOR = Color.RED;
 
-    private final AnimationService as;
+    private final AnimationService animationService;
 
     private Ball2D selectedBall;
-    double perceptionRadiusRatio;
-    private boolean showConnections, showPerceptionCircle, showVelocityVector, showAccelerationVector, showPath;
+    double perceptionRadiusRatio, repelRadiusRatio;
+    private boolean showConnections, showPerceptionCircle, showRepelCircle, showVelocityVector, showAccelerationVector, showPath;
     private double maxBallSize = MAX_RADIUS;
-    private Color uniformBallColor = INIT_UNIFORM_BALL_COLOR;
-    private Color selectedBallColor = INIT_SELECTED_BALL_COLOR;
-    private String flockType, physicsEngine;
+    private Color uniformBallColor = INIT_UNIFORM_BALL_COLOR, selectedBallColor = INIT_SELECTED_BALL_COLOR;
+    private String flockType;
+    private Engine.FlockingSim flockingSim;
 
-    public Flock(AnimationService as) {
+    public Flock(AnimationService animationService) {
         //Size is zero so it does not influence the rest of the layout when balls are moved
         this.setMinSize(0, 0);
         this.setMaxSize(0, 0);
-        this.as = as;
+        this.animationService = animationService;
     }
 
     public void controlFlockSize(int numberOfBalls, Dimension2D parentDimension) {
@@ -46,9 +47,9 @@ public class Flock extends Pane {
                 Ball2D ball2D = createBall();
                 ball2D.setCenterPosition(getRandomPositionOnParent(parentDimension.getWidth(), parentDimension.getHeight()));
                 ball2D.setPerceptionRadius(ball2D.getBody().getRadius() * perceptionRadiusRatio);
+                ball2D.setRepelRadius(ball2D.getBody().getRadius() * repelRadiusRatio);
                 addMouseFunctionality(ball2D);
                 this.getChildren().add(ball2D);
-                ball2D.addComponents();
             } else {
                 Node ball2D = this.getChildren().get(0);
                 this.getChildren().remove(ball2D);
@@ -66,7 +67,7 @@ public class Flock extends Pane {
         ball.getBody().setOnMousePressed(onMousePressed(ball));
         Stack<Point2D> dragPoints = new Stack<>();
         ball.getBody().setOnMouseDragged(onMouseDragged(ball, dragPoints));
-        ball.getBody().setOnMouseReleased(e -> ball.setSpeedBasedOnMouseDrag(dragPoints, as.getTimeline().getCycleDuration()));
+        ball.getBody().setOnMouseReleased(e -> ball.setSpeedBasedOnMouseDrag(dragPoints, animationService.getTimeline().getCycleDuration()));
     }
 
     private EventHandler<MouseEvent> onMousePressed(Ball2D ball) {
@@ -103,6 +104,10 @@ public class Flock extends Pane {
         this.perceptionRadiusRatio = perceptionRadiusRatio;
     }
 
+    public void setRepelRadiusRatio(double repelRadiusRatio) {
+        this.repelRadiusRatio = repelRadiusRatio;
+    }
+
     public boolean isShowConnections() {
         return showConnections;
     }
@@ -117,6 +122,14 @@ public class Flock extends Pane {
 
     public void setShowPerceptionCircle(boolean showPerceptionCircle) {
         this.showPerceptionCircle = showPerceptionCircle;
+    }
+
+    public boolean isShowRepelCircle() {
+        return showRepelCircle;
+    }
+
+    public void setShowRepelCircle(boolean showRepelCircle) {
+        this.showRepelCircle = showRepelCircle;
     }
 
     public boolean isShowVelocityVector() {
@@ -155,11 +168,11 @@ public class Flock extends Pane {
         this.showPath = showPath;
     }
 
-    public String getPhysicsEngine() {
-        return physicsEngine;
+    public Engine.FlockingSim getEngine() {
+        return flockingSim;
     }
 
-    public void setPhysicsEngine(String physicsEngine) {
-        this.physicsEngine = physicsEngine;
+    public void setEngine(Engine.FlockingSim flockingSim) {
+        this.flockingSim = flockingSim;
     }
 }

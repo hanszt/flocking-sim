@@ -21,8 +21,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import static hzt.controller.AnimationService.LINE_STROKE_WIDTH;
-import static hzt.controller.main_scene.MainSceneController.ENGINE_TYPE_1;
-import static hzt.controller.utils.PhysicsEngine.*;
+import static hzt.controller.utils.Engine.*;
 import static hzt.model.entity.Flock.*;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
@@ -33,6 +32,7 @@ public class Ball2D extends Group {
     private final String name;
     private final Circle body;
     private final Circle perceptionCircle;
+    private final Circle repelDistanceCircle;
     private final VisibleVector visibleAccelerationVector;
     private final VisibleVector visibleVelocityVector;
     private final Path path;
@@ -48,26 +48,34 @@ public class Ball2D extends Group {
         this.initPaint = initPaint;
         this.body = new Circle(radius);
         this.perceptionCircle = new Circle();
+        this.repelDistanceCircle = new Circle();
         this.visibleVelocityVector = new VisibleVector();
         this.visibleAccelerationVector = new VisibleVector();
         this.path = new Path();
         this.densityMaterial = DENSITY;
         this.velocity = Point2D.ZERO;
         this.acceleration = Point2D.ZERO;
-        ballsInPerceptionRadiusMap = new HashMap<>();
-        perceptionCircle.setStrokeType(StrokeType.OUTSIDE);
-        perceptionCircle.setDisable(true); //ignores user input
-        perceptionCircle.setFill(TRANSPARENT);
-        perceptionCircle.centerXProperty().bind(body.centerXProperty());
-        perceptionCircle.centerYProperty().bind(body.centerYProperty());
-        path.setPathVisible(false);
+        this.ballsInPerceptionRadiusMap = new HashMap<>();
+        configureComponents();
+        super.getChildren().addAll(body, perceptionCircle, repelDistanceCircle, visibleVelocityVector, visibleAccelerationVector, path);
+    }
+
+    private void configureComponents() {
+        configureCircle(perceptionCircle);
+        configureCircle(repelDistanceCircle);
         configureLine(visibleVelocityVector);
         configureLine(visibleAccelerationVector);
         updatePaint(initPaint);
+        path.setPathVisible(false);
+        visibleAccelerationVector.getStrokeDashArray().addAll(4., 4.);
     }
 
-    public void addComponents() {
-        super.getChildren().addAll(body, perceptionCircle, visibleVelocityVector, visibleAccelerationVector, path);
+    private void configureCircle(Circle circle) {
+        circle.setStrokeType(StrokeType.OUTSIDE);
+        circle.setDisable(true); //ignores user input
+        circle.setFill(TRANSPARENT);
+        circle.centerXProperty().bind(body.centerXProperty());
+        circle.centerYProperty().bind(body.centerYProperty());
     }
 
     private void configureLine(Line line) {
@@ -86,14 +94,14 @@ public class Ball2D extends Group {
         Flock flock = (Flock) this.getParent();
         keyPressedAccIncrement = accelerationMultiplier / deltaT.toSeconds();
         Set<Ball2D> ballsSet = ballsInPerceptionRadiusMap.keySet();
-        Point2D physicsEngineAcceleration = flock.getPhysicsEngine().equals(ENGINE_TYPE_1) ?
-                getAccProfile1(this, ballsSet) : getAccProfile2(this, ballsSet);
+        Point2D physicsEngineAcceleration = flock.getEngine().getTotalAcceleration(this, ballsSet);
         prevAttractionComponent = addComponentToAcceleration(physicsEngineAcceleration, prevAttractionComponent);
         updateBallsInPerceptionRadiusMap();
         updateVisibleVector(visibleVelocityVector, velocity, MAX_VISIBLE_SPEED_VECTOR_LENGTH);
         updateVisibleVector(visibleAccelerationVector, acceleration, MAX_VISIBLE_ACCELERATION_VECTOR_LENGTH);
         updatePath();
         perceptionCircle.setVisible(flock.isShowPerceptionCircle());
+        repelDistanceCircle.setVisible(flock.isShowRepelCircle());
         visibleVelocityVector.setVisible(flock.isShowVelocityVector());
         visibleAccelerationVector.setVisible(flock.isShowAccelerationVector());
         if (flock.isShowConnections()) strokeConnections();
@@ -311,6 +319,7 @@ public class Ball2D extends Group {
     public void updatePaint(Paint paint) {
         body.setFill(paint);
         perceptionCircle.setStroke(paint);
+        repelDistanceCircle.setStroke(paint);
         visibleVelocityVector.setStroke(paint);
         visibleAccelerationVector.setStroke(paint);
         path.setStroke(paint);
@@ -342,6 +351,14 @@ public class Ball2D extends Group {
 
     public void setPerceptionRadius(double radius) {
         this.perceptionCircle.setRadius(radius);
+    }
+
+    public float getRepelRadius() {
+        return (float) repelDistanceCircle.getRadius();
+    }
+
+    public void setRepelRadius(double radius) {
+        this.repelDistanceCircle.setRadius(radius);
     }
 
     public Map<Ball2D, Connection> getBallsInPerceptionRadiusMap() {
