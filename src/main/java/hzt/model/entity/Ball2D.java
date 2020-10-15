@@ -94,7 +94,7 @@ public class Ball2D extends Group {
         Flock flock = (Flock) this.getParent();
         keyPressedAccIncrement = accelerationMultiplier / deltaT.toSeconds();
         Set<Ball2D> ballsSet = ballsInPerceptionRadiusMap.keySet();
-        Point2D physicsEngineAcceleration = flock.getEngine().getTotalAcceleration(this, ballsSet);
+        Point2D physicsEngineAcceleration = flock.getFlockingSim().getTotalAcceleration(this, ballsSet);
         prevAttractionComponent = addComponentToAcceleration(physicsEngineAcceleration, prevAttractionComponent);
         updateBallsInPerceptionRadiusMap();
         updateVisibleVector(visibleVelocityVector, velocity, MAX_VISIBLE_SPEED_VECTOR_LENGTH);

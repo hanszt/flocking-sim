@@ -138,19 +138,19 @@
                                                 <Button mnemonicParsing="false" onAction="#reset" prefWidth="1000.0"
                                                         text="Reset"/>
                                                 <ToggleButton layoutX="14.0" layoutY="72.0" mnemonicParsing="false"
-                                                              onAction="#pauseSim" prefWidth="1000.0" text="Pause"/>
+                                                              onAction="#pauseSimButtonAction" prefWidth="1000.0" text="Pause"/>
                                                 <ToggleButton fx:id="bounceWallsButton" layoutX="14.0" layoutY="72.0"
                                                               mnemonicParsing="false"
                                                               prefWidth="1000.0" selected="$initBounceWallsButtonValue"
                                                               text="Bounce of walls"/>
                                                 <ToggleButton fx:id="showConnectionsButton" mnemonicParsing="false"
-                                                              onAction="#showConnections" prefWidth="1000.0"
+                                                              onAction="#connectionsButtonAction" prefWidth="1000.0"
                                                               text="Show connections"/>
                                                 <ToggleButton fx:id="showPathButton" mnemonicParsing="false"
-                                                              onAction="#showPathSelectedBall" prefWidth="1000.0"
+                                                              onAction="#showPathSelectedBallButtonAction" prefWidth="1000.0"
                                                               text="Show path selected"/>
                                                 <ToggleButton fx:id="showRepelCircleButton" mnemonicParsing="false"
-                                                              onAction="#showRepelCircles" prefWidth="1000.0"
+                                                              onAction="#repelCircleButtonAction" prefWidth="1000.0"
                                                               text="Show repel circles"/>
                                             </children>
                                             <padding>
@@ -161,17 +161,17 @@
                                             <children>
                                                 <Button mnemonicParsing="false" onAction="#newInstance"
                                                         prefWidth="1000.0" text="New instance"/>
-                                                <ToggleButton mnemonicParsing="false" onAction="#setTransparent"
+                                                <ToggleButton mnemonicParsing="false" onAction="#transparentButtonAction"
                                                               prefWidth="1000.0" text="Transparent"/>
                                                 <ToggleButton fx:id="showPerceptionButton" layoutX="14.0" layoutY="72.0"
-                                                              mnemonicParsing="false" onAction="#showPerception"
+                                                              mnemonicParsing="false" onAction="#perceptionButtonAction"
                                                               prefWidth="1000.0" text="Show perception"/>
                                                 <ToggleButton fx:id="velocityButton" mnemonicParsing="false"
                                                               prefWidth="1000.0" text="Show velocities"
-                                                              onAction="#showVelocityVector"/>
+                                                              onAction="#velocityVectorButtonAction"/>
                                                 <ToggleButton fx:id="showAccelerationVectorButton" layoutX="14.0"
                                                               layoutY="72.0"
-                                                              mnemonicParsing="false" onAction="#showAccelerationVector"
+                                                              mnemonicParsing="false" onAction="#accelerationButtonAction"
                                                               prefWidth="1000.0" text="Show accelerations"/>
                                             </children>
                                             <padding>
@@ -187,11 +187,11 @@
                                             <children>
                                                 <Label text="Background color"/>
                                                 <ColorPicker fx:id="backgroundColorPicker"
-                                                             onAction="#setBackgroundColor" prefHeight="30"
+                                                             onAction="#backgroundColorPickerAction" prefHeight="30"
                                                              prefWidth="1000.0"/>
                                                 <Label text="Selected ball color"/>
                                                 <ColorPicker fx:id="selectedBallColorPicker"
-                                                             onAction="#setSelectedBallColor" prefHeight="30"
+                                                             onAction="#selectedBallColorPickerAction" prefHeight="30"
                                                              prefWidth="1000.0"/>
                                             </children>
                                             <padding>
@@ -202,7 +202,7 @@
                                             <children>
                                                 <Label text="Ball color"/>
                                                 <ColorPicker fx:id="ballColorPicker"
-                                                             onAction="#setUniformBallColor" prefHeight="30"
+                                                             onAction="#uniformBallColorPickerAction" prefHeight="30"
                                                              prefWidth="1000.0"/>
                                             </children>
                                             <padding>

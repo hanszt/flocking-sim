@@ -33,7 +33,8 @@ public class Engine {
 
         abstract Point2D getAccelerationBetweenTwoBalls(Ball2D self, Ball2D other);
 
-        public abstract String getName();
+        @Override
+        public abstract String toString();
     }
 
     private final FlockingSim type1 = new FlockingSim() {
@@ -54,7 +55,7 @@ public class Engine {
         }
 
         @Override
-        public String getName() {
+        public String toString() {
             return "Engine type 1";
         }
     };
@@ -77,7 +78,7 @@ public class Engine {
         }
 
         @Override
-        public String getName() {
+        public String toString() {
             return "Engine type 2";
         }
     };

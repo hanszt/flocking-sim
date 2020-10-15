@@ -6,12 +6,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import lombok.Getter;
 
 import java.io.IOException;
 
 import static hzt.controller.AppConstants.FXML_FILE_LOCATION;
 import static hzt.controller.AppConstants.Scene.ABOUT_SCENE;
 
+@Getter
 public abstract class AbstractSceneController implements Controller {
 
     private final String fxmlFileName;
@@ -58,17 +60,6 @@ public abstract class AbstractSceneController implements Controller {
         appManager.setupScene(ABOUT_SCENE);
     }
 
-    public String getFxmlFileName() {
-        return fxmlFileName;
-    }
-
     protected abstract AbstractSceneController getBean();
 
-    public Scene getScene() {
-        return scene;
-    }
-
-    public AppManager getAppManager() {
-        return appManager;
-    }
 }

@@ -28,14 +28,14 @@ public class MainSceneController extends AbstractSceneController {
     private static final Color INIT_BG_COLOR = DARKBLUE.darker().darker().darker();
 
     private final Flock flock;
-    private final AnimationService as;
+    private final AnimationService animationService;
     private final Engine engine;
 
     public MainSceneController(AppManager appManager) {
         super(MAIN_SCENE.getFxmlFileName(), appManager);
         engine = new Engine();
-        as = new AnimationService(this);
-        flock = new Flock(as);
+        animationService = new AnimationService(this);
+        flock = new Flock(this);
     }
 
     //constants declared in FXML file
@@ -82,7 +82,7 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private ComboBox<Engine.FlockingSim> physicsEngineComboBox;
     @FXML
-    private ComboBox<String> flockSettingsComboBox;
+    private ComboBox<Flock.FlockType> flockSettingsComboBox;
 
     @FXML
     private ToggleButton velocityButton;
@@ -160,29 +160,28 @@ public class MainSceneController extends AbstractSceneController {
         animationPane.getChildren().add(flock);
         animationPane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
         EventHandler<ActionEvent> animationLoop = initializeAnimationLoop();
-        as.addAnimationLoopToTimeline(animationLoop, true);
+        animationService.addAnimationLoopToTimeline(animationLoop, true);
     }
 
-    public static final String RANDOM_FLOCK = "Random flock", UNIFORM_FLOCK = "Uniform Flock";
-
     private void configureComboBoxes() {
-        flockSettingsComboBox.getItems().addAll(RANDOM_FLOCK, UNIFORM_FLOCK);
-        flockSettingsComboBox.setValue(RANDOM_FLOCK);
+        flockSettingsComboBox.getItems().addAll(flock.getRandom(), flock.getUniform());
+        physicsEngineComboBox.setConverter(getStringConverter());
+        flockSettingsComboBox.setValue(flock.getRandom());
+
         physicsEngineComboBox.getItems().addAll(engine.getType1(), engine.getType2());
         physicsEngineComboBox.setConverter(getStringConverter());
         physicsEngineComboBox.setValue(engine.getType1());
     }
 
-    private StringConverter<Engine.FlockingSim> getStringConverter() {
-
+    private <T> StringConverter<T> getStringConverter() {
         return new StringConverter<>() {
             @Override
-            public String toString(Engine.FlockingSim item) {
-                return item.getName();
+            public String toString(T item) {
+                return item.toString();
             }
 
             @Override
-            public Engine.FlockingSim fromString(String id) {
+            public T fromString(String id) {
                 return null;
             }
         };
@@ -194,7 +193,7 @@ public class MainSceneController extends AbstractSceneController {
             double friction = frictionSlider.getValue();
             double accelerationMultiplier = accelerationSlider.getValue();
             boolean bounce = bounceWallsButton.isSelected();
-            as.run(flock, accelerationMultiplier, friction, bounce, maxSpeed);
+            animationService.run(flock, accelerationMultiplier, friction, bounce, maxSpeed);
         };
     }
 
@@ -216,7 +215,7 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     private void setupFlock() {
-        flock.setEngine(engine.getType1());
+        flock.setFlockingSim(engine.getType1());
         flock.setShowVelocityVector(velocityButton.isSelected());
         flock.setShowAccelerationVector(showAccelerationVectorButton.isSelected());
         flock.setShowPerceptionCircle(showPerceptionButton.isSelected());
@@ -278,13 +277,13 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     @FXML
-    private void setBackgroundColor(ActionEvent event) {
+    private void backgroundColorPickerAction(ActionEvent event) {
         backgroundColor = ((ColorPicker) event.getSource()).getValue();
         animationPane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
     }
 
     @FXML
-    private void setUniformBallColor(ActionEvent event) {
+    private void uniformBallColorPickerAction(ActionEvent event) {
         Color color = ((ColorPicker) event.getSource()).getValue();
         flock.setUniformBallColor(color);
         for (Node n : flock.getChildren()) {
@@ -294,51 +293,51 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     @FXML
-    private void setSelectedBallColor(ActionEvent event) {
+    private void selectedBallColorPickerAction(ActionEvent event) {
         Color color = ((ColorPicker) event.getSource()).getValue();
         flock.setSelectedBallColor(color);
         flock.getSelectedBall().updatePaint(color);
     }
 
     @FXML
-    private void pauseSim(ActionEvent actionEvent) {
-        if (((ToggleButton) actionEvent.getSource()).isSelected()) as.pauseTimeline();
-        else as.startTimeline();
+    private void pauseSimButtonAction(ActionEvent actionEvent) {
+        if (((ToggleButton) actionEvent.getSource()).isSelected()) animationService.pauseTimeline();
+        else animationService.startTimeline();
     }
 
     @FXML
-    private void setTransparent(ActionEvent actionEvent) {
+    private void transparentButtonAction(ActionEvent actionEvent) {
         if (!((ToggleButton) actionEvent.getSource()).isSelected()) getAppManager().getStage().setOpacity(1);
         else getAppManager().getStage().setOpacity(STAGE_OPACITY);
     }
 
     @FXML
-    private void showConnections(ActionEvent actionEvent) {
+    private void connectionsButtonAction(ActionEvent actionEvent) {
         flock.setShowConnections(((ToggleButton) actionEvent.getSource()).isSelected());
     }
 
     @FXML
-    private void showPerception(ActionEvent actionEvent) {
+    private void perceptionButtonAction(ActionEvent actionEvent) {
         flock.setShowPerceptionCircle(((ToggleButton) actionEvent.getSource()).isSelected());
     }
 
     @FXML
-    private void showRepelCircles(ActionEvent actionEvent) {
+    private void repelCircleButtonAction(ActionEvent actionEvent) {
         flock.setShowRepelCircle(((ToggleButton) actionEvent.getSource()).isSelected());
     }
 
     @FXML
-    private void showVelocityVector(ActionEvent actionEvent) {
+    private void velocityVectorButtonAction(ActionEvent actionEvent) {
         flock.setShowVelocityVector(((ToggleButton) actionEvent.getSource()).isSelected());
     }
 
     @FXML
-    private void showAccelerationVector(ActionEvent actionEvent) {
+    private void accelerationButtonAction(ActionEvent actionEvent) {
         flock.setShowAccelerationVector(((ToggleButton) actionEvent.getSource()).isSelected());
     }
 
     @FXML
-    private void showPathSelectedBall(ActionEvent event) {
+    private void showPathSelectedBallButtonAction(ActionEvent event) {
         boolean showPath = ((ToggleButton) event.getSource()).isSelected();
         Ball2D ball = flock.getSelectedBall();
         flock.setShowPath(showPath);
@@ -347,7 +346,7 @@ public class MainSceneController extends AbstractSceneController {
 
     @FXML
     private void physicsEngineComboBoxAction(ActionEvent event) {
-        flock.setEngine((Engine.FlockingSim) ((ComboBox<?>) event.getSource()).getValue());
+        flock.setFlockingSim((Engine.FlockingSim) ((ComboBox<?>) event.getSource()).getValue());
     }
 
     @FXML
@@ -360,7 +359,11 @@ public class MainSceneController extends AbstractSceneController {
         return this;
     }
 
-    public Flock getBallGroup() {
+    public AnimationService getAnimationService() {
+        return animationService;
+    }
+
+    public Flock getFlock() {
         return flock;
     }
 

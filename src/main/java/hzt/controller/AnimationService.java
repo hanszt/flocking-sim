@@ -43,7 +43,7 @@ public class AnimationService {
     }
 
     public void run(Flock flock, double accelerationMultiplier, double frictionFactor, boolean bounce, double maxSpeed) {
-        Ball2D selected = mainSceneController.getBallGroup().getSelectedBall();
+        Ball2D selected = mainSceneController.getFlock().getSelectedBall();
         statisticsService.showStatisticsAboutSelectedBall(selected);
         LocalTime startTimeSim = mainSceneController.getAppManager().startTimeSim, stopTimeSim = LocalTime.now();
         Duration runTimeSim = Duration.millis((stopTimeSim.toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);

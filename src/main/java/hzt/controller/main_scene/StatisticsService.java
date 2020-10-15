@@ -3,7 +3,6 @@ package hzt.controller.main_scene;
 import hzt.model.entity.Ball2D;
 import javafx.util.Duration;
 
-
 public class StatisticsService {
 
     private final MainSceneController mc;
