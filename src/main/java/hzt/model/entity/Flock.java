@@ -10,7 +10,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -41,7 +40,6 @@ public class Flock extends Pane {
 
     public Flock(MainSceneController mainSceneController) {
         //Size is zero so it does not influence the rest of the layout when balls are moved
-        this.setMinSize(0, 0);
         this.setMaxSize(0, 0);
         this.sceneController = mainSceneController;
     }

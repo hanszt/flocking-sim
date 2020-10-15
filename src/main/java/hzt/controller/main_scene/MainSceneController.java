@@ -165,26 +165,10 @@ public class MainSceneController extends AbstractSceneController {
 
     private void configureComboBoxes() {
         flockSettingsComboBox.getItems().addAll(flock.getRandom(), flock.getUniform());
-        physicsEngineComboBox.setConverter(getStringConverter());
         flockSettingsComboBox.setValue(flock.getRandom());
 
         physicsEngineComboBox.getItems().addAll(engine.getType1(), engine.getType2());
-        physicsEngineComboBox.setConverter(getStringConverter());
         physicsEngineComboBox.setValue(engine.getType1());
-    }
-
-    private <T> StringConverter<T> getStringConverter() {
-        return new StringConverter<>() {
-            @Override
-            public String toString(T item) {
-                return item.toString();
-            }
-
-            @Override
-            public T fromString(String id) {
-                return null;
-            }
-        };
     }
 
     private EventHandler<ActionEvent> initializeAnimationLoop() {
@@ -207,9 +191,7 @@ public class MainSceneController extends AbstractSceneController {
         Dimension2D sceneDimension;
         if (scene.getWidth() == 0 && scene.getHeight() == 0) {
             sceneDimension = new Dimension2D(root.getPrefWidth(), root.getPrefHeight());
-        } else {
-            sceneDimension = new Dimension2D(scene.getWidth(), scene.getHeight());
-        }
+        } else sceneDimension = new Dimension2D(scene.getWidth(), scene.getHeight());
         return new Dimension2D(sceneDimension.getWidth() - mainControlPanel.getWidth(),
                 sceneDimension.getHeight() - slidersPane.getHeight());
     }
