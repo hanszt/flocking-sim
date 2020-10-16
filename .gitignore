@@ -20,6 +20,12 @@
 *.tar
 *.zip
 
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
 # Logs and databases #
 ######################
 *.log
@@ -38,5 +44,4 @@ Thumbs.db
 
 # IDE generated files #
 ######################
-.idea
 target
