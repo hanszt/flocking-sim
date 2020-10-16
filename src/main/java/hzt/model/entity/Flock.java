@@ -63,6 +63,7 @@ public class Flock extends Pane {
 
     public abstract static class FlockType {
         abstract Ball2D createBall();
+
         @Override
         public abstract String toString();
     }
@@ -72,6 +73,7 @@ public class Flock extends Pane {
         Ball2D createBall() {
             return new Ball2D(getRandomDouble(MIN_RADIUS, maxBallSize), getRandomColor());
         }
+
         @Override
         public String toString() {
             return "Random flock";
@@ -83,6 +85,7 @@ public class Flock extends Pane {
         Ball2D createBall() {
             return new Ball2D(maxBallSize, uniformBallColor);
         }
+
         @Override
         public String toString() {
             return "Uniform Flock";

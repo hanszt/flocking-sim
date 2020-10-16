@@ -1,6 +1,6 @@
 # Flocking Simulation
 
-A program to practice, simulating 2D motions
+A program to visualize flocking behaviour of a group of fish or birds
 
 Made By Hans Zuidervaart.
 
@@ -18,8 +18,24 @@ source: https://openjfx.io/openjfx-docs/#IDE-Intellij
 
 ## Screenshots
 
-screenshot 1  A preview of the application
+#### screenshot 1: A preview of the application
 ![FlockingSim](src/main/resources/images/example1.jpg)
+
+#### screenshot 2: A preview of when the show connections button is toggled
+which boid sees what other boid? This is dependent on the perception radius slider position
+![FlockingSim](src/main/resources/images/example2.jpg)
+
+#### screenshot 3: A preview of when the show repel circles button is toggled
+![FlockingSim](src/main/resources/images/example3.jpg)
+
+#### screenshot 4: A preview of when the 'show path selected ball' button is toggled
+![FlockingSim](src/main/resources/images/example4.jpg)
+
+#### screenshot 5: A preview of when the show accelerations button is toggled
+![FlockingSim](src/main/resources/images/example5.jpg)
+
+#### screenshot 6: A preview of when the show velocities button is toggled
+![FlockingSim](src/main/resources/images/example6.jpg)
 
 ## Background
 Boids is an artificial life program, developed by Craig Reynolds in 1986, which simulates the flockingSim behaviour of birds. His paper on this topic was published in 1987 in the proceedings of the ACM SIGGRAPH conference. [1] The name "boid" corresponds to a shortened version of "bird-oid object", which refers to a bird-like object.[2] Incidentally, "boid" is also a New York Metropolitan dialect pronunciation for "bird".
@@ -48,7 +64,7 @@ At the time of proposal, Reynolds' approach represented a giant step forward com
 
 The boids model has been used for other interesting applications. It has been applied to automatically program Internet multi-channel radio stations.[9] It has also been used for visualizing information[10] and for optimization tasks.[11] 
 ## Motivation
-
+I was curious about the workings of this kind of simulations. It was a lot of fun making it! Enjoy!
 ## Sources
 [Flocking sim](https://en.wikipedia.org/wiki/Boids)
 

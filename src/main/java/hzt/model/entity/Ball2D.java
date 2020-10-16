@@ -14,6 +14,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeType;
 import javafx.util.Duration;
+import lombok.ToString;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +26,7 @@ import static hzt.controller.utils.Engine.*;
 import static hzt.model.entity.Flock.*;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
+@ToString
 public class Ball2D extends Group {
 
     private static int next = 0;
@@ -250,9 +252,6 @@ public class Ball2D extends Group {
         setCenterPosition(centerPosition.getX(), centerPosition.getY());
     }
 
-    private EventHandler<KeyEvent> keyPressed;
-    private EventHandler<KeyEvent> keyReleased;
-
     public void addKeyControlForAcceleration() {
         addKeyControlForAcceleration(KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D);
     }
@@ -260,16 +259,18 @@ public class Ball2D extends Group {
     private double keyPressedAccIncrement;
     private boolean upPressed, downPressed, leftPressed, rightPressed;
 
+    private EventHandler<KeyEvent> keyPressed, keyReleased;
+
     public void addKeyControlForAcceleration(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
         //           acceleration = acceleration.normalize().multiply(accIncrement);
-        setKeyPressed(up, down, left, right);
-        setKeyReleased(up, down, left, right);
-        this.getScene().addEventFilter(KeyEvent.KEY_PRESSED, keyPressed);
+        keyPressed = keyPressed(up, down, left, right);
+        keyReleased = keyReleased(up, down, left, right);
+        this.getScene().addEventFilter(KeyEvent.KEY_PRESSED, keyPressed(up, down, left, right));
         this.getScene().addEventFilter(KeyEvent.KEY_RELEASED, keyReleased);
     }
 
-    private void setKeyPressed(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
-        keyPressed = key -> {
+    private EventHandler<KeyEvent> keyPressed(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
+       return key -> {
             if (key.getCode() == down && !downPressed) {
                 downPressed = true;
                 acceleration = acceleration.add(new Point2D(0, keyPressedAccIncrement));
@@ -289,8 +290,8 @@ public class Ball2D extends Group {
         };
     }
 
-    private void setKeyReleased(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
-        keyReleased = key -> {
+    private EventHandler<KeyEvent> keyReleased(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
+        return  key -> {
             if (key.getCode() == down) {
                 downPressed = false;
                 acceleration = acceleration.subtract(new Point2D(0, keyPressedAccIncrement));
@@ -365,14 +366,4 @@ public class Ball2D extends Group {
         return ballsInPerceptionRadiusMap;
     }
 
-    @Override
-    public String toString() {
-        return "Ball2D{" +
-                "acceleration=" + acceleration +
-                ", body=" + body +
-                ", densityMaterial=" + densityMaterial +
-                ", name='" + name + '\'' +
-                ", velocity=" + velocity +
-                '}';
-    }
 }
