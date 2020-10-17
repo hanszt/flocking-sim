@@ -49,12 +49,4 @@ public class AppManager extends AppVars {
                 instance, runTimeSim.toSeconds(), DOTTED_LINE);
     }
 
-    public Duration getRunTimeSim() {
-        return runTimeSim;
-    }
-
-    public void setRunTimeSim(Duration runTimeSim) {
-        this.runTimeSim = runTimeSim;
-    }
-
 }

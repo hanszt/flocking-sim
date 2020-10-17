@@ -1,6 +1,6 @@
 package hzt.controller;
 
-import hzt.Launcher;
+import hzt.Main;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -42,7 +42,7 @@ public abstract class AbstractSceneController implements Controller {
 
     @FXML
     public void newInstance() {
-        new Launcher().start(new Stage());
+        new Main().start(new Stage());
     }
 
     @FXML

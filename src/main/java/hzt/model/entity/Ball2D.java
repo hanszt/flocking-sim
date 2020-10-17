@@ -1,12 +1,10 @@
 package hzt.model.entity;
 
-import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Paint;
@@ -14,6 +12,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeType;
 import javafx.util.Duration;
+import lombok.Getter;
 import lombok.ToString;
 
 import java.util.HashMap;
@@ -22,11 +21,12 @@ import java.util.Set;
 import java.util.Stack;
 
 import static hzt.controller.AnimationService.LINE_STROKE_WIDTH;
-import static hzt.controller.utils.Engine.*;
+import static hzt.controller.utils.Engine.DENSITY;
 import static hzt.model.entity.Flock.*;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
 @ToString
+@Getter
 public class Ball2D extends Group {
 
     private static int next = 0;
@@ -34,11 +34,11 @@ public class Ball2D extends Group {
     private final String name;
     private final Circle body;
     private final Circle perceptionCircle;
-    private final Circle repelDistanceCircle;
+    private final Circle repelCircle;
     private final VisibleVector visibleAccelerationVector;
     private final VisibleVector visibleVelocityVector;
     private final Path path;
-    private final Map<Ball2D, Connection> ballsInPerceptionRadiusMap;
+    private final Map<Ball2D, Connection> perceptionRadiusMap;
     private final Paint initPaint;
 
     private final double densityMaterial; // kg
@@ -50,21 +50,21 @@ public class Ball2D extends Group {
         this.initPaint = initPaint;
         this.body = new Circle(radius);
         this.perceptionCircle = new Circle();
-        this.repelDistanceCircle = new Circle();
+        this.repelCircle = new Circle();
         this.visibleVelocityVector = new VisibleVector();
         this.visibleAccelerationVector = new VisibleVector();
         this.path = new Path();
         this.densityMaterial = DENSITY;
         this.velocity = Point2D.ZERO;
         this.acceleration = Point2D.ZERO;
-        this.ballsInPerceptionRadiusMap = new HashMap<>();
+        this.perceptionRadiusMap = new HashMap<>();
         configureComponents();
-        super.getChildren().addAll(body, perceptionCircle, repelDistanceCircle, visibleVelocityVector, visibleAccelerationVector, path);
+        super.getChildren().addAll(body, perceptionCircle, repelCircle, visibleVelocityVector, visibleAccelerationVector, path);
     }
 
     private void configureComponents() {
         configureCircle(perceptionCircle);
-        configureCircle(repelDistanceCircle);
+        configureCircle(repelCircle);
         configureLine(visibleVelocityVector);
         configureLine(visibleAccelerationVector);
         updatePaint(initPaint);
@@ -95,7 +95,7 @@ public class Ball2D extends Group {
     public void update(Duration deltaT, double accelerationMultiplier, double maxSpeed) {
         Flock flock = (Flock) this.getParent();
         keyPressedAccIncrement = accelerationMultiplier / deltaT.toSeconds();
-        Set<Ball2D> ballsSet = ballsInPerceptionRadiusMap.keySet();
+        Set<Ball2D> ballsSet = perceptionRadiusMap.keySet();
         Point2D physicsEngineAcceleration = flock.getFlockingSim().getTotalAcceleration(this, ballsSet);
         prevAttractionComponent = addComponentToAcceleration(physicsEngineAcceleration, prevAttractionComponent);
         updateBallsInPerceptionRadiusMap();
@@ -103,7 +103,7 @@ public class Ball2D extends Group {
         updateVisibleVector(visibleAccelerationVector, acceleration, MAX_VISIBLE_ACCELERATION_VECTOR_LENGTH);
         updatePath();
         perceptionCircle.setVisible(flock.isShowPerceptionCircle());
-        repelDistanceCircle.setVisible(flock.isShowRepelCircle());
+        repelCircle.setVisible(flock.isShowRepelCircle());
         visibleVelocityVector.setVisible(flock.isShowVelocityVector());
         visibleAccelerationVector.setVisible(flock.isShowAccelerationVector());
         if (flock.isShowConnections()) strokeConnections();
@@ -124,9 +124,7 @@ public class Ball2D extends Group {
     }
 
     private void strokeConnections() {
-        for (Map.Entry<Ball2D, Connection> other : ballsInPerceptionRadiusMap.entrySet()) {
-            Ball2D otherBall = other.getKey();
-            Line lineToOther = other.getValue();
+        perceptionRadiusMap.forEach((otherBall, lineToOther) -> {
             double distance = otherBall.getCenterPosition().subtract(this.getCenterPosition()).magnitude();
             lineToOther.setStroke(this.body.getFill());
             lineToOther.setStrokeWidth(LINE_STROKE_WIDTH);
@@ -137,7 +135,7 @@ public class Ball2D extends Group {
             lineToOther.setEndX(otherBall.getBody().getCenterX());
             lineToOther.setEndY(otherBall.getBody().getCenterY());
             if (!this.getChildren().contains(lineToOther)) this.getChildren().add(lineToOther);
-        }
+        });
     }
 
     private void updatePath() {
@@ -147,22 +145,16 @@ public class Ball2D extends Group {
     }
 
     private void updateBallsInPerceptionRadiusMap() {
-        ObservableList<Node> allBalls = this.getParent().getChildrenUnmodifiable();
-        for (Node node : allBalls) {
-            if (!node.equals(this)) {
-                Ball2D ball2D = (Ball2D) node;
-                double distance = ball2D.getCenterPosition().subtract(this.getCenterPosition()).magnitude();
-                if (distance < perceptionCircle.getRadius()) {
-                    if (!ballsInPerceptionRadiusMap.containsKey(ball2D)) {
-                        ballsInPerceptionRadiusMap.put(ball2D, new Connection());
-                    }
-                } else {
-                    Line lineToOther = ballsInPerceptionRadiusMap.get(ball2D);
-                    this.getChildren().remove(lineToOther);
-                    ballsInPerceptionRadiusMap.remove(ball2D);
-                }
+        getParent().getChildrenUnmodifiable().stream().filter(node -> !node.equals(this)).map(node -> (Ball2D) node).forEach(ball2D -> {
+            double distance = ball2D.getCenterPosition().subtract(this.getCenterPosition()).magnitude();
+            if (distance < perceptionCircle.getRadius()) {
+                if (!perceptionRadiusMap.containsKey(ball2D)) perceptionRadiusMap.put(ball2D, new Connection());
+            } else {
+                Line lineToOther = perceptionRadiusMap.get(ball2D);
+                this.getChildren().remove(lineToOther);
+                perceptionRadiusMap.remove(ball2D);
             }
-        }
+        });
     }
 
     public void addFriction(double frictionFactor) {
@@ -320,34 +312,14 @@ public class Ball2D extends Group {
     public void updatePaint(Paint paint) {
         body.setFill(paint);
         perceptionCircle.setStroke(paint);
-        repelDistanceCircle.setStroke(paint);
+        repelCircle.setStroke(paint);
         visibleVelocityVector.setStroke(paint);
         visibleAccelerationVector.setStroke(paint);
         path.setStroke(paint);
     }
 
-    public Circle getBody() {
-        return body;
-    }
-
-    public Path getPath() {
-        return path;
-    }
-
-    public Paint getInitPaint() {
-        return initPaint;
-    }
-
-    public Point2D getVelocity() {
-        return velocity;
-    }
-
     public void setVelocity(Point2D velocity) {
         this.velocity = velocity;
-    }
-
-    public Point2D getAcceleration() {
-        return acceleration;
     }
 
     public void setPerceptionRadius(double radius) {
@@ -355,15 +327,10 @@ public class Ball2D extends Group {
     }
 
     public float getRepelRadius() {
-        return (float) repelDistanceCircle.getRadius();
+        return (float) repelCircle.getRadius();
     }
 
     public void setRepelRadius(double radius) {
-        this.repelDistanceCircle.setRadius(radius);
+        this.repelCircle.setRadius(radius);
     }
-
-    public Map<Ball2D, Connection> getBallsInPerceptionRadiusMap() {
-        return ballsInPerceptionRadiusMap;
-    }
-
 }

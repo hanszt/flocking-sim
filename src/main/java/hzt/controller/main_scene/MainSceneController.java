@@ -11,13 +11,13 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import lombok.Getter;
 
 import static hzt.controller.AppConstants.STAGE_OPACITY;
 import static hzt.controller.AppConstants.Scene.MAIN_SCENE;
@@ -25,6 +25,7 @@ import static hzt.model.entity.Flock.INIT_SELECTED_BALL_COLOR;
 import static hzt.model.entity.Flock.INIT_UNIFORM_BALL_COLOR;
 import static javafx.scene.paint.Color.DARKBLUE;
 
+@Getter
 public class MainSceneController extends AbstractSceneController {
 
     private static final Color INIT_BG_COLOR = DARKBLUE.darker().darker().darker();
@@ -164,8 +165,7 @@ public class MainSceneController extends AbstractSceneController {
         engine.setRepelFactor(repelFactorSlider.getValue());
         animationPane.getChildren().add(flock);
         animationPane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
-        EventHandler<ActionEvent> animationLoop = initializeAnimationLoop();
-        animationService.addAnimationLoopToTimeline(animationLoop, true);
+        animationService.addAnimationLoopToTimeline(initializeAnimationLoop(), true);
     }
 
     private void bindFullScreenButtonToFullScreen() {
@@ -270,10 +270,7 @@ public class MainSceneController extends AbstractSceneController {
     private void uniformBallColorPickerAction(ActionEvent event) {
         Color color = ((ColorPicker) event.getSource()).getValue();
         flock.setUniformBallColor(color);
-        for (Node n : flock.getChildren()) {
-            Ball2D ball2D = (Ball2D) n;
-            ball2D.updatePaint(color);
-        }
+        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.updatePaint(color));
     }
 
     @FXML
@@ -327,7 +324,6 @@ public class MainSceneController extends AbstractSceneController {
         flock.setShowPath(showPath);
         if (ball != null) ball.getPath().setPathVisible(showPath);
 //        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.getPath().setPathVisible(showPath));
-
     }
 
     @FXML
@@ -346,58 +342,7 @@ public class MainSceneController extends AbstractSceneController {
         configureFlock();
     }
 
-
     protected AbstractSceneController getBean() {
         return this;
     }
-
-    public AnimationService getAnimationService() {
-        return animationService;
-    }
-
-    public Flock getFlock() {
-        return flock;
-    }
-
-    public Label getBallNameLabel() {
-        return ballNameLabel;
-    }
-
-    public Label getPositionStatsLabel() {
-        return positionStatsLabel;
-    }
-
-    public Label getVelocityStatsLabel() {
-        return velocityStatsLabel;
-    }
-
-    public Label getAccelerationStatsLabel() {
-        return accelerationStatsLabel;
-    }
-
-    public Label getFrictionStatsLabel() {
-        return frictionStatsLabel;
-    }
-
-    public Label getFrameRateStatsLabel() {
-        return frameRateStatsLabel;
-    }
-
-    public Label getNrOfBallsInPerceptionRadiusLabel() {
-        return nrOfBallsInPerceptionRadiusLabel;
-    }
-
-    public Label getBallSizeLabel() {
-        return ballSizeLabel;
-    }
-
-    public Label getNumberOfBallsLabel() {
-        return numberOfBallsLabel;
-    }
-
-    public Label getRunTimeLabel() {
-        return runTimeLabel;
-    }
-
-
 }

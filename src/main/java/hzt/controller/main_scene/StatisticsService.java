@@ -19,7 +19,7 @@ public class StatisticsService {
             positionY = selected.getCenterPosition().getY();
             velocity = selected.getVelocity().magnitude();
             acceleration = selected.getAcceleration().magnitude();
-            ballsInPerceptionRadius = selected.getBallsInPerceptionRadiusMap().size();
+            ballsInPerceptionRadius = selected.getPerceptionRadiusMap().size();
             ballSize = selected.getBody().getRadius() * 2;
         } else {
             positionX = positionY = velocity = acceleration = ballSize = Double.NaN;

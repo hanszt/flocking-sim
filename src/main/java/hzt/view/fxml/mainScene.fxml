@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.effect.ColorAdjust?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <?import java.lang.*?>
@@ -42,15 +41,11 @@
         </Menu>
     </MenuBar>
     <AnchorPane VBox.vgrow="ALWAYS">
-        <SplitPane fx:id="mainSplitPane" dividerPositions="0.7182628062360802" layoutX="201.0" layoutY="165.0"
+        <SplitPane dividerPositions="0.7182628062360802" layoutX="201.0" layoutY="165.0"
                    nodeOrientation="LEFT_TO_RIGHT" pickOnBounds="false" AnchorPane.bottomAnchor="0.0"
                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <SplitPane dividerPositions="0.7626527050610821" orientation="VERTICAL">
-                <AnchorPane fx:id="animationPane" prefHeight="3000.0" prefWidth="10000.0">
-                    <effect>
-                        <ColorAdjust brightness="0.33" contrast="-0.07"/>
-                    </effect>
-                </AnchorPane>
+                <AnchorPane fx:id="animationPane" prefHeight="3000.0" prefWidth="10000.0"/>
                 <HBox fx:id="slidersPane" maxHeight="150.0" prefHeight="150.0"
                       SplitPane.resizableWithParent="false">
                     <VBox prefWidth="3000.0">

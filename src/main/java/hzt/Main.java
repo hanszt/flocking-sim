@@ -6,7 +6,7 @@ import javafx.stage.Stage;
 
 import static hzt.controller.AppConstants.Scene.MAIN_SCENE;
 
-public class Launcher extends Application {
+public class Main extends Application {
 
     public static void main(String[] args) {
         launch();
