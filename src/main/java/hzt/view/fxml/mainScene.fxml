@@ -6,12 +6,12 @@
 <?import javafx.scene.text.Font?>
 <?import java.lang.*?>
 <VBox fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="650.0"
-      prefWidth="900.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      prefHeight="700.0" prefWidth="900.0"
+      xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="hzt.controller.main_scene.MainSceneController">
 
     <fx:define>
-        <Integer fx:id="initNumberOfBalls" fx:value="150"/>
+        <Integer fx:id="initNumberOfBalls" fx:value="120"/>
         <Integer fx:id="initAccelerationUserSelectedBall" fx:value="50"/>
         <Integer fx:id="initAttraction" fx:value="3"/>
         <Integer fx:id="initRepelFactor" fx:value="10"/>
@@ -28,7 +28,7 @@
         <Boolean fx:id="initBounceWallsButtonValue" fx:value="true"/>
     </fx:define>
 
-    <MenuBar prefHeight="0.0" prefWidth="602.0" VBox.vgrow="NEVER">
+    <MenuBar fx:id="menuBar" prefHeight="0.0" prefWidth="602.0" VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="File">
             <MenuItem mnemonicParsing="false" onAction="#newInstance" text="New instance…"/>
             <SeparatorMenuItem mnemonicParsing="false"/>
@@ -46,7 +46,7 @@
                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <SplitPane dividerPositions="0.7626527050610821" orientation="VERTICAL">
                 <AnchorPane fx:id="animationPane" prefHeight="3000.0" prefWidth="10000.0"/>
-                <HBox fx:id="slidersPane" maxHeight="150.0" prefHeight="150.0"
+                <HBox fx:id="slidersPane" prefHeight="150.0" maxHeight="150"
                       SplitPane.resizableWithParent="false">
                     <VBox prefWidth="3000.0">
                         <padding>
@@ -54,7 +54,7 @@
                         </padding>
                         <Label text="Number of balls"/>
                         <Slider fx:id="numberOfBallsSlider" majorTickUnit="10.0"
-                                value="$initNumberOfBalls" max="250.0"
+                                min="1" value="$initNumberOfBalls" max="200.0"
                                 minorTickCount="5" showTickLabels="true" showTickMarks="true"/>
                         <Label layoutX="15.0" layoutY="70.0" text="Max ball size"/>
                         <Slider fx:id="maxBallSizeSlider" layoutX="15.0" layoutY="87.0" min="1"
@@ -105,7 +105,7 @@
                 <ComboBox fx:id="physicsEngineComboBox" onAction="#physicsEngineComboBoxAction"
                           prefWidth="300.0"
                           promptText="Select ball from list"/>
-                <ComboBox fx:id="flockSettingsComboBox" onAction="#flockSettingsDropdownAction"
+                <ComboBox fx:id="flockSettingsComboBox" onAction="#flockTypeDropdownAction"
                           prefWidth="300.0"
                           promptText="Flock settings"/>
                 <Label text="Choose animation settings"/>
@@ -124,15 +124,19 @@
                                       prefWidth="1000.0" selected="$initBounceWallsButtonValue"
                                       text="Bounce of walls"/>
                         <ToggleButton fx:id="showRepelCircleButton" mnemonicParsing="false"
-                                      onAction="#repelCircleButtonAction" prefWidth="1000.0"
+                                      prefWidth="1000.0" onAction="#showRepelCircleButtonAction"
                                       text="Show repel circles"/>
                         <ToggleButton fx:id="showConnectionsButton" mnemonicParsing="false"
-                                      onAction="#connectionsButtonAction" prefWidth="1000.0"
+                                      prefWidth="1000.0"
                                       text="Show connections"/>
-                        <ToggleButton fx:id="showPathButton" mnemonicParsing="false"
+                        <ToggleButton fx:id="showPathSelectedButton" mnemonicParsing="false"
                                       onAction="#showPathSelectedBallButtonAction"
                                       prefWidth="1000.0"
                                       text="Show path selected"/>
+                        <ToggleButton fx:id="showAllPathsButton" mnemonicParsing="false"
+                                      onAction="#showPathsAllBallsButtonAction"
+                                      prefWidth="1000.0"
+                                      text="Show path all"/>
                     </VBox>
                     <VBox prefWidth="150.0" spacing="4.0">
                         <padding>
@@ -147,15 +151,14 @@
                                       onAction="#transparentButtonAction"
                                       prefWidth="1000.0" text="Transparent"/>
                         <ToggleButton fx:id="showPerceptionButton" layoutX="14.0" layoutY="72.0"
-                                      mnemonicParsing="false" onAction="#perceptionButtonAction"
+                                      mnemonicParsing="false" onAction="#showPerceptionRadiusButtonAction"
                                       prefWidth="1000.0" text="Show perception"/>
                         <ToggleButton fx:id="showVelocityVectorButton" mnemonicParsing="false"
                                       prefWidth="1000.0" text="Show velocities"
-                                      onAction="#velocityVectorButtonAction"/>
+                                      onAction="#showVelocitiesButtonAction"/>
                         <ToggleButton fx:id="showAccelerationVectorButton" layoutX="14.0"
-                                      layoutY="72.0"
+                                      layoutY="72.0" onAction="#showAccelerationsButtonAction"
                                       mnemonicParsing="false"
-                                      onAction="#accelerationButtonAction"
                                       prefWidth="1000.0" text="Show accelerations"/>
                     </VBox>
                 </HBox>
@@ -179,7 +182,7 @@
                             <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                         </padding>
                         <Label text="Ball color"/>
-                        <ColorPicker fx:id="ballColorPicker"
+                        <ColorPicker fx:id="uniformBallColorPicker"
                                      onAction="#uniformBallColorPickerAction" prefHeight="30"
                                      prefWidth="1000.0"/>
                     </VBox>

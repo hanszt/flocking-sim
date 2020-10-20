@@ -20,7 +20,7 @@ public final class AppConstants {
             ANSI_RESET;
     public static final float STAGE_OPACITY = 0.8f;
 
-    public enum Scene {
+    public enum Screen {
 
         MAIN_SCENE("mainScene.fxml", "Main Scene"),
         ABOUT_SCENE("aboutScene.fxml", "About Scene");
@@ -28,7 +28,7 @@ public final class AppConstants {
         private final String fxmlFileName;
         private final String englishDescription;
 
-        Scene(String fxmlFileName, String englishDescription) {
+        Screen(String fxmlFileName, String englishDescription) {
             this.fxmlFileName = fxmlFileName;
             this.englishDescription = englishDescription;
         }

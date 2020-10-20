@@ -1,10 +1,12 @@
 package hzt.model.entity;
 
+import hzt.controller.main_scene.MainSceneController;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Paint;
@@ -68,7 +70,7 @@ public class Ball2D extends Group {
         configureLine(visibleVelocityVector);
         configureLine(visibleAccelerationVector);
         updatePaint(initPaint);
-        path.setPathVisible(false);
+        path.setVisible(false);
         visibleAccelerationVector.getStrokeDashArray().addAll(4., 4.);
     }
 
@@ -99,21 +101,23 @@ public class Ball2D extends Group {
         Point2D physicsEngineAcceleration = flock.getFlockingSim().getTotalAcceleration(this, ballsSet);
         prevAttractionComponent = addComponentToAcceleration(physicsEngineAcceleration, prevAttractionComponent);
         updateBallsInPerceptionRadiusMap();
+        updatePositionAndVelocityBasedOnAcceleration(deltaT, maxSpeed);
+        manageComponentsVisibility(flock.getSceneController());
+    }
+
+    private void manageComponentsVisibility(MainSceneController ms) {
         updateVisibleVector(visibleVelocityVector, velocity, MAX_VISIBLE_SPEED_VECTOR_LENGTH);
         updateVisibleVector(visibleAccelerationVector, acceleration, MAX_VISIBLE_ACCELERATION_VECTOR_LENGTH);
         updatePath();
-        perceptionCircle.setVisible(flock.isShowPerceptionCircle());
-        repelCircle.setVisible(flock.isShowRepelCircle());
-        visibleVelocityVector.setVisible(flock.isShowVelocityVector());
-        visibleAccelerationVector.setVisible(flock.isShowAccelerationVector());
-        if (flock.isShowConnections()) strokeConnections();
+        if (ms.getShowAllPathsButton().isSelected()) path.fadeOut();
+        if (ms.getShowConnectionsButton().isSelected()) strokeConnections();
         else getChildren().removeIf(n -> n instanceof Connection);
-        updatePositionAndVelocityBasedOnAcceleration(deltaT, maxSpeed);
     }
 
     private void updateVisibleVector(Line line, Point2D vector, double maxMagnitude) {
         Point2D begin = getCenterPosition();
         Point2D end = begin.add(vector);
+//        if (!end.equals(Point2D.ZERO)) end = begin;
         end = begin.add(end.subtract(begin).normalize().multiply(MAX_VISIBLE_VECTOR_LENGTH * vector.magnitude() / maxMagnitude));
         double visibleVectorMagnitude = end.subtract(begin).magnitude();
         if (visibleVectorMagnitude > MAX_VISIBLE_VECTOR_LENGTH) {
@@ -139,13 +143,13 @@ public class Ball2D extends Group {
     }
 
     private void updatePath() {
-        int size = path.getElements().size();
         path.addLine(getCenterPosition(), prevCenterPosition);
-        if (size >= MAX_PATH_SIZE) path.removeLine(0);
+        if (path.getElements().size() >= MAX_PATH_SIZE) path.removeLine(0);
     }
 
     private void updateBallsInPerceptionRadiusMap() {
-        getParent().getChildrenUnmodifiable().stream().filter(node -> !node.equals(this)).map(node -> (Ball2D) node).forEach(ball2D -> {
+        Flock flock = (Flock) getParent();
+        flock.getChildrenUnmodifiable().stream().filter(node -> !node.equals(this)).map(node -> (Ball2D) node).forEach(ball2D -> {
             double distance = ball2D.getCenterPosition().subtract(this.getCenterPosition()).magnitude();
             if (distance < perceptionCircle.getRadius()) {
                 if (!perceptionRadiusMap.containsKey(ball2D)) perceptionRadiusMap.put(ball2D, new Connection());
@@ -257,8 +261,9 @@ public class Ball2D extends Group {
         //           acceleration = acceleration.normalize().multiply(accIncrement);
         keyPressed = keyPressed(up, down, left, right);
         keyReleased = keyReleased(up, down, left, right);
-        this.getScene().addEventFilter(KeyEvent.KEY_PRESSED, keyPressed(up, down, left, right));
-        this.getScene().addEventFilter(KeyEvent.KEY_RELEASED, keyReleased);
+        Scene scene = ((Flock) getParent()).getSceneController().getScene();
+        scene.addEventFilter(KeyEvent.KEY_PRESSED, keyPressed);
+        scene.addEventFilter(KeyEvent.KEY_RELEASED, keyReleased);
     }
 
     private EventHandler<KeyEvent> keyPressed(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
@@ -305,8 +310,9 @@ public class Ball2D extends Group {
 
     public void removeKeyControlsForAcceleration() {
         upPressed = downPressed = leftPressed = rightPressed = false;
-        this.getScene().removeEventFilter(KeyEvent.KEY_PRESSED, keyPressed);
-        this.getScene().removeEventFilter(KeyEvent.KEY_RELEASED, keyReleased);
+        Scene scene = ((Flock) getParent()).getSceneController().getScene();
+        scene.removeEventFilter(KeyEvent.KEY_PRESSED, keyPressed);
+        scene.removeEventFilter(KeyEvent.KEY_RELEASED, keyReleased);
     }
 
     public void updatePaint(Paint paint) {

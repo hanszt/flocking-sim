@@ -4,8 +4,8 @@ import hzt.controller.AbstractSceneController;
 import hzt.controller.AppManager;
 import javafx.fxml.FXML;
 
-import static hzt.controller.AppConstants.Scene.ABOUT_SCENE;
-import static hzt.controller.AppConstants.Scene.MAIN_SCENE;
+import static hzt.controller.AppConstants.Screen.ABOUT_SCENE;
+import static hzt.controller.AppConstants.Screen.MAIN_SCENE;
 
 public class AboutController extends AbstractSceneController {
 

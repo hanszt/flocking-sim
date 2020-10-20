@@ -9,22 +9,16 @@
       fx:controller="hzt.controller.about_scene.AboutController">
 
     <MenuBar prefHeight="0.0" prefWidth="602.0" VBox.vgrow="NEVER">
-        <menus>
-            <Menu mnemonicParsing="false" text="File">
-                <items>
-                    <MenuItem mnemonicParsing="false" onAction="#newInstance" text="New instance…"/>
-                    <SeparatorMenuItem mnemonicParsing="false"/>
-                    <MenuItem mnemonicParsing="false" onAction="#quitInstance" text="Quit instance"/>
-                    <SeparatorMenuItem mnemonicParsing="false"/>
-                    <MenuItem mnemonicParsing="false" onAction="#exitProgram" text="Exit"/>
-                </items>
-            </Menu>
-            <Menu mnemonicParsing="false" text="Help">
-                <items>
-                    <MenuItem mnemonicParsing="false" text="About"/>
-                </items>
-            </Menu>
-        </menus>
+        <Menu mnemonicParsing="false" text="File">
+            <MenuItem mnemonicParsing="false" onAction="#newInstance" text="New instance…"/>
+            <SeparatorMenuItem mnemonicParsing="false"/>
+            <MenuItem mnemonicParsing="false" onAction="#quitInstance" text="Quit instance"/>
+            <SeparatorMenuItem mnemonicParsing="false"/>
+            <MenuItem mnemonicParsing="false" onAction="#exitProgram" text="Exit"/>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Help">
+            <MenuItem mnemonicParsing="false" text="About"/>
+        </Menu>
     </MenuBar>
     <AnchorPane VBox.vgrow="ALWAYS">
 

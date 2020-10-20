@@ -4,7 +4,7 @@ import hzt.controller.AppManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-import static hzt.controller.AppConstants.Scene.MAIN_SCENE;
+import static hzt.controller.AppConstants.Screen.MAIN_SCENE;
 
 public class Main extends Application {
 

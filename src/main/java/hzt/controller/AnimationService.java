@@ -43,11 +43,10 @@ public class AnimationService {
 
     public void run(Flock flock, double accelerationMultiplier, double frictionFactor, boolean bounce, double maxSpeed) {
         Ball2D selected = mainSceneController.getFlock().getSelectedBall();
-        statisticsService.showStatisticsAboutSelectedBall(selected);
         LocalTime startTimeSim = mainSceneController.getAppManager().startTimeSim, stopTimeSim = LocalTime.now();
         Duration runTimeSim = Duration.millis((stopTimeSim.toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
-        statisticsService.showGlobalStatistics(frictionFactor, timeline.getCycleDuration(),
-                flock.getChildren().size(), runTimeSim);
+        statisticsService.showStatisticsAboutSelectedBall(selected);
+        statisticsService.showGlobalStatistics(frictionFactor, timeline.getCycleDuration(), flock.getChildren().size(), runTimeSim);
         flock.getChildren().stream().map(ball2D -> (Ball2D) ball2D).forEach(ball -> {
             ball.addFriction(frictionFactor);
             if (bounce) ball.bounceOfEdges(mainSceneController.getAnimationWindowDimension());

@@ -8,8 +8,8 @@ import javafx.util.Duration;
 import java.time.LocalTime;
 
 import static hzt.controller.AppConstants.*;
-import static hzt.controller.AppConstants.Scene.ABOUT_SCENE;
-import static hzt.controller.AppConstants.Scene.MAIN_SCENE;
+import static hzt.controller.AppConstants.Screen.ABOUT_SCENE;
+import static hzt.controller.AppConstants.Screen.MAIN_SCENE;
 import static java.lang.System.out;
 
 public class AppManager extends AppVars {
@@ -30,12 +30,12 @@ public class AppManager extends AppVars {
     public void configureStage(Stage stage) {
         stage.setTitle(String.format("%s (%d)", TITLE, instance));
         stage.setMinWidth(400);
-        stage.setMinHeight(400);
+        stage.setMinHeight(750);
         stage.setOnCloseRequest(e -> printClosingText());
     }
 
-    public void setupScene(AppConstants.Scene scene) {
-        curSceneController = sceneControllerMap.get(scene);
+    public void setupScene(Screen screen) {
+        curSceneController = sceneControllerMap.get(screen);
         stage.setScene(curSceneController.getScene());
         curSceneController.setup();
     }

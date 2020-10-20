@@ -8,7 +8,7 @@ import java.util.Map;
 public abstract class AppVars {
 
     final Stage stage;
-    final Map<AppConstants.Scene, AbstractSceneController> sceneControllerMap;
+    final Map<AppConstants.Screen, AbstractSceneController> sceneControllerMap;
     AbstractSceneController curSceneController;
 
     public AppVars(Stage stage) {
@@ -20,7 +20,7 @@ public abstract class AppVars {
         return stage;
     }
 
-    public Map<AppConstants.Scene, AbstractSceneController> getSceneControllerMap() {
+    public Map<AppConstants.Screen, AbstractSceneController> getSceneControllerMap() {
         return sceneControllerMap;
     }
 }

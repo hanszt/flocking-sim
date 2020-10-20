@@ -20,7 +20,7 @@ import javafx.stage.Stage;
 import lombok.Getter;
 
 import static hzt.controller.AppConstants.STAGE_OPACITY;
-import static hzt.controller.AppConstants.Scene.MAIN_SCENE;
+import static hzt.controller.AppConstants.Screen.MAIN_SCENE;
 import static hzt.model.entity.Flock.INIT_SELECTED_BALL_COLOR;
 import static hzt.model.entity.Flock.INIT_UNIFORM_BALL_COLOR;
 import static javafx.scene.paint.Color.DARKBLUE;
@@ -76,6 +76,8 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private VBox root;
     @FXML
+    private MenuBar menuBar;
+    @FXML
     private AnchorPane animationPane;
     @FXML
     private VBox mainControlPanel;
@@ -92,7 +94,7 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private ToggleButton bounceWallsButton;
     @FXML
-    private ToggleButton showPathButton;
+    private ToggleButton showPathSelectedButton;
     @FXML
     private ToggleButton showPerceptionButton;
     @FXML
@@ -103,9 +105,11 @@ public class MainSceneController extends AbstractSceneController {
     private ToggleButton showConnectionsButton;
     @FXML
     private ToggleButton fullScreenButton;
+    @FXML
+    private ToggleButton showAllPathsButton;
 
     @FXML
-    private ColorPicker ballColorPicker;
+    private ColorPicker uniformBallColorPicker;
     @FXML
     private ColorPicker backgroundColorPicker;
     @FXML
@@ -155,17 +159,20 @@ public class MainSceneController extends AbstractSceneController {
 
     @Override
     public void setup() {
-        resetControls();
         addListenersToSliders();
         configureColorPickers();
         configureComboBoxes();
         configureFlock();
+        reset();
+        flock.setFlockingSim(engine.getType1());
         bindFullScreenButtonToFullScreen();
         engine.setPullFactor(attractionSlider.getValue());
         engine.setRepelFactor(repelFactorSlider.getValue());
         animationPane.getChildren().add(flock);
         animationPane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
         animationService.addAnimationLoopToTimeline(initializeAnimationLoop(), true);
+        flock.setSelectedBall(flock.getRandomNewSelectedBall());
+        uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandom()));
     }
 
     private void bindFullScreenButtonToFullScreen() {
@@ -196,7 +203,7 @@ public class MainSceneController extends AbstractSceneController {
 
     private void configureColorPickers() {
         backgroundColorPicker.setValue(backgroundColor);
-        ballColorPicker.setValue(INIT_UNIFORM_BALL_COLOR);
+        uniformBallColorPicker.setValue(INIT_UNIFORM_BALL_COLOR);
         selectedBallColorPicker.setValue(INIT_SELECTED_BALL_COLOR);
     }
 
@@ -206,19 +213,10 @@ public class MainSceneController extends AbstractSceneController {
             sceneDimension = new Dimension2D(root.getPrefWidth(), root.getPrefHeight());
         } else sceneDimension = new Dimension2D(scene.getWidth(), scene.getHeight());
         return new Dimension2D(sceneDimension.getWidth() - mainControlPanel.getWidth(),
-                sceneDimension.getHeight() - slidersPane.getHeight());
+                sceneDimension.getHeight() - slidersPane.getHeight() - menuBar.getHeight());
     }
 
     private void configureFlock() {
-        flock.setFlockingSim(engine.getType1());
-        flock.setShowVelocityVector(showVelocityVectorButton.isSelected());
-        flock.setShowAccelerationVector(showAccelerationVectorButton.isSelected());
-        flock.setShowPerceptionCircle(showPerceptionButton.isSelected());
-        flock.setShowRepelCircle(showRepelCircleButton.isSelected());
-        flock.setShowConnections(showConnectionsButton.isSelected());
-        flock.setPerceptionRadiusRatio(perceptionRadiusSlider.getValue());
-        flock.setRepelRadiusRatio(repelDistanceSlider.getValue());
-        flock.setMaxBallSize(maxBallSizeSlider.getValue());
         flock.setFlockType(flockSettingsComboBox.getValue());
         flock.controlFlockSize((int) numberOfBallsSlider.getValue(), getAnimationWindowDimension());
     }
@@ -235,11 +233,17 @@ public class MainSceneController extends AbstractSceneController {
 
     public void reset() {
         resetControls();
-        flock.setShowAccelerationVector(showAccelerationVectorButton.isSelected());
-        flock.setShowConnections(showConnectionsButton.isSelected());
-        flock.setShowVelocityVector(showVelocityVectorButton.isSelected());
-        flock.setShowPerceptionCircle(showPerceptionButton.isSelected());
-        flock.setShowRepelCircle(showRepelCircleButton.isSelected());
+        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(this::setBallParams);
+    }
+
+    public void setBallParams(Ball2D ball2D) {
+        ball2D.getVisibleVelocityVector().setVisible(showVelocityVectorButton.isSelected());
+        ball2D.getVisibleAccelerationVector().setVisible(showAccelerationVectorButton.isSelected());
+        ball2D.getRepelCircle().setVisible(showRepelCircleButton.isSelected());
+        ball2D.getPerceptionCircle().setVisible(showPerceptionButton.isSelected());
+        boolean showPathSelectedBall = flock.getSelectedBall() != null && flock.getSelectedBall().equals(ball2D);
+        if (showPathSelectedBall) ball2D.getPath().setVisible(showPathSelectedButton.isSelected());
+        else ball2D.getPath().setVisible(showAllPathsButton.isSelected());
     }
 
     private void resetControls() {
@@ -253,7 +257,8 @@ public class MainSceneController extends AbstractSceneController {
         perceptionRadiusSlider.setValue(initPerceptionRadius);
         maxSpeedSlider.setValue(initMaxSpeed);
         showConnectionsButton.setSelected(initShowConnections);
-        showPathButton.setSelected(initShowPath);
+        showPathSelectedButton.setSelected(initShowPath);
+        showAllPathsButton.setSelected(initShowPath);
         showVelocityVectorButton.setSelected(initShowVelocity);
         showAccelerationVectorButton.setSelected(initShowAcceleration);
         showPerceptionButton.setSelected(initShowPerception);
@@ -270,7 +275,8 @@ public class MainSceneController extends AbstractSceneController {
     private void uniformBallColorPickerAction(ActionEvent event) {
         Color color = ((ColorPicker) event.getSource()).getValue();
         flock.setUniformBallColor(color);
-        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.updatePaint(color));
+        flock.getChildren().stream().map(n -> (Ball2D) n)
+                .filter(ball -> !ball.equals(flock.getSelectedBall())).forEach(ball2D -> ball2D.updatePaint(color));
     }
 
     @FXML
@@ -293,37 +299,17 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     @FXML
-    private void connectionsButtonAction(ActionEvent actionEvent) {
-        flock.setShowConnections(((ToggleButton) actionEvent.getSource()).isSelected());
-    }
-
-    @FXML
-    private void perceptionButtonAction(ActionEvent actionEvent) {
-        flock.setShowPerceptionCircle(((ToggleButton) actionEvent.getSource()).isSelected());
-    }
-
-    @FXML
-    private void repelCircleButtonAction(ActionEvent actionEvent) {
-        flock.setShowRepelCircle(((ToggleButton) actionEvent.getSource()).isSelected());
-    }
-
-    @FXML
-    private void velocityVectorButtonAction(ActionEvent actionEvent) {
-        flock.setShowVelocityVector(((ToggleButton) actionEvent.getSource()).isSelected());
-    }
-
-    @FXML
-    private void accelerationButtonAction(ActionEvent actionEvent) {
-        flock.setShowAccelerationVector(((ToggleButton) actionEvent.getSource()).isSelected());
-    }
-
-    @FXML
     private void showPathSelectedBallButtonAction(ActionEvent event) {
         boolean showPath = ((ToggleButton) event.getSource()).isSelected();
         Ball2D ball = flock.getSelectedBall();
-        flock.setShowPath(showPath);
-        if (ball != null) ball.getPath().setPathVisible(showPath);
-//        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.getPath().setPathVisible(showPath));
+        if (ball != null) ball.getPath().setVisible(showPath);
+    }
+
+    @FXML
+    private void showPathsAllBallsButtonAction(ActionEvent event) {
+        boolean showPaths = ((ToggleButton) event.getSource()).isSelected();
+        flock.getChildren().stream().map(n -> (Ball2D) n).filter(ball -> !ball.equals(flock.getSelectedBall()))
+                .forEach(ball2D -> ball2D.getPath().setVisible(showPaths));
     }
 
     @FXML
@@ -332,14 +318,40 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     @FXML
+    private void showPerceptionRadiusButtonAction(ActionEvent event) {
+        boolean visible = ((ToggleButton) event.getSource()).isSelected();
+        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.getPerceptionCircle().setVisible(visible));
+    }
+
+    @FXML
+    public void showRepelCircleButtonAction(ActionEvent event) {
+        boolean visible = ((ToggleButton) event.getSource()).isSelected();
+        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.getRepelCircle().setVisible(visible));
+    }
+
+    @FXML
+    public void showVelocitiesButtonAction(ActionEvent event) {
+        boolean visible = ((ToggleButton) event.getSource()).isSelected();
+        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.getVisibleVelocityVector().setVisible(visible));
+    }
+
+    @FXML
+    public void showAccelerationsButtonAction(ActionEvent event) {
+        boolean visible = ((ToggleButton) event.getSource()).isSelected();
+        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.getVisibleAccelerationVector().setVisible(visible));
+    }
+
+    @FXML
     private void physicsEngineComboBoxAction(ActionEvent event) {
         flock.setFlockingSim((Engine.FlockingSim) ((ComboBox<?>) event.getSource()).getValue());
     }
 
     @FXML
-    private void flockSettingsDropdownAction() {
+    private void flockTypeDropdownAction() {
         flock.controlFlockSize(0, getAnimationWindowDimension());
         configureFlock();
+        uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandom()));
+        flock.setSelectedBall(flock.getRandomNewSelectedBall());
     }
 
     protected AbstractSceneController getBean() {

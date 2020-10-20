@@ -11,7 +11,7 @@ import lombok.Getter;
 import java.io.IOException;
 
 import static hzt.controller.AppConstants.FXML_FILE_LOCATION;
-import static hzt.controller.AppConstants.Scene.ABOUT_SCENE;
+import static hzt.controller.AppConstants.Screen.ABOUT_SCENE;
 
 @Getter
 public abstract class AbstractSceneController implements Controller {
