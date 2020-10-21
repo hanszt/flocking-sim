@@ -67,10 +67,11 @@ public class Ball2D extends Group {
     private void configureComponents() {
         configureCircle(perceptionCircle);
         configureCircle(repelCircle);
-        configureLine(visibleVelocityVector);
-        configureLine(visibleAccelerationVector);
+        configureVisibleVector(visibleVelocityVector);
+        configureVisibleVector(visibleAccelerationVector);
         updatePaint(initPaint);
         path.setVisible(false);
+        path.setLineWidth(body.getRadius() / 4);
         visibleAccelerationVector.getStrokeDashArray().addAll(4., 4.);
     }
 
@@ -82,7 +83,7 @@ public class Ball2D extends Group {
         circle.centerYProperty().bind(body.centerYProperty());
     }
 
-    private void configureLine(Line line) {
+    private void configureVisibleVector(Line line) {
         line.setStrokeWidth(LINE_STROKE_WIDTH);
         line.startXProperty().bind(body.centerXProperty());
         line.startYProperty().bind(body.centerYProperty());
@@ -106,23 +107,24 @@ public class Ball2D extends Group {
     }
 
     private void manageComponentsVisibility(MainSceneController ms) {
-        updateVisibleVector(visibleVelocityVector, velocity, MAX_VISIBLE_SPEED_VECTOR_LENGTH);
-        updateVisibleVector(visibleAccelerationVector, acceleration, MAX_VISIBLE_ACCELERATION_VECTOR_LENGTH);
+        updateVisibleVector(visibleVelocityVector, velocity, 300);
+        updateVisibleVector(visibleAccelerationVector, acceleration, 2000);
         updatePath();
         if (ms.getShowAllPathsButton().isSelected()) path.fadeOut();
         if (ms.getShowConnectionsButton().isSelected()) strokeConnections();
         else getChildren().removeIf(n -> n instanceof Connection);
     }
 
-    private void updateVisibleVector(Line line, Point2D vector, double maxMagnitude) {
+    private void updateVisibleVector(Line line, Point2D vector, double correction) {
         Point2D begin = getCenterPosition();
         Point2D end = begin.add(vector);
 //        if (!end.equals(Point2D.ZERO)) end = begin;
-        end = begin.add(end.subtract(begin).normalize().multiply(MAX_VISIBLE_VECTOR_LENGTH * vector.magnitude() / maxMagnitude));
+        Point2D unitVector = end.subtract(begin).normalize();
+        Point2D radiusInVectorDir = unitVector.multiply(body.getRadius() - line.getStrokeWidth());
+        begin = begin.add(radiusInVectorDir);
+        end = begin.add(unitVector.multiply(MAX_VECTOR_LENGTH * vector.magnitude() / correction));
         double visibleVectorMagnitude = end.subtract(begin).magnitude();
-        if (visibleVectorMagnitude > MAX_VISIBLE_VECTOR_LENGTH) {
-            end = begin.add(end.subtract(begin).normalize().multiply(MAX_VISIBLE_VECTOR_LENGTH));
-        }
+        if (visibleVectorMagnitude > MAX_VECTOR_LENGTH) end = begin.add(unitVector.multiply(MAX_VECTOR_LENGTH));
         line.setEndX(end.getX());
         line.setEndY(end.getY());
     }
@@ -267,7 +269,7 @@ public class Ball2D extends Group {
     }
 
     private EventHandler<KeyEvent> keyPressed(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
-       return key -> {
+        return key -> {
             if (key.getCode() == down && !downPressed) {
                 downPressed = true;
                 acceleration = acceleration.add(new Point2D(0, keyPressedAccIncrement));
@@ -288,7 +290,7 @@ public class Ball2D extends Group {
     }
 
     private EventHandler<KeyEvent> keyReleased(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
-        return  key -> {
+        return key -> {
             if (key.getCode() == down) {
                 downPressed = false;
                 acceleration = acceleration.subtract(new Point2D(0, keyPressedAccIncrement));

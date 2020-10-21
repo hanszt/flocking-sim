@@ -23,8 +23,7 @@ public class Flock extends Pane {
 
     public static final int MIN_RADIUS = 3, MAX_RADIUS = 10;
     static final int MAX_PATH_SIZE_ALL = 200, MAX_PATH_SIZE = 50;
-    static final int MAX_VISIBLE_VECTOR_LENGTH = 100;
-    public static final double MAX_VISIBLE_SPEED_VECTOR_LENGTH = 300, MAX_VISIBLE_ACCELERATION_VECTOR_LENGTH = 1000;
+    static final int MAX_VECTOR_LENGTH = 80;
     public static final Color INIT_UNIFORM_BALL_COLOR = Color.ORANGE, INIT_SELECTED_BALL_COLOR = Color.RED;
 
     private final MainSceneController sceneController;

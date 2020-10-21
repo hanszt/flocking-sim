@@ -37,6 +37,9 @@ which boid sees what other boid? This is dependent on the perception radius slid
 #### screenshot 6: A preview of when the show velocities button is toggled
 ![FlockingSim](src/main/resources/images/example6.jpg)
 
+#### screenshot 7: A preview of when the show paths button is toggled
+![FlockingSim](src/main/resources/images/example7.jpg)
+
 ## Background
 Boids is an artificial life program, developed by Craig Reynolds in 1986, which simulates the flockingSim behaviour of birds. His paper on this topic was published in 1987 in the proceedings of the ACM SIGGRAPH conference. [1] The name "boid" corresponds to a shortened version of "bird-oid object", which refers to a bird-like object.[2] Incidentally, "boid" is also a New York Metropolitan dialect pronunciation for "bird".
 Rules applied in simple Boids

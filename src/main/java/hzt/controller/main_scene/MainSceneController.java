@@ -23,12 +23,12 @@ import static hzt.controller.AppConstants.STAGE_OPACITY;
 import static hzt.controller.AppConstants.Screen.MAIN_SCENE;
 import static hzt.model.entity.Flock.INIT_SELECTED_BALL_COLOR;
 import static hzt.model.entity.Flock.INIT_UNIFORM_BALL_COLOR;
-import static javafx.scene.paint.Color.DARKBLUE;
+import static javafx.scene.paint.Color.NAVY;
 
 @Getter
 public class MainSceneController extends AbstractSceneController {
 
-    private static final Color INIT_BG_COLOR = DARKBLUE.darker().darker().darker();
+    private static final Color INIT_BG_COLOR = NAVY;
 
     private final Flock flock;
     private final AnimationService animationService;
@@ -97,6 +97,8 @@ public class MainSceneController extends AbstractSceneController {
     private ToggleButton showPathSelectedButton;
     @FXML
     private ToggleButton showPerceptionButton;
+    @FXML
+    private ToggleButton showPerceptionSelectedBallButton;
     @FXML
     private ToggleButton showRepelCircleButton;
     @FXML
@@ -262,6 +264,7 @@ public class MainSceneController extends AbstractSceneController {
         showVelocityVectorButton.setSelected(initShowVelocity);
         showAccelerationVectorButton.setSelected(initShowAcceleration);
         showPerceptionButton.setSelected(initShowPerception);
+        showPerceptionSelectedBallButton.setSelected(initShowPerception);
         bounceWallsButton.setSelected(initBounceWallsButtonValue);
     }
 
@@ -308,8 +311,8 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private void showPathsAllBallsButtonAction(ActionEvent event) {
         boolean showPaths = ((ToggleButton) event.getSource()).isSelected();
-        flock.getChildren().stream().map(n -> (Ball2D) n).filter(ball -> !ball.equals(flock.getSelectedBall()))
-                .forEach(ball2D -> ball2D.getPath().setVisible(showPaths));
+        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.getPath().setVisible(showPaths));
+        showPathSelectedButton.setSelected(showPaths);
     }
 
     @FXML
@@ -321,6 +324,13 @@ public class MainSceneController extends AbstractSceneController {
     private void showPerceptionRadiusButtonAction(ActionEvent event) {
         boolean visible = ((ToggleButton) event.getSource()).isSelected();
         flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.getPerceptionCircle().setVisible(visible));
+        showPerceptionSelectedBallButton.setSelected(visible);
+    }
+
+    @FXML
+    private void showPerceptionSelectedBallButtonAction(ActionEvent event) {
+        boolean visible = ((ToggleButton) event.getSource()).isSelected();
+        flock.getSelectedBall().getPerceptionCircle().setVisible(visible);
     }
 
     @FXML
@@ -357,4 +367,6 @@ public class MainSceneController extends AbstractSceneController {
     protected AbstractSceneController getBean() {
         return this;
     }
+
+
 }

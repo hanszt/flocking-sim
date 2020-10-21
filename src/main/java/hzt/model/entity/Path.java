@@ -11,6 +11,7 @@ import static hzt.controller.AnimationService.LINE_STROKE_WIDTH;
 
 public class Path extends Group {
 
+    private double lineWidth;
     private Paint paint;
 
     public Path() {
@@ -21,9 +22,13 @@ public class Path extends Group {
         if (!currentPosition.equals(Point2D.ZERO) && !prevPosition.equals(Point2D.ZERO)) {
             Line line = new Line(prevPosition.getX(), prevPosition.getY(), currentPosition.getX(), currentPosition.getY());
             line.setStroke(paint);
-            line.setStrokeWidth(LINE_STROKE_WIDTH);
+            line.setStrokeWidth(lineWidth);
             getChildren().add(line);
         }
+    }
+
+    public void setLineWidth(double lineWidth) {
+        this.lineWidth = lineWidth;
     }
 
    public void fadeOut() {
