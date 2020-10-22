@@ -2,9 +2,11 @@ package hzt.controller.utils;
 
 import hzt.model.entity.Ball2D;
 import javafx.geometry.Point2D;
+import lombok.Getter;
 
 import java.util.Set;
 
+@Getter
 public class Engine {
 
     public static final double DENSITY = 100; // kg/m^3
@@ -83,13 +85,25 @@ public class Engine {
         }
     };
 
-    public FlockingSim getType1() {
-        return type1;
-    }
+    private final FlockingSim type3 = new FlockingSim() {
 
-    public FlockingSim getType2() {
-        return type2;
-    }
+        Point2D getAccelerationBetweenTwoBalls(Ball2D self, Ball2D other) {
+            final int multiplier = 10;
+            Point2D vectorSelfToOther = other.getCenterPosition().subtract(self.getCenterPosition());
+            Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
+            float distance = (float) vectorSelfToOther.magnitude();
+            float repelDistance = self.getRepelRadius() + other.getRepelRadius();
+            Point2D acceleration;
+            if (distance <= repelDistance) acceleration = unitVectorInAccDir.multiply(-repelFactor * multiplier);
+            else acceleration = unitVectorInAccDir.multiply(pullFactor * multiplier);
+            return acceleration;
+        }
+
+        @Override
+        public String toString() {
+            return "Engine type 3";
+        }
+    };
 
     public void setPullFactor(double pullFactor) {
         this.pullFactor = (float) pullFactor;

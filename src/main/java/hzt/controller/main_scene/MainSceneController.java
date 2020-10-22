@@ -189,7 +189,7 @@ public class MainSceneController extends AbstractSceneController {
         flockSettingsComboBox.getItems().addAll(flock.getRandom(), flock.getUniform());
         flockSettingsComboBox.setValue(flock.getRandom());
 
-        physicsEngineComboBox.getItems().addAll(engine.getType1(), engine.getType2());
+        physicsEngineComboBox.getItems().addAll(engine.getType1(), engine.getType2(), engine.getType3());
         physicsEngineComboBox.setValue(engine.getType1());
     }
 

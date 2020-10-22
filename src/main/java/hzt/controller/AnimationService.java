@@ -8,6 +8,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Dimension2D;
 import javafx.util.Duration;
 
 import java.time.LocalTime;
@@ -43,14 +44,15 @@ public class AnimationService {
 
     public void run(Flock flock, double accelerationMultiplier, double frictionFactor, boolean bounce, double maxSpeed) {
         Ball2D selected = mainSceneController.getFlock().getSelectedBall();
+        Dimension2D animationWindowSize = mainSceneController.getAnimationWindowDimension();
         LocalTime startTimeSim = mainSceneController.getAppManager().startTimeSim, stopTimeSim = LocalTime.now();
         Duration runTimeSim = Duration.millis((stopTimeSim.toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
         statisticsService.showStatisticsAboutSelectedBall(selected);
         statisticsService.showGlobalStatistics(frictionFactor, timeline.getCycleDuration(), flock.getChildren().size(), runTimeSim);
         flock.getChildren().stream().map(ball2D -> (Ball2D) ball2D).forEach(ball -> {
             ball.addFriction(frictionFactor);
-            if (bounce) ball.bounceOfEdges(mainSceneController.getAnimationWindowDimension());
-            else ball.floatThroughEdges(mainSceneController.getAnimationWindowDimension());
+            if (bounce) ball.bounceOfEdges(animationWindowSize);
+            else ball.floatThroughEdges(animationWindowSize);
             ball.update(timeline.getCycleDuration(), accelerationMultiplier, maxSpeed);
         });
     }
