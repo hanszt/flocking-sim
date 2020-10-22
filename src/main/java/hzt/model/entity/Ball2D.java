@@ -107,7 +107,9 @@ public class Ball2D extends Group {
     }
 
     private void manageComponentsVisibility(MainSceneController ms) {
-        updateVisibleVector(visibleVelocityVector, velocity, 300);
+        double maxSpeed = ms.getMaxSpeedSlider().getValue();
+        final  int minSpeedLength = 300;
+        updateVisibleVector(visibleVelocityVector, velocity, maxSpeed >= minSpeedLength ? maxSpeed : minSpeedLength);
         updateVisibleVector(visibleAccelerationVector, acceleration, 2000);
         updatePath();
         if (ms.getShowAllPathsButton().isSelected()) path.fadeOut();

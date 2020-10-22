@@ -31,11 +31,11 @@ public class StatisticsService {
         mc.getVelocityStatsLabel().setText(String.format("%-4.2f p/s", velocity));
         mc.getAccelerationStatsLabel().setText(String.format("%-4.2f p/s^2", acceleration));
         mc.getNrOfBallsInPerceptionRadiusLabel().setText(String.format("%-3d", ballsInPerceptionRadius));
-        mc.getBallSizeLabel().setText(String.format("%-4.2f", ballSize));
+        mc.getBallSizeLabel().setText(String.format("%-4.2f p", ballSize));
     }
 
     public void showGlobalStatistics(double friction, Duration cycleDuration, int size, Duration runTimeSim) {
-        mc.getFrictionStatsLabel().setText(String.format("%-1.2f", friction));
+        mc.getFrictionStatsLabel().setText(String.format("%-1.3f", friction));
         mc.getFrameRateStatsLabel().setText(String.format("%-4.2f f/s", 1 / cycleDuration.toSeconds()));
         mc.getNumberOfBallsLabel().setText(String.format("%-3d", size));
         mc.getRunTimeLabel().setText(String.format("%-4.3f seconds", runTimeSim.toSeconds()));
