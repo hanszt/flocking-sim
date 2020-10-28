@@ -19,7 +19,7 @@
         <Integer fx:id="initMaxBallSize" fx:value="5"/>
         <Integer fx:id="initPerceptionRadius" fx:value="25"/>
         <Integer fx:id="initMaxSpeed" fx:value="150"/>
-        <Double fx:id="initFriction" fx:value=".05"/>
+        <Double fx:id="initFriction" fx:value="1"/>
         <Boolean fx:id="initShowConnections" fx:value="false"/>
         <Boolean fx:id="initShowPath" fx:value="false"/>
         <Boolean fx:id="initShowVelocity" fx:value="false"/>
@@ -77,8 +77,7 @@
                                 showTickMarks="true" value="$initRepelFactor"/>
                         <Label text="Friction"/>
                         <Slider fx:id="frictionSlider" majorTickUnit=".1" value="$initFriction"
-                                max=".2"
-                                minorTickCount="1" showTickLabels="true" showTickMarks="true"/>
+                                max="10" showTickLabels="true" showTickMarks="true"/>
                     </VBox>
                     <VBox layoutX="10.0" layoutY="10.0" prefWidth="3000.0">
                         <padding>

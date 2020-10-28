@@ -24,7 +24,8 @@ import java.util.Stack;
 
 import static hzt.controller.AnimationService.LINE_STROKE_WIDTH;
 import static hzt.controller.utils.Engine.DENSITY;
-import static hzt.model.entity.Flock.*;
+import static hzt.model.entity.Flock.MAX_PATH_SIZE;
+import static hzt.model.entity.Flock.MAX_VECTOR_LENGTH;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
 @ToString
@@ -163,8 +164,13 @@ public class Ball2D extends Group {
         });
     }
 
+    private Point2D prevDecelerationComponent = Point2D.ZERO;
+
     public void addFriction(double frictionFactor) {
-        velocity = velocity.multiply(1 - frictionFactor);
+//        velocity = velocity.multiply(1 - frictionFactor);
+        Point2D decelerationDir = velocity.normalize().multiply(-1);
+        Point2D decelerationCausedByFriction = decelerationDir.multiply(velocity.magnitude()).multiply(frictionFactor);
+        prevDecelerationComponent = addComponentToAcceleration(decelerationCausedByFriction, prevDecelerationComponent);
     }
 
     private void updatePositionAndVelocityBasedOnAcceleration(Duration deltaT, double maxSpeed) {
