@@ -226,12 +226,9 @@
                         </VBox>
                         <VBox layoutX="10.0" layoutY="10.0" prefWidth="188.0">
                             <Label fx:id="ballNameLabel" text="Unknown"/>
-                            <Label fx:id="positionStatsLabel"
-                                   text="(x = NaN, y = NaN) (p)"/>
-                            <Label fx:id="velocityStatsLabel"
-                                   text="(x = NaN, y = NaN) (p/2)"/>
-                            <Label fx:id="accelerationStatsLabel"
-                                   text="(x = NaN, y = NaN) (p/s^2)"/>
+                            <Label fx:id="positionStatsLabel"/>
+                            <Label fx:id="velocityStatsLabel"/>
+                            <Label fx:id="accelerationStatsLabel"/>
                             <Label fx:id="ballSizeLabel" text="0"/>
                             <Label fx:id="nrOfBallsInPerceptionRadiusLabel" text="0"/>
                         </VBox>

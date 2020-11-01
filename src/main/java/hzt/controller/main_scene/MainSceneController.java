@@ -19,6 +19,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import lombok.Getter;
 
+import java.io.IOException;
+
 import static hzt.controller.AppConstants.STAGE_OPACITY;
 import static hzt.controller.AppConstants.Screen.MAIN_SCENE;
 import static hzt.model.entity.Flock.INIT_SELECTED_BALL_COLOR;
@@ -34,7 +36,7 @@ public class MainSceneController extends AbstractSceneController {
     private final AnimationService animationService;
     private final Engine engine;
 
-    public MainSceneController(AppManager appManager) {
+    public MainSceneController(AppManager appManager) throws IOException {
         super(MAIN_SCENE.getFxmlFileName(), appManager);
         engine = new Engine();
         animationService = new AnimationService(this);

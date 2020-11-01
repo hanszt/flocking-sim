@@ -171,7 +171,7 @@ public class Ball2D extends Group {
     public void addFriction(double frictionFactor) {
 //        velocity = velocity.multiply(1 - frictionFactor);
         Point2D decelerationDir = velocity.normalize().multiply(-1);
-        Point2D decelerationCausedByFriction = decelerationDir.multiply(velocity.magnitude()).multiply(frictionFactor);
+        Point2D decelerationCausedByFriction = decelerationDir.multiply(velocity.magnitude() * frictionFactor);
         prevDecelerationComponent = addComponentToAcceleration(decelerationCausedByFriction, prevDecelerationComponent);
     }
 
@@ -179,10 +179,20 @@ public class Ball2D extends Group {
         Point2D position = getCenterPosition();
         double deltaTSeconds = deltaT.toSeconds();
         velocity = velocity.add(acceleration.multiply(deltaTSeconds));
-        if (velocity.magnitude() > maxSpeed) velocity = velocity.normalize().multiply(maxSpeed);
+        limitSpeed(maxSpeed);
         prevCenterPosition = position;
         position = position.add(velocity.multiply(deltaTSeconds));
         setCenterPosition(position);
+    }
+
+    void limitSpeed(double maxSpeed) {
+        if (velocity.magnitude() > maxSpeed) velocity = velocity.normalize().multiply(maxSpeed);
+//        if (velocity.magnitude() > maxSpeed) {
+//            Point2D velocityDir = velocity.normalize();
+//            double angle = acceleration.angle(velocity);
+//            double scalarProjectionOfAccelerationOnVelocity = acceleration.magnitude() * Math.cos(angle);
+//            acceleration = acceleration.subtract(velocityDir.multiply(scalarProjectionOfAccelerationOnVelocity));
+//        }
     }
 
     public Point2D addComponentToAcceleration(Point2D acceleration, Point2D prevAcceleration) {

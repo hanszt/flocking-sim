@@ -5,6 +5,7 @@ import hzt.controller.main_scene.MainSceneController;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.time.LocalTime;
 
 import static hzt.controller.AppConstants.*;
@@ -21,10 +22,15 @@ public class AppManager extends AppVars {
 
     public AppManager(Stage stage) {
         super(stage);
-        startTimeSim = LocalTime.now();
-        System.out.printf("Starting instance %d of %s at %s...\n", instance, TITLE, startTimeSim.toString().substring(0, 5));
-        sceneControllerMap.put(MAIN_SCENE, new MainSceneController(this));
-        sceneControllerMap.put(ABOUT_SCENE, new AboutController(this));
+        try {
+            startTimeSim = LocalTime.now();
+            System.out.printf("Starting instance %d of %s at %s...\n", instance, TITLE, startTimeSim.toString().substring(0, 5));
+            sceneControllerMap.put(MAIN_SCENE, new MainSceneController(this));
+            sceneControllerMap.put(ABOUT_SCENE, new AboutController(this));
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Something went wrong when loading fxml frontend...");
+        }
     }
 
     public void configureStage(Stage stage) {
