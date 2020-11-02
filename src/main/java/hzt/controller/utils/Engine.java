@@ -52,6 +52,7 @@ public class Engine {
             Point2D acceleration;
             float repelDistance = self.getRepelRadius() + other.getRepelRadius();
             if (distance <= repelDistance) acceleration = unitVectorInAccDir.multiply(-repelMagnitude);
+            else if (distance <= self.getBody().getRadius() + other.getBody().getRadius()) acceleration = Point2D.ZERO;
             else acceleration = unitVectorInAccDir.multiply(attractionMagnitude);
             return acceleration;
         }
@@ -75,6 +76,7 @@ public class Engine {
             float repelMagnitude = -repelFactor * part2Formula + curveFitConstant;
             Point2D acceleration;
             if (distance <= repelDistance) acceleration = unitVectorInAccDir.multiply(repelMagnitude);
+            else if (distance <= self.getBody().getRadius() + other.getBody().getRadius()) acceleration = Point2D.ZERO;
             else acceleration = unitVectorInAccDir.multiply(attractionMagnitude);
             return acceleration;
         }
@@ -95,6 +97,7 @@ public class Engine {
             float repelDistance = self.getRepelRadius() + other.getRepelRadius();
             Point2D acceleration;
             if (distance <= repelDistance) acceleration = unitVectorInAccDir.multiply(-repelFactor * multiplier);
+            else if (distance <= self.getBody().getRadius() + other.getBody().getRadius()) acceleration = Point2D.ZERO;
             else acceleration = unitVectorInAccDir.multiply(pullFactor * multiplier);
             return acceleration;
         }

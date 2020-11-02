@@ -17,10 +17,7 @@ import javafx.util.Duration;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.Stack;
+import java.util.*;
 
 import static hzt.controller.AnimationService.LINE_STROKE_WIDTH;
 import static hzt.controller.utils.Engine.DENSITY;
@@ -47,6 +44,10 @@ public class Ball2D extends Group {
     private final double densityMaterial; // kg
     private Point2D velocity; // pixel/s
     private Point2D acceleration; // pixel/s^2
+
+    public Ball2D(double radius, Paint paint) {
+        this("Ball" + ++next, radius, paint);
+    }
 
     public Ball2D(String name, double radius, Paint initPaint) {
         this.name = name;
@@ -90,20 +91,18 @@ public class Ball2D extends Group {
         line.startYProperty().bind(body.centerYProperty());
     }
 
-    public Ball2D(double radius, Paint paint) {
-        this("Ball" + ++next, radius, paint);
-    }
-
-    private Point2D prevAttractionComponent = Point2D.ZERO;
-
-    public void update(Duration deltaT, double accelerationMultiplier, double maxSpeed) {
+    public void update(Duration deltaT, double accelerationMultiplier, double frictionFactor, double maxSpeed) {
+        acceleration = Point2D.ZERO;
         Flock flock = (Flock) this.getParent();
-        keyPressedAccIncrement = accelerationMultiplier / deltaT.toSeconds();
+        maxAcceleration = accelerationMultiplier / deltaT.toSeconds();
         Set<Ball2D> ballsSet = perceptionRadiusMap.keySet();
         Point2D physicsEngineAcceleration = flock.getFlockingSim().getTotalAcceleration(this, ballsSet);
-        prevAttractionComponent = addComponentToAcceleration(physicsEngineAcceleration, prevAttractionComponent);
+        acceleration = acceleration.add(physicsEngineAcceleration);
+        acceleration = acceleration.add(addFriction(frictionFactor));
+        acceleration = acceleration.add(userInputAcceleration);
+//        prevAttractionComponent = addComponentToAcceleration(physicsEngineAcceleration, prevAttractionComponent);
         updateBallsInPerceptionRadiusMap();
-        updatePositionAndVelocityBasedOnAcceleration(deltaT, maxSpeed);
+        updatePositionAndVelocityBasedOnAcceleration(deltaT, maxSpeed, maxAcceleration);
         manageComponentsVisibility(flock.getSceneController());
     }
 
@@ -166,38 +165,33 @@ public class Ball2D extends Group {
         });
     }
 
-    private Point2D prevDecelerationComponent = Point2D.ZERO;
-
-    public void addFriction(double frictionFactor) {
+    public Point2D addFriction(double frictionFactor) {
 //        velocity = velocity.multiply(1 - frictionFactor);
-        Point2D decelerationDir = velocity.normalize().multiply(-1);
-        Point2D decelerationCausedByFriction = decelerationDir.multiply(velocity.magnitude() * frictionFactor);
-        prevDecelerationComponent = addComponentToAcceleration(decelerationCausedByFriction, prevDecelerationComponent);
+        Point2D decelerationDir = velocity.multiply(-1);
+        return decelerationDir.multiply(frictionFactor);
+//        prevDecelerationComponent = addComponentToAcceleration(decelerationCausedByFriction, prevDecelerationComponent);
     }
 
-    private void updatePositionAndVelocityBasedOnAcceleration(Duration deltaT, double maxSpeed) {
+    private void updatePositionAndVelocityBasedOnAcceleration(Duration deltaT, double maxSpeed, double maxAcceleration) {
         Point2D position = getCenterPosition();
         double deltaTSeconds = deltaT.toSeconds();
+        acceleration = limit(maxAcceleration, acceleration);
         velocity = velocity.add(acceleration.multiply(deltaTSeconds));
-        limitSpeed(maxSpeed);
+        velocity = limit(maxSpeed, velocity);
         prevCenterPosition = position;
         position = position.add(velocity.multiply(deltaTSeconds));
-        setCenterPosition(position);
+        this.setCenterPosition(position.getX(), position.getY());
     }
 
-    void limitSpeed(double maxSpeed) {
-        if (velocity.magnitude() > maxSpeed) velocity = velocity.normalize().multiply(maxSpeed);
+    Point2D limit(double maxValue, Point2D limitedVector) {
+        if (limitedVector.magnitude() > maxValue) limitedVector = limitedVector.normalize().multiply(maxValue);
+        return limitedVector;
 //        if (velocity.magnitude() > maxSpeed) {
 //            Point2D velocityDir = velocity.normalize();
 //            double angle = acceleration.angle(velocity);
 //            double scalarProjectionOfAccelerationOnVelocity = acceleration.magnitude() * Math.cos(angle);
 //            acceleration = acceleration.subtract(velocityDir.multiply(scalarProjectionOfAccelerationOnVelocity));
 //        }
-    }
-
-    public Point2D addComponentToAcceleration(Point2D acceleration, Point2D prevAcceleration) {
-        this.acceleration = this.acceleration.add(acceleration.subtract(prevAcceleration));
-        return acceleration;
     }
 
     public void setSpeedBasedOnMouseDrag(Stack<Point2D> dragPoints, Duration duration) {
@@ -214,16 +208,10 @@ public class Ball2D extends Group {
     public void floatThroughEdges(Dimension2D dimension) {
         double width = dimension.getWidth(), height = dimension.getHeight();
         Point2D centerPosition = getCenterPosition();
-        if (body.getCenterX() >= width) {
-            this.setCenterPosition(new Point2D(0, centerPosition.getY()));
-        } else if (body.getCenterX() <= 0) {
-            this.setCenterPosition(new Point2D(width, centerPosition.getY()));
-        }
-        if (body.getCenterY() >= height) {
-            this.setCenterPosition(new Point2D(centerPosition.getX(), 0));
-        } else if (body.getCenterY() <= 0) {
-            this.setCenterPosition(new Point2D(centerPosition.getX(), height));
-        }
+        if (body.getCenterX() >= width) this.setCenterPosition(0, centerPosition.getY());
+        else if (body.getCenterX() <= 0) this.setCenterPosition(width, centerPosition.getY());
+        if (body.getCenterY() >= height) this.setCenterPosition(centerPosition.getX(), 0);
+        else if (body.getCenterY() <= 0) this.setCenterPosition(centerPosition.getX(), height);
     }
 
     private Point2D prevCenterPosition = Point2D.ZERO;
@@ -259,20 +247,22 @@ public class Ball2D extends Group {
         return new Point2D(body.getCenterX(), body.getCenterY());
     }
 
+    public void setCenterPosition(Point2D point2D) {
+        body.setCenterX(point2D.getX());
+        body.setCenterY(point2D.getY());
+    }
+
     public void setCenterPosition(double x, double y) {
         body.setCenterX(x);
         body.setCenterY(y);
-    }
-
-    public void setCenterPosition(Point2D centerPosition) {
-        setCenterPosition(centerPosition.getX(), centerPosition.getY());
     }
 
     public void addKeyControlForAcceleration() {
         addKeyControlForAcceleration(KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D);
     }
 
-    private double keyPressedAccIncrement;
+    private Point2D userInputAcceleration = Point2D.ZERO;
+    private double maxAcceleration;
     private boolean upPressed, downPressed, leftPressed, rightPressed;
 
     private EventHandler<KeyEvent> keyPressed, keyReleased;
@@ -287,46 +277,48 @@ public class Ball2D extends Group {
     }
 
     private EventHandler<KeyEvent> keyPressed(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
-        return key -> {
-            if (key.getCode() == down && !downPressed) {
+        return keyEvent -> {
+            if (keyEvent.getCode() == down && !downPressed) {
                 downPressed = true;
-                acceleration = acceleration.add(new Point2D(0, keyPressedAccIncrement));
+                userInputAcceleration = userInputAcceleration.add(0, maxAcceleration);
             }
-            if (key.getCode() == left && !leftPressed) {
+            if (keyEvent.getCode() == left && !leftPressed) {
                 leftPressed = true;
-                acceleration = acceleration.add(new Point2D(-keyPressedAccIncrement, 0));
+                userInputAcceleration = userInputAcceleration.add(-maxAcceleration, 0);
             }
-            if (key.getCode() == up && !upPressed) {
+            if (keyEvent.getCode() == up && !upPressed) {
                 upPressed = true;
-                acceleration = acceleration.add(new Point2D(0, -keyPressedAccIncrement));
+                userInputAcceleration = userInputAcceleration.add(0, -maxAcceleration);
             }
-            if (key.getCode() == right && !rightPressed) {
+            if (keyEvent.getCode() == right && !rightPressed) {
                 rightPressed = true;
-                acceleration = acceleration.add(new Point2D(keyPressedAccIncrement, 0));
+                userInputAcceleration = userInputAcceleration.add(maxAcceleration, 0);
             }
         };
     }
 
     private EventHandler<KeyEvent> keyReleased(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
-        return key -> {
-            if (key.getCode() == down) {
+        return keyEvent -> {
+            if (keyEvent.getCode() == down) {
                 downPressed = false;
-                acceleration = acceleration.subtract(new Point2D(0, keyPressedAccIncrement));
+                userInputAcceleration = userInputAcceleration.subtract(0, maxAcceleration);
             }
-            if (key.getCode() == left) {
+            if (keyEvent.getCode() == left) {
                 leftPressed = false;
-                acceleration = acceleration.subtract(new Point2D(-keyPressedAccIncrement, 0));
+                userInputAcceleration = userInputAcceleration.subtract(-maxAcceleration, 0);
             }
-            if (key.getCode() == up) {
+            if (keyEvent.getCode() == up) {
                 upPressed = false;
-                acceleration = acceleration.subtract(new Point2D(0, -keyPressedAccIncrement));
+                userInputAcceleration = userInputAcceleration.subtract(0, -maxAcceleration);
             }
-            if (key.getCode() == right) {
+            if (keyEvent.getCode() == right) {
                 rightPressed = false;
-                acceleration = acceleration.subtract(new Point2D(keyPressedAccIncrement, 0));
+                userInputAcceleration = userInputAcceleration.subtract(maxAcceleration, 0);
             }
+            if (!upPressed && !downPressed && !leftPressed && !rightPressed) userInputAcceleration = Point2D.ZERO;
         };
     }
+
 
     public void removeKeyControlsForAcceleration() {
         upPressed = downPressed = leftPressed = rightPressed = false;

@@ -56,9 +56,10 @@ class Ball2DTest {
             Ball2D ball2D = new Ball2D(getRandomNumber(0, maxValue), BLACK);
             Point2D point2D = new Point2D(Math.random(), Math.random());
             double maxSpeed = getRandomNumber(0, maxValue);
-            ball2D.setVelocity(point2D.normalize().multiply(maxSpeed + getRandomNumber(0, maxValue)));
+            Point2D velocity = point2D.normalize().multiply(maxSpeed + getRandomNumber(0, maxValue));
+            ball2D.setVelocity(velocity);
             //act
-            ball2D.limitSpeed(maxSpeed);
+            ball2D.limit(maxSpeed, velocity);
             actualSpeeds[i] = Precision.round(ball2D.getVelocity().magnitude(), decimalPlaces);
             expectedSpeeds[i] = Precision.round(maxSpeed, decimalPlaces);
         }

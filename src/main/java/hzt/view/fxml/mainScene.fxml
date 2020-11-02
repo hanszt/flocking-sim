@@ -86,7 +86,7 @@
                         <Label text="Repel distance"/>
                         <Slider fx:id="repelDistanceSlider" max="20.0" showTickLabels="true"
                                 showTickMarks="true" value="$initRepelDistanceFactor"/>
-                        <Label layoutX="15.0" layoutY="70.0" text="Acceleration selected ball"/>
+                        <Label text="Max acceleration"/>
                         <Slider fx:id="accelerationSlider" layoutX="15.0" layoutY="87.0" min="1"
                                 showTickLabels="true" showTickMarks="true"
                                 value="$initAccelerationUserSelectedBall"/>
