@@ -1,18 +1,14 @@
 package hzt.controller;
 
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Dimension2D;
 import javafx.scene.Parent;
-import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.net.URL;
 
-import static hzt.controller.AppManager.MIN_STAGE_DIMENSION;
-
 public abstract class FXMLController {
 
-    private static final String FXML_FILE_LOCATION = "../../../fxml/";
+    private static final String FXML_FILE_LOCATION = "/fxml/";
 
     private final Parent root;
 

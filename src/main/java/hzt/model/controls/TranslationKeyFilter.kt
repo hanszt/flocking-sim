@@ -1,9 +1,7 @@
 package hzt.model.controls
 
-import kotlin.jvm.JvmOverloads
-import javafx.scene.input.KeyCode
-import hzt.model.controls.AbstractKeyFilter
 import javafx.geometry.Point2D
+import javafx.scene.input.KeyCode
 
 class TranslationKeyFilter @JvmOverloads constructor(
     left: KeyCode = KeyCode.A, right: KeyCode = KeyCode.D,

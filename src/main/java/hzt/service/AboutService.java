@@ -11,7 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 
 public class AboutService {
 
@@ -42,15 +43,12 @@ public class AboutService {
         return new AboutText(name, loadTextContent(file));
     }
 
-    private static List<String> readInputFileByLine(String path) {
-        List<String> inputList = new ArrayList<>();
-        File file = new File(path);
-        try (Scanner input = new Scanner(file)) {
-            while (input.hasNextLine()) {
-                inputList.add(input.nextLine());
-            }
-        } catch (FileNotFoundException e) {
-            LOGGER.error("File with path {} not found...", path, e);
+    private static String loadTextContent(File file) {
+        try {
+            return Files.readString(file.toPath());
+        } catch (IOException e) {
+            LOGGER.error("File with path {} not found...", file.toPath(), e);
+            return "";
         }
     }
 

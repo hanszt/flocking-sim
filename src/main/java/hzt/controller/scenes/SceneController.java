@@ -5,6 +5,7 @@ import hzt.controller.FXMLController;
 import hzt.controller.SceneManager;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.geometry.Dimension2D;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -12,6 +13,8 @@ import java.io.IOException;
 import java.time.LocalTime;
 
 public abstract class SceneController extends FXMLController {
+
+    public static final Dimension2D INIT_SCENE_DIMENSION = new Dimension2D(600, 800);
 
     private boolean setup;
 

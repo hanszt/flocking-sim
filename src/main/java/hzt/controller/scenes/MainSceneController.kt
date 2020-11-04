@@ -2,6 +2,7 @@ package hzt.controller.scenes
 
 import hzt.controller.SceneManager
 import hzt.controller.sub_pane.AppearanceController
+import hzt.controller.sub_pane.AppearanceController.Companion.INIT_BG_COLOR
 import hzt.controller.sub_pane.StatisticsController
 import hzt.model.FlockProperties
 import hzt.model.PropertyLoader
@@ -27,7 +28,7 @@ import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.util.Duration
-import org.apache.logging.log4j.LogManager
+import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.time.LocalTime
 
@@ -363,7 +364,7 @@ class MainSceneController(sceneManager: SceneManager) : SceneController(Scene.MA
 
     companion object {
 
-        private val LOGGER = LogManager.getLogger(MainSceneController::class.java)
+        private val LOGGER = LoggerFactory.getLogger(MainSceneController::class.java)
         private val STAGE_OPACITY = PropertyLoader.parsedDoubleAppProp("stage_opacity", .8)
         private const val INIT_ACCELERATION_USER_SELECTED_BALL = 50
         private const val INIT_ATTRACTION = 3

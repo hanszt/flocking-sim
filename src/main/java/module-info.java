@@ -3,8 +3,7 @@ import hzt.service.IThemeService;
 
 open module FlockingSim2D {
 
-    requires slf4j.api;
-    requires org.apache.logging.log4j;
+    requires org.slf4j;
     requires javafx.base;
     requires javafx.graphics;
     requires javafx.fxml;

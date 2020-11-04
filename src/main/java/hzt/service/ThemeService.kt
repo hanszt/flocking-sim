@@ -7,7 +7,7 @@ import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
-import org.apache.logging.log4j.LogManager
+import org.slf4j.LoggerFactory
 import java.io.File
 import java.net.MalformedURLException
 import java.net.URL
@@ -55,7 +55,7 @@ class ThemeService : IThemeService {
 
     companion object {
         private const val RELATIVE_STYLE_SHEET_RESOURCE_DIR = "/css"
-        private val LOGGER = LogManager.getLogger(ThemeService::class.java)
+        private val LOGGER = LoggerFactory.getLogger(ThemeService::class.java)
         private val DEFAULT_THEME = Resource("Light")
 
         private fun SortedSet<Resource>.checkNotEmpty(): Set<Resource> {

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @AnalyzeClasses(packages = "hzt", importOptions = ImportOption.DoNotIncludeTests.class)
 class LayeredArchitectureTest {

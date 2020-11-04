@@ -118,4 +118,8 @@ class AppearanceController(private val mainSceneController: MainSceneController)
             )
         )
     }
+
+    companion object {
+        val INIT_BG_COLOR = Color.NAVY
+    }
 }
