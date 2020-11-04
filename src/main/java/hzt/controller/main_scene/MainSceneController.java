@@ -206,7 +206,7 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     private void configureColorPickers() {
-        backgroundColorPicker.setValue(backgroundColor);
+        backgroundColorPicker.setValue(INIT_BG_COLOR);
         uniformBallColorPicker.setValue(INIT_UNIFORM_BALL_COLOR);
         selectedBallColorPicker.setValue(INIT_SELECTED_BALL_COLOR);
     }
