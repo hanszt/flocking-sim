@@ -50,10 +50,9 @@ public class AnimationService {
         statisticsService.showStatisticsAboutSelectedBall(selected);
         statisticsService.showGlobalStatistics(frictionFactor, timeline.getCycleDuration(), flock.getChildren().size(), runTimeSim);
         flock.getChildren().stream().map(ball2D -> (Boid) ball2D).forEach(ball -> {
-            ball.addFriction(frictionFactor);
             if (bounce) ball.bounceOfEdges(animationWindowSize);
             else ball.floatThroughEdges(animationWindowSize);
-            ball.update(timeline.getCycleDuration(), accelerationMultiplier, maxSpeed);
+            ball.update(timeline.getCycleDuration(), accelerationMultiplier, frictionFactor, maxSpeed);
         });
     }
 

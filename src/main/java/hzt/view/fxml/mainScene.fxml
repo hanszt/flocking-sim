@@ -86,7 +86,7 @@
                         <Label text="Repel distance"/>
                         <Slider fx:id="repelDistanceSlider" max="20.0" showTickLabels="true"
                                 showTickMarks="true" value="$initRepelDistanceFactor"/>
-                        <Label layoutX="15.0" layoutY="70.0" text="Acceleration selected ball"/>
+                        <Label text="Max acceleration"/>
                         <Slider fx:id="accelerationSlider" layoutX="15.0" layoutY="87.0" min="1"
                                 showTickLabels="true" showTickMarks="true"
                                 value="$initAccelerationUserSelectedBall"/>
@@ -226,12 +226,9 @@
                         </VBox>
                         <VBox layoutX="10.0" layoutY="10.0" prefWidth="188.0">
                             <Label fx:id="ballNameLabel" text="Unknown"/>
-                            <Label fx:id="positionStatsLabel"
-                                   text="(x = NaN, y = NaN) (p)"/>
-                            <Label fx:id="velocityStatsLabel"
-                                   text="(x = NaN, y = NaN) (p/2)"/>
-                            <Label fx:id="accelerationStatsLabel"
-                                   text="(x = NaN, y = NaN) (p/s^2)"/>
+                            <Label fx:id="positionStatsLabel"/>
+                            <Label fx:id="velocityStatsLabel"/>
+                            <Label fx:id="accelerationStatsLabel"/>
                             <Label fx:id="ballSizeLabel" text="0"/>
                             <Label fx:id="nrOfBallsInPerceptionRadiusLabel" text="0"/>
                         </VBox>

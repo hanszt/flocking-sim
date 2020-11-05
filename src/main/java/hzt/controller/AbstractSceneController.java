@@ -18,20 +18,15 @@ public abstract class AbstractSceneController implements Controller {
 
     private final String fxmlFileName;
     protected final AppManager appManager;
-    protected Scene scene;
+    protected final Scene scene;
 
-    public AbstractSceneController(String fxmlFileName, AppManager appManager) {
+    public AbstractSceneController(String fxmlFileName, AppManager appManager) throws IOException {
         this.fxmlFileName = fxmlFileName;
         this.appManager = appManager;
         FXMLLoader fxmlLoader = new FXMLLoader();
         setControllerFactory(fxmlLoader);
-        try {
-            Parent root = fxmlLoader.load();
-            scene = new Scene(root);
-        } catch (IOException e) {
-            System.err.println("Scene could not be set...");
-            e.printStackTrace();
-        }
+        Parent root = fxmlLoader.load();
+        scene = new Scene(root);
     }
 
     //to be able to pass arguments to the constructor, it's necessary to specify the controller factory of the loader
