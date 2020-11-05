@@ -2,9 +2,7 @@ package hzt.controller.main_scene;
 
 import org.junit.jupiter.api.Test;
 
-import java.util.*;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class StatisticsServiceTest {
 

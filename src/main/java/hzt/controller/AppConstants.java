@@ -1,25 +1,43 @@
 package hzt.controller;
 
+import javafx.scene.paint.Color;
+import lombok.Getter;
+
+import static javafx.scene.paint.Color.NAVY;
+
 public final class AppConstants {
+
+    public static final int INIT_NUMBER_OF_BALLS = 120;
+    public static final int INIT_ACCELERATION_USER_SELECTED_BALL = 50;
+    public static final int INIT_ATTRACTION = 3;
+    public static final int INIT_REPEL_FACTOR = 10;
+    public static final int INIT_REPEL_DISTANCE_FACTOR = 3;
+    public static final int INIT_MAX_BALL_SIZE = 5;
+    public static final int INIT_PERCEPTION_RADIUS = 25;
+    public static final int INIT_MAX_SPEED = 150;
+    public static final double INIT_FRICTION = 1;
+    public static final boolean INIT_BOUNCE_WALLS_BUTTON_VALUE = true;
+    public static final boolean INIT_SHOW_CONNECTIONS = false;
+    public static final boolean INIT_SHOW_PATH = false;
+    public static final boolean INIT_SHOW_VELOCITY = false;
+    public static final boolean INIT_SHOW_ACCELERATION = false;
+    public static final boolean INIT_SHOW_PERCEPTION = false;
+
+    public static final Color INIT_BG_COLOR = NAVY;
+
+    public static final String FXML_FILE_LOCATION = "/hzt/view/fxml/";
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_BLUE = "\u001B[34m";
+    public static final String TITLE = "Flocking Simulation";
+    public static final String DOTTED_LINE = "----------------------------------------------------------------------------------------\n";
+    public static final String CLOSING_MESSAGE = ANSI_BLUE + "See you next Time! :)" + ANSI_RESET;
+    public static final float STAGE_OPACITY = 0.8f;
 
     private AppConstants() {
     }
 
-    public static final String FXML_FILE_LOCATION = "/hzt/view/fxml/";
 
-    private static final String ANSI_RESET = "\u001B[0m";
-    private static final String ANSI_BRIGHT_PURPLE = "\u001B[95m";
-    private static final String ANSI_BLUE = "\u001B[34m";
-    private static final String ANSI_GREEN = "\u001B[32m";
-    private static final String ANSI_BRIGHT_RED = "\u001B[91m";
-
-    public static final String TITLE = "Flocking Simulation";
-    public static final String DOTTED_LINE = "----------------------------------------------------------------------------------------\n";
-    public static final String CLOSING_MESSAGE = ANSI_BLUE +
-            "See you next Time! :)" +
-            ANSI_RESET;
-    public static final float STAGE_OPACITY = 0.8f;
-
+    @Getter
     public enum Screen {
 
         MAIN_SCENE("mainScene.fxml", "Main Scene"),
@@ -33,12 +51,5 @@ public final class AppConstants {
             this.englishDescription = englishDescription;
         }
 
-        public String getFxmlFileName() {
-            return fxmlFileName;
-        }
-
-        public String getEnglishDescription() {
-            return englishDescription;
-        }
     }
 }

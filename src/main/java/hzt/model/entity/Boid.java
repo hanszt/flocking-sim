@@ -101,7 +101,6 @@ public class Boid extends Group {
         acceleration = acceleration.add(physicsEngineAcceleration);
         acceleration = acceleration.add(addFriction(frictionFactor));
         acceleration = acceleration.add(userInputAcceleration);
-//        prevAttractionComponent = addComponentToAcceleration(physicsEngineAcceleration, prevAttractionComponent);
         updateBallsInPerceptionRadiusMap();
         updatePositionAndVelocityBasedOnAcceleration(deltaT, maxSpeed, maxAcceleration);
         manageComponentsVisibility(flock.getSceneController());
@@ -109,7 +108,7 @@ public class Boid extends Group {
 
     private void manageComponentsVisibility(MainSceneController ms) {
         double maxSpeed = ms.getMaxSpeedSlider().getValue();
-        final  int minSpeedLength = 300;
+        final int minSpeedLength = 300;
         updateVisibleVector(visibleVelocityVector, velocity, maxSpeed >= minSpeedLength ? maxSpeed : minSpeedLength);
         updateVisibleVector(visibleAccelerationVector, acceleration, 2000);
         updatePath();
@@ -121,7 +120,6 @@ public class Boid extends Group {
     private void updateVisibleVector(Line line, Point2D vector, double correction) {
         Point2D begin = getCenterPosition();
         Point2D end = begin.add(vector);
-//        if (!end.equals(Point2D.ZERO)) end = begin;
         Point2D unitVector = end.subtract(begin).normalize();
         Point2D radiusInVectorDir = unitVector.multiply(body.getRadius() - line.getStrokeWidth());
         begin = begin.add(radiusInVectorDir);
@@ -167,10 +165,8 @@ public class Boid extends Group {
     }
 
     public Point2D addFriction(double frictionFactor) {
-//        velocity = velocity.multiply(1 - frictionFactor);
         Point2D decelerationDir = velocity.multiply(-1);
         return decelerationDir.multiply(frictionFactor);
-//        prevDecelerationComponent = addComponentToAcceleration(decelerationCausedByFriction, prevDecelerationComponent);
     }
 
     private void updatePositionAndVelocityBasedOnAcceleration(Duration deltaT, double maxSpeed, double maxAcceleration) {
@@ -187,15 +183,9 @@ public class Boid extends Group {
     Point2D limit(double maxValue, Point2D limitedVector) {
         if (limitedVector.magnitude() > maxValue) limitedVector = limitedVector.normalize().multiply(maxValue);
         return limitedVector;
-//        if (velocity.magnitude() > maxSpeed) {
-//            Point2D velocityDir = velocity.normalize();
-//            double angle = acceleration.angle(velocity);
-//            double scalarProjectionOfAccelerationOnVelocity = acceleration.magnitude() * Math.cos(angle);
-//            acceleration = acceleration.subtract(velocityDir.multiply(scalarProjectionOfAccelerationOnVelocity));
-//        }
     }
 
-    public void setSpeedBasedOnMouseDrag(Stack<Point2D> dragPoints, Duration duration) {
+    public void setSpeedBasedOnMouseDrag(Deque<Point2D> dragPoints, Duration duration) {
         final int speedMultiplier = 3;
         if (!dragPoints.isEmpty()) {
             Point2D last = dragPoints.pop();
@@ -207,7 +197,8 @@ public class Boid extends Group {
     }
 
     public void floatThroughEdges(Dimension2D dimension) {
-        double width = dimension.getWidth(), height = dimension.getHeight();
+        double width = dimension.getWidth();
+        double height = dimension.getHeight();
         Point2D centerPosition = getCenterPosition();
         if (body.getCenterX() >= width) this.setCenterPosition(0, centerPosition.getY());
         else if (body.getCenterX() <= 0) this.setCenterPosition(width, centerPosition.getY());
@@ -218,7 +209,8 @@ public class Boid extends Group {
     private Point2D prevCenterPosition = Point2D.ZERO;
 
     public void bounceOfEdges(Dimension2D dimension) {
-        double width = dimension.getWidth(), height = dimension.getHeight();
+        double width = dimension.getWidth();
+        double height = dimension.getHeight();
         Bounds bounds = body.getBoundsInLocal();
         Point2D centerPosition = getCenterPosition();
         if (bounds.getMinX() <= 0 && centerPosition.getX() < prevCenterPosition.getX())
@@ -264,12 +256,15 @@ public class Boid extends Group {
 
     private Point2D userInputAcceleration = Point2D.ZERO;
     private double maxAcceleration;
-    private boolean upPressed, downPressed, leftPressed, rightPressed;
+    private boolean upPressed;
+    private boolean downPressed;
+    private boolean leftPressed;
+    private boolean rightPressed;
 
-    private EventHandler<KeyEvent> keyPressed, keyReleased;
+    private EventHandler<KeyEvent> keyPressed;
+    private EventHandler<KeyEvent> keyReleased;
 
     public void addKeyControlForAcceleration(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
-        //           acceleration = acceleration.normalize().multiply(accIncrement);
         keyPressed = keyPressed(up, down, left, right);
         keyReleased = keyReleased(up, down, left, right);
         Scene scene = ((Flock) getParent()).getSceneController().getScene();

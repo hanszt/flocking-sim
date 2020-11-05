@@ -2,9 +2,11 @@ package hzt.model.entity;
 
 import hzt.controller.main_scene.MainSceneController;
 import hzt.controller.utils.Engine;
+import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -12,7 +14,9 @@ import javafx.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Stack;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Random;
 
 import static hzt.controller.utils.RandomGenerator.*;
 
@@ -21,15 +25,19 @@ import static hzt.controller.utils.RandomGenerator.*;
 @Setter
 public class Flock extends Pane {
 
-    public static final int MIN_RADIUS = 3, MAX_RADIUS = 10;
-    static final int MAX_PATH_SIZE_ALL = 200, MAX_PATH_SIZE = 50;
+    public static final int MIN_RADIUS = 3;
+    public static final int MAX_RADIUS = 10;
+    static final int MAX_PATH_SIZE_ALL = 200;
+    static final int MAX_PATH_SIZE = 50;
     static final int MAX_VECTOR_LENGTH = 80;
-    public static final Color INIT_UNIFORM_BALL_COLOR = Color.ORANGE, INIT_SELECTED_BALL_COLOR = Color.RED;
+    public static final Color INIT_UNIFORM_BALL_COLOR = Color.ORANGE;
+    public static final Color INIT_SELECTED_BALL_COLOR = Color.RED;
 
     private final MainSceneController sceneController;
 
     private Boid selectedBall;
-    private Color uniformBallColor = INIT_UNIFORM_BALL_COLOR, selectedBallColor = INIT_SELECTED_BALL_COLOR;
+    private Color uniformBallColor = INIT_UNIFORM_BALL_COLOR;
+    private Color selectedBallColor = INIT_SELECTED_BALL_COLOR;
     private FlockType flockType;
     private Engine.FlockingSim flockingSim;
 
@@ -59,19 +67,20 @@ public class Flock extends Pane {
     }
 
     private void removeBallFromFLock() {
-        Boid boid = (Boid) this.getChildren().get(0);
-       this.getChildren().remove(boid);
+        ObservableList<Node> list = this.getChildren();
+        Boid boid = (Boid) list.get(0);
+        this.getChildren().remove(boid);
         this.getChildren().stream().map(n -> (Boid) n).forEach(ball -> {
             ball.getPerceptionRadiusMap().remove(boid);
             ball.getChildren().removeIf(n -> n instanceof Connection);
         });
         if (boid.equals(selectedBall)) {
-            selectedBall = this.getChildren().size() > 0 ? getRandomNewSelectedBall() : null;
+            selectedBall = !list.isEmpty() ? getRandomSelectedBall() : null;
         }
     }
 
-    public Boid getRandomNewSelectedBall() {
-        Boid ball = (Boid) this.getChildren().get((int) (Math.random() * getChildren().size()));
+    public Boid getRandomSelectedBall() {
+        Boid ball = (Boid) this.getChildren().get(new Random().nextInt(getChildren().size()));
         ball.updatePaint(selectedBallColor);
         ball.addKeyControlForAcceleration();
         ball.getPath().setVisible(sceneController.getShowPathSelectedButton().isSelected());
@@ -111,7 +120,7 @@ public class Flock extends Pane {
 
     public void addMouseFunctionality(Boid ball) {
         Duration frameDuration = sceneController.getAnimationService().getTimeline().getCycleDuration();
-        Stack<Point2D> dragPoints = new Stack<>();
+        Deque<Point2D> dragPoints = new ArrayDeque<>();
         ball.getBody().setOnMousePressed(onMousePressed(ball));
         ball.getBody().setOnMouseDragged(onMouseDragged(ball, dragPoints));
         ball.getBody().setOnMouseReleased(e -> ball.setSpeedBasedOnMouseDrag(dragPoints, frameDuration));
@@ -135,11 +144,15 @@ public class Flock extends Pane {
         };
     }
 
-    private EventHandler<MouseEvent> onMouseDragged(Boid ball, Stack<Point2D> dragPoints) {
+    private EventHandler<MouseEvent> onMouseDragged(Boid ball, Deque<Point2D> dragPoints) {
         return e -> {
             ball.getBody().setCenterX(e.getX());
             ball.getBody().setCenterY(e.getY());
             dragPoints.add(ball.getCenterPosition());
         };
+    }
+
+    public FlockType getRandom() {
+        return random;
     }
 }

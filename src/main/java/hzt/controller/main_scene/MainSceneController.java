@@ -2,6 +2,7 @@ package hzt.controller.main_scene;
 
 import hzt.controller.AbstractSceneController;
 import hzt.controller.AnimationService;
+import hzt.controller.AppConstants;
 import hzt.controller.AppManager;
 import hzt.controller.utils.Engine;
 import hzt.model.entity.Boid;
@@ -25,55 +26,9 @@ import static hzt.controller.AppConstants.STAGE_OPACITY;
 import static hzt.controller.AppConstants.Screen.MAIN_SCENE;
 import static hzt.model.entity.Flock.INIT_SELECTED_BALL_COLOR;
 import static hzt.model.entity.Flock.INIT_UNIFORM_BALL_COLOR;
-import static javafx.scene.paint.Color.NAVY;
 
 @Getter
 public class MainSceneController extends AbstractSceneController {
-
-    private static final Color INIT_BG_COLOR = NAVY;
-
-    private final Flock flock;
-    private final AnimationService animationService;
-    private final Engine engine;
-
-    public MainSceneController(AppManager appManager) throws IOException {
-        super(MAIN_SCENE.getFxmlFileName(), appManager);
-        engine = new Engine();
-        animationService = new AnimationService(this);
-        flock = new Flock(this);
-    }
-
-    //constants declared in FXML file
-    @FXML
-    private Integer initNumberOfBalls;
-    @FXML
-    private Integer initAccelerationUserSelectedBall;
-    @FXML
-    private Integer initAttraction;
-    @FXML
-    private Integer initRepelFactor;
-    @FXML
-    private Integer initRepelDistanceFactor;
-    @FXML
-    private Integer initMaxBallSize;
-    @FXML
-    private Integer initPerceptionRadius;
-    @FXML
-    private Integer initMaxSpeed;
-    @FXML
-    private Double initFriction;
-    @FXML
-    private Boolean initBounceWallsButtonValue;
-    @FXML
-    private Boolean initShowConnections;
-    @FXML
-    private Boolean initShowPath;
-    @FXML
-    private Boolean initShowVelocity;
-    @FXML
-    private Boolean initShowAcceleration;
-    @FXML
-    private Boolean initShowPerception;
 
     @FXML
     private VBox root;
@@ -159,7 +114,18 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private Label runTimeLabel;
 
-    private Color backgroundColor = INIT_BG_COLOR;
+    private Color backgroundColor = AppConstants.INIT_BG_COLOR;
+
+    private final Flock flock;
+    private final AnimationService animationService;
+    private final Engine engine;
+
+    public MainSceneController(AppManager appManager) throws IOException {
+        super(MAIN_SCENE.getFxmlFileName(), appManager);
+        engine = new Engine();
+        animationService = new AnimationService(this);
+        flock = new Flock(this);
+    }
 
     @Override
     public void setup() {
@@ -168,14 +134,12 @@ public class MainSceneController extends AbstractSceneController {
         configureComboBoxes();
         configureFlock();
         reset();
-        flock.setFlockingSim(engine.getType1());
         bindFullScreenButtonToFullScreen();
         engine.setPullFactor(attractionSlider.getValue());
         engine.setRepelFactor(repelFactorSlider.getValue());
         animationPane.getChildren().add(flock);
         animationPane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
         animationService.addAnimationLoopToTimeline(initializeAnimationLoop(), true);
-        flock.setSelectedBall(flock.getRandomNewSelectedBall());
         uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandom()));
     }
 
@@ -206,7 +170,7 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     private void configureColorPickers() {
-        backgroundColorPicker.setValue(INIT_BG_COLOR);
+        backgroundColorPicker.setValue(AppConstants.INIT_BG_COLOR);
         uniformBallColorPicker.setValue(INIT_UNIFORM_BALL_COLOR);
         selectedBallColorPicker.setValue(INIT_SELECTED_BALL_COLOR);
     }
@@ -223,6 +187,8 @@ public class MainSceneController extends AbstractSceneController {
     private void configureFlock() {
         flock.setFlockType(flockSettingsComboBox.getValue());
         flock.controlFlockSize((int) numberOfBallsSlider.getValue(), getAnimationWindowDimension());
+        flock.setFlockingSim(engine.getType1());
+        flock.setSelectedBall(flock.getRandomSelectedBall());
     }
 
     private void addListenersToSliders() {
@@ -251,23 +217,23 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     private void resetControls() {
-        maxBallSizeSlider.setValue(initMaxBallSize);
-        numberOfBallsSlider.setValue(initNumberOfBalls);
-        accelerationSlider.setValue(initAccelerationUserSelectedBall);
-        attractionSlider.setValue(initAttraction);
-        repelDistanceSlider.setValue(initRepelDistanceFactor);
-        repelFactorSlider.setValue(initRepelFactor);
-        frictionSlider.setValue(initFriction);
-        perceptionRadiusSlider.setValue(initPerceptionRadius);
-        maxSpeedSlider.setValue(initMaxSpeed);
-        showConnectionsButton.setSelected(initShowConnections);
-        showPathSelectedButton.setSelected(initShowPath);
-        showAllPathsButton.setSelected(initShowPath);
-        showVelocityVectorButton.setSelected(initShowVelocity);
-        showAccelerationVectorButton.setSelected(initShowAcceleration);
-        showPerceptionButton.setSelected(initShowPerception);
-        showPerceptionSelectedBallButton.setSelected(initShowPerception);
-        bounceWallsButton.setSelected(initBounceWallsButtonValue);
+        maxBallSizeSlider.setValue(AppConstants.INIT_MAX_BALL_SIZE);
+        numberOfBallsSlider.setValue(AppConstants.INIT_NUMBER_OF_BALLS);
+        accelerationSlider.setValue(AppConstants.INIT_ACCELERATION_USER_SELECTED_BALL);
+        attractionSlider.setValue(AppConstants.INIT_ATTRACTION);
+        repelDistanceSlider.setValue(AppConstants.INIT_REPEL_DISTANCE_FACTOR);
+        repelFactorSlider.setValue(AppConstants.INIT_REPEL_FACTOR);
+        frictionSlider.setValue(AppConstants.INIT_FRICTION);
+        perceptionRadiusSlider.setValue(AppConstants.INIT_PERCEPTION_RADIUS);
+        maxSpeedSlider.setValue(AppConstants.INIT_MAX_SPEED);
+        showConnectionsButton.setSelected(AppConstants.INIT_SHOW_CONNECTIONS);
+        showPathSelectedButton.setSelected(AppConstants.INIT_SHOW_PATH);
+        showAllPathsButton.setSelected(AppConstants.INIT_SHOW_PATH);
+        showVelocityVectorButton.setSelected(AppConstants.INIT_SHOW_VELOCITY);
+        showAccelerationVectorButton.setSelected(AppConstants.INIT_SHOW_ACCELERATION);
+        showPerceptionButton.setSelected(AppConstants.INIT_SHOW_PERCEPTION);
+        showPerceptionSelectedBallButton.setSelected(AppConstants.INIT_SHOW_PERCEPTION);
+        bounceWallsButton.setSelected(AppConstants.INIT_BOUNCE_WALLS_BUTTON_VALUE);
     }
 
     @FXML
@@ -363,7 +329,7 @@ public class MainSceneController extends AbstractSceneController {
         flock.controlFlockSize(0, getAnimationWindowDimension());
         configureFlock();
         uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandom()));
-        flock.setSelectedBall(flock.getRandomNewSelectedBall());
+        flock.setSelectedBall(flock.getRandomSelectedBall());
     }
 
     protected AbstractSceneController getBean() {

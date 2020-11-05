@@ -52,7 +52,7 @@ class Ball2DTest {
         //arrange
         final int nrOftestCases = 10000, maxValue = 100, decimalPlaces = 10;
         double[] expectedSpeeds = new double[nrOftestCases], actualSpeeds = new double[nrOftestCases];
-        for (int i = 0; i < nrOftestCases; i++) {
+        for (int caseNr = 0; caseNr < nrOftestCases; caseNr++) {
             Boid ball2D = new Boid(getRandomNumber(0, maxValue), BLACK);
             Point2D point2D = new Point2D(Math.random(), Math.random());
             double maxSpeed = getRandomNumber(0, maxValue);
@@ -60,8 +60,8 @@ class Ball2DTest {
             ball2D.setVelocity(velocity);
             //act
             ball2D.limit(maxSpeed, velocity);
-            actualSpeeds[i] = Precision.round(ball2D.getVelocity().magnitude(), decimalPlaces);
-            expectedSpeeds[i] = Precision.round(maxSpeed, decimalPlaces);
+            actualSpeeds[caseNr] = Precision.round(ball2D.getVelocity().magnitude(), decimalPlaces);
+            expectedSpeeds[caseNr] = Precision.round(maxSpeed, decimalPlaces);
         }
         //assert: expected, actual
         assertArrayEquals(expectedSpeeds, actualSpeeds);

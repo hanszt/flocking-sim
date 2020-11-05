@@ -4,29 +4,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<?import java.lang.*?>
+
 <VBox fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
       prefHeight="700.0" prefWidth="900.0"
       xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="hzt.controller.main_scene.MainSceneController">
-
-    <fx:define>
-        <Integer fx:id="initNumberOfBalls" fx:value="120"/>
-        <Integer fx:id="initAccelerationUserSelectedBall" fx:value="50"/>
-        <Integer fx:id="initAttraction" fx:value="3"/>
-        <Integer fx:id="initRepelFactor" fx:value="10"/>
-        <Integer fx:id="initRepelDistanceFactor" fx:value="3"/>
-        <Integer fx:id="initMaxBallSize" fx:value="5"/>
-        <Integer fx:id="initPerceptionRadius" fx:value="25"/>
-        <Integer fx:id="initMaxSpeed" fx:value="150"/>
-        <Double fx:id="initFriction" fx:value="1"/>
-        <Boolean fx:id="initShowConnections" fx:value="false"/>
-        <Boolean fx:id="initShowPath" fx:value="false"/>
-        <Boolean fx:id="initShowVelocity" fx:value="false"/>
-        <Boolean fx:id="initShowAcceleration" fx:value="false"/>
-        <Boolean fx:id="initShowPerception" fx:value="false"/>
-        <Boolean fx:id="initBounceWallsButtonValue" fx:value="true"/>
-    </fx:define>
 
     <MenuBar fx:id="menuBar" prefHeight="0.0" prefWidth="602.0" VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="File">
@@ -53,16 +35,14 @@
                             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                         </padding>
                         <Label text="Number of balls"/>
-                        <Slider fx:id="numberOfBallsSlider" majorTickUnit="10.0"
-                                min="1" value="$initNumberOfBalls" max="200.0"
+                        <Slider fx:id="numberOfBallsSlider" majorTickUnit="10.0" min="1" max="200.0"
                                 minorTickCount="5" showTickLabels="true" showTickMarks="true"/>
                         <Label layoutX="15.0" layoutY="70.0" text="Max ball size"/>
                         <Slider fx:id="maxBallSizeSlider" layoutX="15.0" layoutY="87.0" min="1"
-                                showTickLabels="true" showTickMarks="true"
-                                value="$initMaxBallSize" max="50"/>
+                                showTickLabels="true" showTickMarks="true" max="50"/>
                         <Label text="Perception radius"/>
                         <Slider fx:id="perceptionRadiusSlider" max="200.0" showTickLabels="true"
-                                showTickMarks="true" value="$initPerceptionRadius"/>
+                                showTickMarks="true"/>
                     </VBox>
                     <VBox prefWidth="3000.0">
                         <padding>
@@ -70,13 +50,12 @@
                         </padding>
                         <Label layoutX="15.0" layoutY="70.0" text="Attraction factor"/>
                         <Slider fx:id="attractionSlider" layoutX="15.0" layoutY="87.0" max="20"
-                                showTickLabels="true" showTickMarks="true"
-                                value="$initAttraction"/>
+                                showTickLabels="true" showTickMarks="true"/>
                         <Label text="Repel factor"/>
                         <Slider fx:id="repelFactorSlider" max="20" showTickLabels="true"
-                                showTickMarks="true" value="$initRepelFactor"/>
+                                showTickMarks="true"/>
                         <Label text="Friction"/>
-                        <Slider fx:id="frictionSlider" majorTickUnit=".1" value="$initFriction"
+                        <Slider fx:id="frictionSlider" majorTickUnit=".1"
                                 max="10" showTickLabels="true" showTickMarks="true"/>
                     </VBox>
                     <VBox layoutX="10.0" layoutY="10.0" prefWidth="3000.0">
@@ -85,11 +64,10 @@
                         </padding>
                         <Label text="Repel distance"/>
                         <Slider fx:id="repelDistanceSlider" max="20.0" showTickLabels="true"
-                                showTickMarks="true" value="$initRepelDistanceFactor"/>
+                                showTickMarks="true"/>
                         <Label text="Max acceleration"/>
                         <Slider fx:id="accelerationSlider" layoutX="15.0" layoutY="87.0" min="1"
-                                showTickLabels="true" showTickMarks="true"
-                                value="$initAccelerationUserSelectedBall"/>
+                                showTickLabels="true" showTickMarks="true"/>
                         <Label text="Max speed"/>
                         <Slider fx:id="maxSpeedSlider" max="1000"
                                 showTickLabels="true" showTickMarks="true"/>
@@ -120,8 +98,7 @@
                                       text="Pause"/>
                         <ToggleButton fx:id="bounceWallsButton" layoutX="14.0" layoutY="72.0"
                                       mnemonicParsing="false"
-                                      prefWidth="1000.0" selected="$initBounceWallsButtonValue"
-                                      text="Bounce of walls"/>
+                                      prefWidth="1000.0" text="Bounce of walls"/>
                         <ToggleButton fx:id="showVelocityVectorButton" mnemonicParsing="false"
                                       prefWidth="1000.0" text="Show velocities"
                                       onAction="#showVelocitiesButtonAction"/>

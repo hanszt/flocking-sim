@@ -5,6 +5,9 @@ import javafx.scene.paint.Color;
 
 public class RandomGenerator {
 
+    private RandomGenerator() {
+    }
+
     public static double getRandomDouble(double min, double max) {
         return Math.random() * (max - min) + min;
     }

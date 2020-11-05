@@ -1,6 +1,8 @@
 package hzt.controller.main_scene;
 
 import hzt.model.entity.Boid;
+import javafx.geometry.Point2D;
+import javafx.geometry.Point3D;
 import javafx.util.Duration;
 
 public class StatisticsService {
@@ -12,26 +14,15 @@ public class StatisticsService {
     }
 
     public void showStatisticsAboutSelectedBall(Boid selected) {
-        double positionX, positionY, velocity, acceleration, ballSize;
-        int ballsInPerceptionRadius;
         if (selected != null) {
-            positionX = selected.getCenterPosition().getX();
-            positionY = selected.getCenterPosition().getY();
-            velocity = selected.getVelocity().magnitude();
-            acceleration = selected.getAcceleration().magnitude();
-            ballsInPerceptionRadius = selected.getPerceptionRadiusMap().size();
-            ballSize = selected.getBody().getRadius() * 2;
-        } else {
-            positionX = positionY = velocity = acceleration = ballSize = Double.NaN;
-            ballsInPerceptionRadius = 0;
+            Point2D centerPos = selected.getCenterPosition();
+            mc.getBallNameLabel().setText(String.format("%s", selected.getName()));
+            mc.getPositionStatsLabel().setText(String.format("x = %-4.2f p, y = %-4.2f p", centerPos.getX(), centerPos.getY()));
+            mc.getVelocityStatsLabel().setText(String.format("%-4.2f p/s", selected.getVelocity().magnitude()));
+            mc.getAccelerationStatsLabel().setText(String.format("%-4.2f p/s^2", selected.getAcceleration().magnitude()));
+            mc.getNrOfBallsInPerceptionRadiusLabel().setText(String.format("%-3d", selected.getPerceptionRadiusMap().size()));
+            mc.getBallSizeLabel().setText(String.format("%-4.2f p", selected.getBody().getRadius() * 2));
         }
-        //selected ball statistics
-        mc.getBallNameLabel().setText(String.format("%s", selected != null ? selected.getName() : "No ball selected"));
-        mc.getPositionStatsLabel().setText(String.format("x = %-4.2f p, y = %-4.2f p", positionX, positionY));
-        mc.getVelocityStatsLabel().setText(String.format("%-4.2f p/s", velocity));
-        mc.getAccelerationStatsLabel().setText(String.format("%-4.2f p/s^2", acceleration));
-        mc.getNrOfBallsInPerceptionRadiusLabel().setText(String.format("%-3d", ballsInPerceptionRadius));
-        mc.getBallSizeLabel().setText(String.format("%-4.2f p", ballSize));
     }
 
     public void showGlobalStatistics(double friction, Duration cycleDuration, int size, Duration runTimeSim) {
