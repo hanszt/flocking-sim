@@ -30,7 +30,7 @@ import static javafx.scene.paint.Color.TRANSPARENT;
 
 @ToString
 @Getter
-public class Ball2D extends Group {
+public class Boid extends Group {
 
     private static int next = 0;
 
@@ -41,14 +41,14 @@ public class Ball2D extends Group {
     private final VisibleVector visibleAccelerationVector;
     private final VisibleVector visibleVelocityVector;
     private final Path path;
-    private final Map<Ball2D, Connection> perceptionRadiusMap;
+    private final Map<Boid, Connection> perceptionRadiusMap;
     private final Paint initPaint;
+    private final double densityMaterial; // kg/m^3
 
-    private final double densityMaterial; // kg
     private Point2D velocity; // pixel/s
     private Point2D acceleration; // pixel/s^2
 
-    public Ball2D(String name, double radius, Paint initPaint) {
+    public Boid(String name, double radius, Paint initPaint) {
         this.name = name;
         this.initPaint = initPaint;
         this.body = new Circle(radius);
@@ -58,9 +58,10 @@ public class Ball2D extends Group {
         this.visibleAccelerationVector = new VisibleVector();
         this.path = new Path();
         this.densityMaterial = DENSITY;
+        this.perceptionRadiusMap = new HashMap<>();
+
         this.velocity = Point2D.ZERO;
         this.acceleration = Point2D.ZERO;
-        this.perceptionRadiusMap = new HashMap<>();
         configureComponents();
         super.getChildren().addAll(body, perceptionCircle, repelCircle, visibleVelocityVector, visibleAccelerationVector, path);
     }
@@ -90,7 +91,7 @@ public class Ball2D extends Group {
         line.startYProperty().bind(body.centerYProperty());
     }
 
-    public Ball2D(double radius, Paint paint) {
+    public Boid(double radius, Paint paint) {
         this("Ball" + ++next, radius, paint);
     }
 
@@ -99,7 +100,7 @@ public class Ball2D extends Group {
     public void update(Duration deltaT, double accelerationMultiplier, double maxSpeed) {
         Flock flock = (Flock) this.getParent();
         keyPressedAccIncrement = accelerationMultiplier / deltaT.toSeconds();
-        Set<Ball2D> ballsSet = perceptionRadiusMap.keySet();
+        Set<Boid> ballsSet = perceptionRadiusMap.keySet();
         Point2D physicsEngineAcceleration = flock.getFlockingSim().getTotalAcceleration(this, ballsSet);
         prevAttractionComponent = addComponentToAcceleration(physicsEngineAcceleration, prevAttractionComponent);
         updateBallsInPerceptionRadiusMap();
@@ -154,7 +155,7 @@ public class Ball2D extends Group {
 
     private void updateBallsInPerceptionRadiusMap() {
         Flock flock = (Flock) getParent();
-        flock.getChildrenUnmodifiable().stream().filter(node -> !node.equals(this)).map(node -> (Ball2D) node).forEach(ball2D -> {
+        flock.getChildrenUnmodifiable().stream().filter(node -> !node.equals(this)).map(node -> (Boid) node).forEach(ball2D -> {
             double distance = ball2D.getCenterPosition().subtract(this.getCenterPosition()).magnitude();
             if (distance < perceptionCircle.getRadius()) {
                 if (!perceptionRadiusMap.containsKey(ball2D)) perceptionRadiusMap.put(ball2D, new Connection());

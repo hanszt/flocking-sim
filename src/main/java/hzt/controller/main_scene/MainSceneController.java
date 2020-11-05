@@ -4,7 +4,7 @@ import hzt.controller.AbstractSceneController;
 import hzt.controller.AnimationService;
 import hzt.controller.AppManager;
 import hzt.controller.utils.Engine;
-import hzt.model.entity.Ball2D;
+import hzt.model.entity.Boid;
 import hzt.model.entity.Flock;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -226,26 +226,26 @@ public class MainSceneController extends AbstractSceneController {
     private void addListenersToSliders() {
         numberOfBallsSlider.valueProperty().addListener((oldVal, curVal, newVal) -> configureFlock());
         perceptionRadiusSlider.valueProperty().addListener((oldVal, curVal, newVal) -> flock.getChildren().stream()
-                .map(n -> (Ball2D) n).forEach(ball -> ball.setPerceptionRadius(ball.getBody().getRadius() * newVal.doubleValue())));
+                .map(n -> (Boid) n).forEach(ball -> ball.setPerceptionRadius(ball.getBody().getRadius() * newVal.doubleValue())));
         repelDistanceSlider.valueProperty().addListener((oldVal, curVal, newVal) -> flock.getChildren().stream()
-                .map(n -> (Ball2D) n).forEach(ball -> ball.setRepelRadius(ball.getBody().getRadius() * newVal.doubleValue())));
+                .map(n -> (Boid) n).forEach(ball -> ball.setRepelRadius(ball.getBody().getRadius() * newVal.doubleValue())));
         attractionSlider.valueProperty().addListener((oldVal, curVal, newVal) -> engine.setPullFactor(newVal.doubleValue()));
         repelFactorSlider.valueProperty().addListener((oldVal, curVal, newVal) -> engine.setRepelFactor(newVal.doubleValue()));
     }
 
     public void reset() {
         resetControls();
-        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(this::setBallParams);
+        flock.getChildren().stream().map(n -> (Boid) n).forEach(this::setBallParams);
     }
 
-    public void setBallParams(Ball2D ball2D) {
-        ball2D.getVisibleVelocityVector().setVisible(showVelocityVectorButton.isSelected());
-        ball2D.getVisibleAccelerationVector().setVisible(showAccelerationVectorButton.isSelected());
-        ball2D.getRepelCircle().setVisible(showRepelCircleButton.isSelected());
-        ball2D.getPerceptionCircle().setVisible(showPerceptionButton.isSelected());
-        boolean showPathSelectedBall = flock.getSelectedBall() != null && flock.getSelectedBall().equals(ball2D);
-        if (showPathSelectedBall) ball2D.getPath().setVisible(showPathSelectedButton.isSelected());
-        else ball2D.getPath().setVisible(showAllPathsButton.isSelected());
+    public void setBallParams(Boid boid) {
+        boid.getVisibleVelocityVector().setVisible(showVelocityVectorButton.isSelected());
+        boid.getVisibleAccelerationVector().setVisible(showAccelerationVectorButton.isSelected());
+        boid.getRepelCircle().setVisible(showRepelCircleButton.isSelected());
+        boid.getPerceptionCircle().setVisible(showPerceptionButton.isSelected());
+        boolean showPathSelectedBall = flock.getSelectedBall() != null && flock.getSelectedBall().equals(boid);
+        if (showPathSelectedBall) boid.getPath().setVisible(showPathSelectedButton.isSelected());
+        else boid.getPath().setVisible(showAllPathsButton.isSelected());
     }
 
     private void resetControls() {
@@ -278,7 +278,7 @@ public class MainSceneController extends AbstractSceneController {
     private void uniformBallColorPickerAction(ActionEvent event) {
         Color color = ((ColorPicker) event.getSource()).getValue();
         flock.setUniformBallColor(color);
-        flock.getChildren().stream().map(n -> (Ball2D) n)
+        flock.getChildren().stream().map(n -> (Boid) n)
                 .filter(ball -> !ball.equals(flock.getSelectedBall())).forEach(ball2D -> ball2D.updatePaint(color));
     }
 
@@ -304,14 +304,14 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private void showPathSelectedBallButtonAction(ActionEvent event) {
         boolean showPath = ((ToggleButton) event.getSource()).isSelected();
-        Ball2D ball = flock.getSelectedBall();
+        Boid ball = flock.getSelectedBall();
         if (ball != null) ball.getPath().setVisible(showPath);
     }
 
     @FXML
     private void showPathsAllBallsButtonAction(ActionEvent event) {
         boolean showPaths = ((ToggleButton) event.getSource()).isSelected();
-        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.getPath().setVisible(showPaths));
+        flock.getChildren().stream().map(n -> (Boid) n).forEach(ball2D -> ball2D.getPath().setVisible(showPaths));
         showPathSelectedButton.setSelected(showPaths);
     }
 
@@ -323,7 +323,7 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private void showPerceptionRadiusButtonAction(ActionEvent event) {
         boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.getPerceptionCircle().setVisible(visible));
+        flock.getChildren().stream().map(n -> (Boid) n).forEach(ball2D -> ball2D.getPerceptionCircle().setVisible(visible));
         showPerceptionSelectedBallButton.setSelected(visible);
     }
 
@@ -336,19 +336,19 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     public void showRepelCircleButtonAction(ActionEvent event) {
         boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.getRepelCircle().setVisible(visible));
+        flock.getChildren().stream().map(n -> (Boid) n).forEach(ball2D -> ball2D.getRepelCircle().setVisible(visible));
     }
 
     @FXML
     public void showVelocitiesButtonAction(ActionEvent event) {
         boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.getVisibleVelocityVector().setVisible(visible));
+        flock.getChildren().stream().map(n -> (Boid) n).forEach(ball2D -> ball2D.getVisibleVelocityVector().setVisible(visible));
     }
 
     @FXML
     public void showAccelerationsButtonAction(ActionEvent event) {
         boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        flock.getChildren().stream().map(n -> (Ball2D) n).forEach(ball2D -> ball2D.getVisibleAccelerationVector().setVisible(visible));
+        flock.getChildren().stream().map(n -> (Boid) n).forEach(ball2D -> ball2D.getVisibleAccelerationVector().setVisible(visible));
     }
 
     @FXML

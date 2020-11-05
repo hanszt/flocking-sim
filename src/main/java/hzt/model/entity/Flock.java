@@ -28,7 +28,7 @@ public class Flock extends Pane {
 
     private final MainSceneController sceneController;
 
-    private Ball2D selectedBall;
+    private Boid selectedBall;
     private Color uniformBallColor = INIT_UNIFORM_BALL_COLOR, selectedBallColor = INIT_SELECTED_BALL_COLOR;
     private FlockType flockType;
     private Engine.FlockingSim flockingSim;
@@ -49,29 +49,29 @@ public class Flock extends Pane {
     private void addBallToFlock(Dimension2D parentDimension) {
         double perceptionRadiusRatio = sceneController.getPerceptionRadiusSlider().getValue();
         double repelRadiusRatio = sceneController.getRepelDistanceSlider().getValue();
-        Ball2D ball2D = flockType.createBall();
-        ball2D.setCenterPosition(getRandomPositionOnParent(parentDimension.getWidth(), parentDimension.getHeight()));
-        ball2D.setPerceptionRadius(ball2D.getBody().getRadius() * perceptionRadiusRatio);
-        ball2D.setRepelRadius(ball2D.getBody().getRadius() * repelRadiusRatio);
-        sceneController.setBallParams(ball2D);
-        addMouseFunctionality(ball2D);
-        this.getChildren().add(ball2D);
+        Boid boid = flockType.createBall();
+        boid.setCenterPosition(getRandomPositionOnParent(parentDimension.getWidth(), parentDimension.getHeight()));
+        boid.setPerceptionRadius(boid.getBody().getRadius() * perceptionRadiusRatio);
+        boid.setRepelRadius(boid.getBody().getRadius() * repelRadiusRatio);
+        sceneController.setBallParams(boid);
+        addMouseFunctionality(boid);
+        this.getChildren().add(boid);
     }
 
     private void removeBallFromFLock() {
-        Ball2D ball2D = (Ball2D) this.getChildren().get(0);
-       this.getChildren().remove(ball2D);
-        this.getChildren().stream().map(n -> (Ball2D) n).forEach(ball -> {
-            ball.getPerceptionRadiusMap().remove(ball2D);
+        Boid boid = (Boid) this.getChildren().get(0);
+       this.getChildren().remove(boid);
+        this.getChildren().stream().map(n -> (Boid) n).forEach(ball -> {
+            ball.getPerceptionRadiusMap().remove(boid);
             ball.getChildren().removeIf(n -> n instanceof Connection);
         });
-        if (ball2D.equals(selectedBall)) {
+        if (boid.equals(selectedBall)) {
             selectedBall = this.getChildren().size() > 0 ? getRandomNewSelectedBall() : null;
         }
     }
 
-    public Ball2D getRandomNewSelectedBall() {
-        Ball2D ball = (Ball2D) this.getChildren().get((int) (Math.random() * getChildren().size()));
+    public Boid getRandomNewSelectedBall() {
+        Boid ball = (Boid) this.getChildren().get((int) (Math.random() * getChildren().size()));
         ball.updatePaint(selectedBallColor);
         ball.addKeyControlForAcceleration();
         ball.getPath().setVisible(sceneController.getShowPathSelectedButton().isSelected());
@@ -79,7 +79,7 @@ public class Flock extends Pane {
     }
 
     public abstract static class FlockType {
-        abstract Ball2D createBall();
+        abstract Boid createBall();
 
         @Override
         public abstract String toString();
@@ -87,8 +87,8 @@ public class Flock extends Pane {
 
     private final FlockType random = new FlockType() {
         @Override
-        Ball2D createBall() {
-            return new Ball2D(getRandomDouble(MIN_RADIUS, sceneController.getMaxBallSizeSlider().getValue()), getRandomColor());
+        Boid createBall() {
+            return new Boid(getRandomDouble(MIN_RADIUS, sceneController.getMaxBallSizeSlider().getValue()), getRandomColor());
         }
 
         @Override
@@ -99,8 +99,8 @@ public class Flock extends Pane {
 
     private final FlockType uniform = new FlockType() {
         @Override
-        Ball2D createBall() {
-            return new Ball2D(sceneController.getMaxBallSizeSlider().getValue(), uniformBallColor);
+        Boid createBall() {
+            return new Boid(sceneController.getMaxBallSizeSlider().getValue(), uniformBallColor);
         }
 
         @Override
@@ -109,7 +109,7 @@ public class Flock extends Pane {
         }
     };
 
-    public void addMouseFunctionality(Ball2D ball) {
+    public void addMouseFunctionality(Boid ball) {
         Duration frameDuration = sceneController.getAnimationService().getTimeline().getCycleDuration();
         Stack<Point2D> dragPoints = new Stack<>();
         ball.getBody().setOnMousePressed(onMousePressed(ball));
@@ -117,7 +117,7 @@ public class Flock extends Pane {
         ball.getBody().setOnMouseReleased(e -> ball.setSpeedBasedOnMouseDrag(dragPoints, frameDuration));
     }
 
-    private EventHandler<MouseEvent> onMousePressed(Ball2D ball) {
+    private EventHandler<MouseEvent> onMousePressed(Boid ball) {
         return mouseEvent -> {
             ball.updatePaint(selectedBallColor);
             ball.setCenterPosition(mouseEvent.getX(), mouseEvent.getY());
@@ -135,7 +135,7 @@ public class Flock extends Pane {
         };
     }
 
-    private EventHandler<MouseEvent> onMouseDragged(Ball2D ball, Stack<Point2D> dragPoints) {
+    private EventHandler<MouseEvent> onMouseDragged(Boid ball, Stack<Point2D> dragPoints) {
         return e -> {
             ball.getBody().setCenterX(e.getX());
             ball.getBody().setCenterY(e.getY());

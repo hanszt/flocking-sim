@@ -1,6 +1,6 @@
 package hzt.controller.main_scene;
 
-import hzt.model.entity.Ball2D;
+import hzt.model.entity.Boid;
 import javafx.util.Duration;
 
 public class StatisticsService {
@@ -11,7 +11,7 @@ public class StatisticsService {
         this.mc = mc;
     }
 
-    public void showStatisticsAboutSelectedBall(Ball2D selected) {
+    public void showStatisticsAboutSelectedBall(Boid selected) {
         double positionX, positionY, velocity, acceleration, ballSize;
         int ballsInPerceptionRadius;
         if (selected != null) {

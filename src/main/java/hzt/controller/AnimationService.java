@@ -2,7 +2,7 @@ package hzt.controller;
 
 import hzt.controller.main_scene.MainSceneController;
 import hzt.controller.main_scene.StatisticsService;
-import hzt.model.entity.Ball2D;
+import hzt.model.entity.Boid;
 import hzt.model.entity.Flock;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -43,13 +43,13 @@ public class AnimationService {
     }
 
     public void run(Flock flock, double accelerationMultiplier, double frictionFactor, boolean bounce, double maxSpeed) {
-        Ball2D selected = mainSceneController.getFlock().getSelectedBall();
+        Boid selected = mainSceneController.getFlock().getSelectedBall();
         Dimension2D animationWindowSize = mainSceneController.getAnimationWindowDimension();
         LocalTime startTimeSim = mainSceneController.getAppManager().startTimeSim, stopTimeSim = LocalTime.now();
         Duration runTimeSim = Duration.millis((stopTimeSim.toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
         statisticsService.showStatisticsAboutSelectedBall(selected);
         statisticsService.showGlobalStatistics(frictionFactor, timeline.getCycleDuration(), flock.getChildren().size(), runTimeSim);
-        flock.getChildren().stream().map(ball2D -> (Ball2D) ball2D).forEach(ball -> {
+        flock.getChildren().stream().map(ball2D -> (Boid) ball2D).forEach(ball -> {
             ball.addFriction(frictionFactor);
             if (bounce) ball.bounceOfEdges(animationWindowSize);
             else ball.floatThroughEdges(animationWindowSize);

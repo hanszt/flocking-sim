@@ -1,6 +1,6 @@
 package hzt.controller.utils;
 
-import hzt.model.entity.Ball2D;
+import hzt.model.entity.Boid;
 import javafx.geometry.Point2D;
 import lombok.Getter;
 
@@ -24,16 +24,16 @@ public class Engine {
      */
     public static abstract class FlockingSim {
 
-        public Point2D getTotalAcceleration(Ball2D self, Set<Ball2D> ball2DSet) {
+        public Point2D getTotalAcceleration(Boid self, Set<Boid> boidSet) {
             Point2D totalAcceleration = Point2D.ZERO;
-            for (Ball2D other : ball2DSet) {
+            for (Boid other : boidSet) {
                 Point2D acceleration = getAccelerationBetweenTwoBalls(self, other);
                 totalAcceleration = totalAcceleration.add(acceleration);
             }
             return totalAcceleration;
         }
 
-        abstract Point2D getAccelerationBetweenTwoBalls(Ball2D self, Ball2D other);
+        abstract Point2D getAccelerationBetweenTwoBalls(Boid self, Boid other);
 
         @Override
         public abstract String toString();
@@ -41,7 +41,7 @@ public class Engine {
 
     private final FlockingSim type1 = new FlockingSim() {
 
-        Point2D getAccelerationBetweenTwoBalls(Ball2D self, Ball2D other) {
+        Point2D getAccelerationBetweenTwoBalls(Boid self, Boid other) {
             Point2D vectorSelfToOther = other.getCenterPosition().subtract(self.getCenterPosition());
             Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
             float distance = (float) vectorSelfToOther.magnitude();
@@ -64,7 +64,7 @@ public class Engine {
 
     private final FlockingSim type2 = new FlockingSim() {
 
-        Point2D getAccelerationBetweenTwoBalls(Ball2D self, Ball2D other) {
+        Point2D getAccelerationBetweenTwoBalls(Boid self, Boid other) {
             Point2D vectorSelfToOther = other.getCenterPosition().subtract(self.getCenterPosition());
             Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
             float distance = (float) vectorSelfToOther.magnitude();
@@ -87,7 +87,7 @@ public class Engine {
 
     private final FlockingSim type3 = new FlockingSim() {
 
-        Point2D getAccelerationBetweenTwoBalls(Ball2D self, Ball2D other) {
+        Point2D getAccelerationBetweenTwoBalls(Boid self, Boid other) {
             final int multiplier = 10;
             Point2D vectorSelfToOther = other.getCenterPosition().subtract(self.getCenterPosition());
             Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
