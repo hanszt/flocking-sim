@@ -45,11 +45,11 @@ public class Boid extends Group {
     private Point2D velocity; // pixel/s
     private Point2D acceleration; // pixel/s^2
 
-    public Ball2D(double radius, Paint paint) {
+    public Boid(double radius, Paint paint) {
         this("Ball" + ++next, radius, paint);
     }
 
-    public Ball2D(String name, double radius, Paint initPaint) {
+    public Boid(String name, double radius, Paint initPaint) {
         this.name = name;
         this.initPaint = initPaint;
         this.body = new Circle(radius);
@@ -96,14 +96,14 @@ public class Boid extends Group {
         acceleration = Point2D.ZERO;
         Flock flock = (Flock) this.getParent();
         maxAcceleration = accelerationMultiplier / deltaT.toSeconds();
-        Set<Ball2D> ballsSet = perceptionRadiusMap.keySet();
+        Set<Boid> ballsSet = perceptionRadiusMap.keySet();
         Point2D physicsEngineAcceleration = flock.getFlockingSim().getTotalAcceleration(this, ballsSet);
         acceleration = acceleration.add(physicsEngineAcceleration);
         acceleration = acceleration.add(addFriction(frictionFactor));
         acceleration = acceleration.add(userInputAcceleration);
 //        prevAttractionComponent = addComponentToAcceleration(physicsEngineAcceleration, prevAttractionComponent);
         updateBallsInPerceptionRadiusMap();
-        updatePositionAndVelocityBasedOnAcceleration(deltaT, maxSpeed);
+        updatePositionAndVelocityBasedOnAcceleration(deltaT, maxSpeed, maxAcceleration);
         manageComponentsVisibility(flock.getSceneController());
     }
 
@@ -154,14 +154,14 @@ public class Boid extends Group {
 
     private void updateBallsInPerceptionRadiusMap() {
         Flock flock = (Flock) getParent();
-        flock.getChildrenUnmodifiable().stream().filter(node -> !node.equals(this)).map(node -> (Boid) node).forEach(ball2D -> {
-            double distance = ball2D.getCenterPosition().subtract(this.getCenterPosition()).magnitude();
+        flock.getChildrenUnmodifiable().stream().filter(node -> !node.equals(this)).map(node -> (Boid) node).forEach(boid -> {
+            double distance = boid.getCenterPosition().subtract(this.getCenterPosition()).magnitude();
             if (distance < perceptionCircle.getRadius()) {
-                if (!perceptionRadiusMap.containsKey(ball2D)) perceptionRadiusMap.put(ball2D, new Connection());
+                if (!perceptionRadiusMap.containsKey(boid)) perceptionRadiusMap.put(boid, new Connection());
             } else {
-                Line lineToOther = perceptionRadiusMap.get(ball2D);
+                Line lineToOther = perceptionRadiusMap.get(boid);
                 this.getChildren().remove(lineToOther);
-                perceptionRadiusMap.remove(ball2D);
+                perceptionRadiusMap.remove(boid);
             }
         });
     }

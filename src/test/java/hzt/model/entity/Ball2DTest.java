@@ -53,7 +53,7 @@ class Ball2DTest {
         final int nrOftestCases = 10000, maxValue = 100, decimalPlaces = 10;
         double[] expectedSpeeds = new double[nrOftestCases], actualSpeeds = new double[nrOftestCases];
         for (int i = 0; i < nrOftestCases; i++) {
-            Ball2D ball2D = new Ball2D(getRandomNumber(0, maxValue), BLACK);
+            Boid ball2D = new Boid(getRandomNumber(0, maxValue), BLACK);
             Point2D point2D = new Point2D(Math.random(), Math.random());
             double maxSpeed = getRandomNumber(0, maxValue);
             Point2D velocity = point2D.normalize().multiply(maxSpeed + getRandomNumber(0, maxValue));
