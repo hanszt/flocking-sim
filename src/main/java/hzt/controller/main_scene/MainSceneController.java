@@ -192,7 +192,7 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     private void addListenersToSliders() {
-        numberOfBallsSlider.valueProperty().addListener((oldVal, curVal, newVal) -> configureFlock());
+        numberOfBallsSlider.valueProperty().addListener((oldVal, curVal, newVal) -> flock.controlFlockSize(newVal.intValue(), getAnimationWindowDimension()));
         perceptionRadiusSlider.valueProperty().addListener((oldVal, curVal, newVal) -> flock.getChildren().stream()
                 .map(n -> (Boid) n).forEach(ball -> ball.setPerceptionRadius(ball.getBody().getRadius() * newVal.doubleValue())));
         repelDistanceSlider.valueProperty().addListener((oldVal, curVal, newVal) -> flock.getChildren().stream()

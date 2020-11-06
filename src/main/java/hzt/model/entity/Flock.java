@@ -84,6 +84,7 @@ public class Flock extends Pane {
         ball.updatePaint(selectedBallColor);
         ball.addKeyControlForAcceleration();
         ball.getPath().setVisible(sceneController.getShowPathSelectedButton().isSelected());
+        ball.getPerceptionCircle().setVisible(sceneController.getShowPerceptionSelectedBallButton().isSelected());
         return ball;
     }
 

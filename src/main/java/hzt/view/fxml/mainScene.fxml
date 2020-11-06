@@ -28,7 +28,7 @@
                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <SplitPane dividerPositions="0.7626527050610821" orientation="VERTICAL">
                 <AnchorPane fx:id="animationPane" prefHeight="3000.0" prefWidth="10000.0"/>
-                <HBox fx:id="slidersPane" prefHeight="150.0" maxHeight="150"
+                <HBox fx:id="slidersPane" prefHeight="180.0" maxHeight="180" minHeight="180"
                       SplitPane.resizableWithParent="false">
                     <VBox prefWidth="3000.0">
                         <padding>
@@ -74,7 +74,7 @@
                     </VBox>
                 </HBox>
             </SplitPane>
-            <VBox fx:id="mainControlPanel" maxWidth="350.0" prefWidth="300.0" spacing="4.0">
+            <VBox fx:id="mainControlPanel" maxWidth="320.0" prefWidth="300.0" spacing="4.0">
                 <padding>
                     <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
                 </padding>

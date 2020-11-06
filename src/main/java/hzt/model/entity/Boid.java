@@ -101,9 +101,9 @@ public class Boid extends Group {
         acceleration = acceleration.add(physicsEngineAcceleration);
         acceleration = acceleration.add(addFriction(frictionFactor));
         acceleration = acceleration.add(userInputAcceleration);
-        updateBallsInPerceptionRadiusMap();
         updatePositionAndVelocityBasedOnAcceleration(deltaT, maxSpeed, maxAcceleration);
         manageComponentsVisibility(flock.getSceneController());
+        updateBallsInPerceptionRadiusMap();
     }
 
     private void manageComponentsVisibility(MainSceneController ms) {
