@@ -17,7 +17,10 @@ import javafx.util.Duration;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.*;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static hzt.controller.AnimationService.LINE_STROKE_WIDTH;
 import static hzt.controller.utils.Engine.DENSITY;
@@ -254,12 +257,11 @@ public class Boid extends Group {
         addKeyControlForAcceleration(KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D);
     }
 
-    private Point2D userInputAcceleration = Point2D.ZERO;
     private double maxAcceleration;
     private boolean upPressed;
-    private boolean downPressed;
-    private boolean leftPressed;
-    private boolean rightPressed;
+    private boolean dPressed;
+    private boolean lPressed;
+    private boolean rPressed;
 
     private EventHandler<KeyEvent> keyPressed;
     private EventHandler<KeyEvent> keyReleased;
@@ -272,52 +274,42 @@ public class Boid extends Group {
         scene.addEventFilter(KeyEvent.KEY_RELEASED, keyReleased);
     }
 
+    private Point2D userInputAcceleration = Point2D.ZERO;
+
+    private static final Point2D X_POS_DIR = new Point2D(1, 0);
+    private static final Point2D Y_POS_DIR = new Point2D(0, 1);
+
     private EventHandler<KeyEvent> keyPressed(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
-        return keyEvent -> {
-            if (keyEvent.getCode() == down && !downPressed) {
-                downPressed = true;
-                userInputAcceleration = userInputAcceleration.add(0, maxAcceleration);
-            }
-            if (keyEvent.getCode() == left && !leftPressed) {
-                leftPressed = true;
-                userInputAcceleration = userInputAcceleration.add(-maxAcceleration, 0);
-            }
-            if (keyEvent.getCode() == up && !upPressed) {
-                upPressed = true;
-                userInputAcceleration = userInputAcceleration.add(0, -maxAcceleration);
-            }
-            if (keyEvent.getCode() == right && !rightPressed) {
-                rightPressed = true;
-                userInputAcceleration = userInputAcceleration.add(maxAcceleration, 0);
-            }
+        return key -> {
+            if (key.getCode() == right && !rPressed) rPressed = pressedAction(X_POS_DIR.multiply(maxAcceleration));
+            if (key.getCode() == left && !lPressed) lPressed = pressedAction(X_POS_DIR.multiply(-maxAcceleration));
+            if (key.getCode() == down && !dPressed) dPressed = pressedAction(Y_POS_DIR.multiply(maxAcceleration));
+            if (key.getCode() == up && !upPressed) upPressed = pressedAction(Y_POS_DIR.multiply(-maxAcceleration));
         };
+    }
+
+    private boolean pressedAction(Point2D vector) {
+        userInputAcceleration = userInputAcceleration.add(vector);
+        return true;
     }
 
     private EventHandler<KeyEvent> keyReleased(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
-        return keyEvent -> {
-            if (keyEvent.getCode() == down) {
-                downPressed = false;
-                userInputAcceleration = userInputAcceleration.subtract(0, maxAcceleration);
-            }
-            if (keyEvent.getCode() == left) {
-                leftPressed = false;
-                userInputAcceleration = userInputAcceleration.subtract(-maxAcceleration, 0);
-            }
-            if (keyEvent.getCode() == up) {
-                upPressed = false;
-                userInputAcceleration = userInputAcceleration.subtract(0, -maxAcceleration);
-            }
-            if (keyEvent.getCode() == right) {
-                rightPressed = false;
-                userInputAcceleration = userInputAcceleration.subtract(maxAcceleration, 0);
-            }
-            if (!upPressed && !downPressed && !leftPressed && !rightPressed) userInputAcceleration = Point2D.ZERO;
+        return key -> {
+            if (key.getCode() == right) rPressed = releaseButtonAction(X_POS_DIR.multiply(-maxAcceleration));
+            if (key.getCode() == left) lPressed = releaseButtonAction(X_POS_DIR.multiply(maxAcceleration));
+            if (key.getCode() == down) dPressed = releaseButtonAction(Y_POS_DIR.multiply(-maxAcceleration));
+            if (key.getCode() == up) upPressed = releaseButtonAction(Y_POS_DIR.multiply(maxAcceleration));
+            if (!upPressed && !dPressed && !lPressed && !rPressed) userInputAcceleration = Point2D.ZERO;
         };
     }
 
+    private boolean releaseButtonAction(Point2D vector) {
+        userInputAcceleration = userInputAcceleration.add(vector);
+        return false;
+    }
 
     public void removeKeyControlsForAcceleration() {
-        upPressed = downPressed = leftPressed = rightPressed = false;
+        upPressed = dPressed = lPressed = rPressed = false;
         Scene scene = ((Flock) getParent()).getSceneController().getScene();
         scene.removeEventFilter(KeyEvent.KEY_PRESSED, keyPressed);
         scene.removeEventFilter(KeyEvent.KEY_RELEASED, keyReleased);
