@@ -8,7 +8,7 @@
 <VBox fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
       prefHeight="700.0" prefWidth="900.0"
       xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="hzt.controller.main_scene.MainSceneController">
+      fx:controller="hzt.controller.MainSceneController">
 
     <MenuBar fx:id="menuBar" prefHeight="0.0" prefWidth="602.0" VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="File">
@@ -27,7 +27,7 @@
                    nodeOrientation="LEFT_TO_RIGHT" pickOnBounds="false" AnchorPane.bottomAnchor="0.0"
                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <SplitPane dividerPositions="0.7626527050610821" orientation="VERTICAL">
-                <AnchorPane fx:id="animationPane" prefHeight="3000.0" prefWidth="10000.0"/>
+                <AnchorPane fx:id="animationPane" minHeight="0.0" minWidth="0.0" prefHeight="300.0" prefWidth="390.0"/>
                 <HBox fx:id="slidersPane" prefHeight="180.0" maxHeight="180" minHeight="180"
                       SplitPane.resizableWithParent="false">
                     <VBox prefWidth="3000.0">
@@ -122,7 +122,7 @@
                                 prefWidth="1000.0" text="New instance"/>
                         <ToggleButton fx:id="fullScreenButton" mnemonicParsing="false"
                                       onAction="#fullScreenButtonAction" prefWidth="1000.0"
-                                      text="Full screen"/>
+                                      text="Full scene"/>
                         <ToggleButton mnemonicParsing="false"
                                       onAction="#transparentButtonAction"
                                       prefWidth="1000.0" text="Transparent"/>

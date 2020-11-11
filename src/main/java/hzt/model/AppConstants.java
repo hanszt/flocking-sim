@@ -1,5 +1,6 @@
-package hzt.controller;
+package hzt.model;
 
+import javafx.geometry.Dimension2D;
 import javafx.scene.paint.Color;
 import lombok.Getter;
 
@@ -25,6 +26,8 @@ public final class AppConstants {
 
     public static final Color INIT_BG_COLOR = NAVY;
 
+    public static final Dimension2D MIN_STAGE_DIMENSION = new Dimension2D(750, 500);
+
     public static final String FXML_FILE_LOCATION = "/hzt/view/fxml/";
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_BLUE = "\u001B[34m";
@@ -38,7 +41,7 @@ public final class AppConstants {
 
 
     @Getter
-    public enum Screen {
+    public enum Scene {
 
         MAIN_SCENE("mainScene.fxml", "Main Scene"),
         ABOUT_SCENE("aboutScene.fxml", "About Scene");
@@ -46,7 +49,7 @@ public final class AppConstants {
         private final String fxmlFileName;
         private final String englishDescription;
 
-        Screen(String fxmlFileName, String englishDescription) {
+        Scene(String fxmlFileName, String englishDescription) {
             this.fxmlFileName = fxmlFileName;
             this.englishDescription = englishDescription;
         }

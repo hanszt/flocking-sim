@@ -1,6 +1,6 @@
 package hzt.controller;
 
-import hzt.Main;
+import hzt.view.Launcher;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -9,20 +9,23 @@ import javafx.stage.Stage;
 import lombok.Getter;
 
 import java.io.IOException;
+import java.time.LocalTime;
 
-import static hzt.controller.AppConstants.FXML_FILE_LOCATION;
-import static hzt.controller.AppConstants.Screen.ABOUT_SCENE;
+import static hzt.model.AppConstants.FXML_FILE_LOCATION;
+import static hzt.model.AppConstants.Scene.ABOUT_SCENE;
 
 @Getter
-public abstract class AbstractSceneController implements Controller {
+public abstract class AbstractSceneController {
 
     private final String fxmlFileName;
-    protected final AppManager appManager;
+    protected final SceneManager sceneManager;
     protected final Scene scene;
+    protected final LocalTime startTimeSim;
 
-    public AbstractSceneController(String fxmlFileName, AppManager appManager) throws IOException {
+    public AbstractSceneController(String fxmlFileName, SceneManager sceneManager) throws IOException {
+        this.startTimeSim = LocalTime.now();
         this.fxmlFileName = fxmlFileName;
-        this.appManager = appManager;
+        this.sceneManager = sceneManager;
         FXMLLoader fxmlLoader = new FXMLLoader();
         setControllerFactory(fxmlLoader);
         Parent root = fxmlLoader.load();
@@ -35,14 +38,18 @@ public abstract class AbstractSceneController implements Controller {
         loader.setLocation(getClass().getResource(FXML_FILE_LOCATION + getFxmlFileName()));
     }
 
+    protected abstract Object getBean();
+
+    public abstract void setup();
+
     @FXML
     public void newInstance() {
-        new Main().start(new Stage());
+        new Launcher().start(new Stage());
     }
 
     @FXML
     void quitInstance() {
-        appManager.getStage().close();
+        sceneManager.getStage().close();
     }
 
     @FXML
@@ -52,9 +59,7 @@ public abstract class AbstractSceneController implements Controller {
 
     @FXML
     void showAbout() {
-        appManager.setupScene(ABOUT_SCENE);
+        sceneManager.setupScene(ABOUT_SCENE);
     }
-
-    protected abstract AbstractSceneController getBean();
 
 }

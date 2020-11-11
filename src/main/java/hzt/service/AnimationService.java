@@ -1,7 +1,6 @@
-package hzt.controller;
+package hzt.service;
 
-import hzt.controller.main_scene.MainSceneController;
-import hzt.controller.main_scene.StatisticsService;
+import hzt.controller.MainSceneController;
 import hzt.model.entity.Boid;
 import hzt.model.entity.Flock;
 import javafx.animation.KeyFrame;
@@ -12,6 +11,8 @@ import javafx.geometry.Dimension2D;
 import javafx.util.Duration;
 
 import java.time.LocalTime;
+
+import static javafx.animation.Animation.INDEFINITE;
 
 public class AnimationService {
 
@@ -31,9 +32,9 @@ public class AnimationService {
     }
 
     public Timeline setupTimeLine() {
-        Timeline timeline = new Timeline();
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        return timeline;
+        Timeline t = new Timeline();
+        t.setCycleCount(INDEFINITE);
+        return t;
     }
 
     public void addAnimationLoopToTimeline(EventHandler<ActionEvent> animationLoop, boolean start) {
@@ -45,8 +46,8 @@ public class AnimationService {
     public void run(Flock flock, double accelerationMultiplier, double frictionFactor, boolean bounce, double maxSpeed) {
         Boid selected = mainSceneController.getFlock().getSelectedBall();
         Dimension2D animationWindowSize = mainSceneController.getAnimationWindowDimension();
-        LocalTime startTimeSim = mainSceneController.getAppManager().startTimeSim, stopTimeSim = LocalTime.now();
-        Duration runTimeSim = Duration.millis((stopTimeSim.toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
+        LocalTime startTimeSim = mainSceneController.getStartTimeSim();
+        Duration runTimeSim = Duration.millis((LocalTime.now().toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
         statisticsService.showStatisticsAboutSelectedBall(selected);
         statisticsService.showGlobalStatistics(frictionFactor, timeline.getCycleDuration(), flock.getChildren().size(), runTimeSim);
         flock.getChildren().stream().map(ball2D -> (Boid) ball2D).forEach(ball -> {

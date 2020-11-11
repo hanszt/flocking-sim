@@ -97,7 +97,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>hzt.Main</mainClass>
+                            <mainClass>hzt.view.Launcher</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

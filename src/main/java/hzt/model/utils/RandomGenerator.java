@@ -1,4 +1,4 @@
-package hzt.controller.utils;
+package hzt.model.utils;
 
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
