@@ -1,8 +1,8 @@
-package hzt.controller.main_scene;
+package hzt.service;
 
+import hzt.controller.MainSceneController;
 import hzt.model.entity.Boid;
 import javafx.geometry.Point2D;
-import javafx.geometry.Point3D;
 import javafx.util.Duration;
 
 public class StatisticsService {

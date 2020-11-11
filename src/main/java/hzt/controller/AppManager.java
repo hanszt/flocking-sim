@@ -1,57 +1,57 @@
 package hzt.controller;
 
-import hzt.controller.about_scene.AboutController;
-import hzt.controller.main_scene.MainSceneController;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
-import static hzt.controller.AppConstants.*;
-import static hzt.controller.AppConstants.Screen.ABOUT_SCENE;
-import static hzt.controller.AppConstants.Screen.MAIN_SCENE;
-import static java.lang.System.out;
+import static hzt.model.AppConstants.*;
 
-public class AppManager extends AppVars {
+public class AppManager {
 
-    LocalTime startTimeSim;
-    Duration runTimeSim;
+    private static final Logger LOGGER = LogManager.getLogger(AppManager.class);
+
     private static int instances = 0;
     private final int instance;
+    final Stage stage;
+    private final SceneManager sceneManager;
 
     public AppManager(Stage stage) {
-        super(stage);
-        instance = ++instances;
-        try {
-            startTimeSim = LocalTime.now();
-            System.out.printf("Starting instance %d of %s at %s...\n", instance, TITLE, startTimeSim.toString().substring(0, 5));
-            sceneControllerMap.put(MAIN_SCENE, new MainSceneController(this));
-            sceneControllerMap.put(ABOUT_SCENE, new AboutController(this));
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Something went wrong when loading fxml frontend...");
-        }
+        this.stage = stage;
+        this.sceneManager = new SceneManager(stage);
+        this.instance = ++instances;
+    }
+
+    public void start() {
+        sceneManager.setupScene(Scene.MAIN_SCENE);
+        configureStage(stage);
+        String startingMessage = String.format("Starting instance %d of %s at %s...%n",
+                instance, TITLE, sceneManager.getCurSceneController().getStartTimeSim().format(DateTimeFormatter.ISO_TIME));
+        LOGGER.trace(startingMessage);
+
+        stage.show();
+        String startedMessage = String.format("instance %d started%n", instance);
+        LOGGER.trace(startedMessage);
     }
 
     public void configureStage(Stage stage) {
         stage.setTitle(String.format("%s (%d)", TITLE, instance));
-        stage.setMinWidth(400);
-        stage.setMinHeight(750);
+        stage.setMinWidth(MIN_STAGE_DIMENSION.getWidth());
+        stage.setMinHeight(MIN_STAGE_DIMENSION.getHeight());
         stage.setOnCloseRequest(e -> printClosingText());
-    }
-
-    public void setupScene(Screen screen) {
-        curSceneController = sceneControllerMap.get(screen);
-        stage.setScene(curSceneController.getScene());
-        curSceneController.setup();
+        if (instances == 1) stage.setMaximized(true);
     }
 
     private void printClosingText() {
+        LocalTime startTimeSim = sceneManager.getCurSceneController().getStartTimeSim();
         LocalTime stopTimeSim = LocalTime.now();
-        runTimeSim = Duration.seconds(stopTimeSim.toSecondOfDay() - startTimeSim.toSecondOfDay());
-        out.printf("%s\nAnimation Runtime of instance %d: %.2f seconds\n%s\n", CLOSING_MESSAGE,
+        Duration runTimeSim = Duration.millis((stopTimeSim.toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
+        String message = String.format("%s%nAnimation Runtime of instance %d: %.2f seconds%n%s%n", CLOSING_MESSAGE,
                 instance, runTimeSim.toSeconds(), DOTTED_LINE);
+        LOGGER.trace(message);
     }
 
 }

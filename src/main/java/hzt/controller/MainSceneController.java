@@ -1,10 +1,8 @@
-package hzt.controller.main_scene;
+package hzt.controller;
 
-import hzt.controller.AbstractSceneController;
-import hzt.controller.AnimationService;
-import hzt.controller.AppConstants;
-import hzt.controller.AppManager;
-import hzt.controller.utils.Engine;
+import hzt.model.AppConstants;
+import hzt.service.AnimationService;
+import hzt.model.utils.Engine;
 import hzt.model.entity.Boid;
 import hzt.model.entity.Flock;
 import javafx.event.ActionEvent;
@@ -12,6 +10,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
+import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
@@ -22,8 +21,8 @@ import lombok.Getter;
 
 import java.io.IOException;
 
-import static hzt.controller.AppConstants.STAGE_OPACITY;
-import static hzt.controller.AppConstants.Screen.MAIN_SCENE;
+import static hzt.model.AppConstants.STAGE_OPACITY;
+import static hzt.model.AppConstants.Scene.MAIN_SCENE;
 import static hzt.model.entity.Flock.INIT_SELECTED_BALL_COLOR;
 import static hzt.model.entity.Flock.INIT_UNIFORM_BALL_COLOR;
 
@@ -116,35 +115,58 @@ public class MainSceneController extends AbstractSceneController {
 
     private Color backgroundColor = AppConstants.INIT_BG_COLOR;
 
+    private final SubScene subScene2D;
+    private final Group subSceneRoot;
     private final Flock flock;
     private final AnimationService animationService;
     private final Engine engine;
 
-    public MainSceneController(AppManager appManager) throws IOException {
-        super(MAIN_SCENE.getFxmlFileName(), appManager);
-        engine = new Engine();
-        animationService = new AnimationService(this);
-        flock = new Flock(this);
+    public MainSceneController(SceneManager sceneManager) throws IOException {
+        super(MAIN_SCENE.getFxmlFileName(), sceneManager);
+        this.subSceneRoot = new Group();
+        this.subScene2D = new SubScene(subSceneRoot, 0, 0, true, SceneAntialiasing.BALANCED);
+        this.flock = new Flock(this);
+        this.engine = new Engine();
+        this.animationService = new AnimationService(this);
+        this.subSceneRoot.getChildren().addAll(flock);
+        this.animationPane.getChildren().add(subScene2D);
     }
 
     @Override
     public void setup() {
-        addListenersToSliders();
-        configureColorPickers();
+        bindFullScreenButtonToFullScreen(fullScreenButton, sceneManager.getStage());
+        configureAnimationPane(animationPane);
+        configureSubScene(subScene2D, animationPane);
         configureComboBoxes();
-        configureFlock();
         reset();
-        bindFullScreenButtonToFullScreen();
+        configureFlock(flock);
+        configureColorPickers();
+        addListenersToSliders();
         engine.setPullFactor(attractionSlider.getValue());
         engine.setRepelFactor(repelFactorSlider.getValue());
-        animationPane.getChildren().add(flock);
-        animationPane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
-        animationService.addAnimationLoopToTimeline(initializeAnimationLoop(), true);
+       animationService.addAnimationLoopToTimeline(initializeAnimationLoop(), true);
         uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandom()));
     }
 
-    private void bindFullScreenButtonToFullScreen() {
-        Stage stage = appManager.getStage();
+    private void configureSubScene(SubScene subScene, Pane animationPane) {
+        subScene.widthProperty().bind(animationPane.widthProperty());
+        subScene.heightProperty().bind(animationPane.heightProperty());
+        subScene.setCamera(getConfiguredCamera());
+    }
+
+    private Camera getConfiguredCamera() {
+        Camera camera = new ParallelCamera();
+        camera.setFarClip(1000);
+        camera.setNearClip(.01);
+        return camera;
+    }
+
+    private void configureAnimationPane(AnchorPane animationPane) {
+        animationPane.setPrefSize(640, 400);
+        animationPane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
+    }
+
+    private void bindFullScreenButtonToFullScreen(ToggleButton fullScreenButton, Stage stage) {
         stage.fullScreenProperty().addListener((observableValue, curVal, newVal) -> fullScreenButton.setSelected(newVal));
         stage.addEventFilter(KeyEvent.KEY_PRESSED, key -> {
             if (key.getCode() == KeyCode.F11) stage.setFullScreen(!stage.isFullScreen());
@@ -184,7 +206,7 @@ public class MainSceneController extends AbstractSceneController {
                 sceneDimension.getHeight() - slidersPane.getHeight() - menuBar.getHeight());
     }
 
-    private void configureFlock() {
+    private void configureFlock(Flock flock) {
         flock.setFlockType(flockSettingsComboBox.getValue());
         flock.controlFlockSize((int) numberOfBallsSlider.getValue(), getAnimationWindowDimension());
         flock.setFlockingSim(engine.getType1());
@@ -265,8 +287,8 @@ public class MainSceneController extends AbstractSceneController {
 
     @FXML
     private void transparentButtonAction(ActionEvent actionEvent) {
-        if (!((ToggleButton) actionEvent.getSource()).isSelected()) getAppManager().getStage().setOpacity(1);
-        else getAppManager().getStage().setOpacity(STAGE_OPACITY);
+        boolean transparent = ((ToggleButton) actionEvent.getSource()).isSelected();
+        getSceneManager().getStage().setOpacity(transparent ? STAGE_OPACITY : 1);
     }
 
     @FXML
@@ -285,7 +307,7 @@ public class MainSceneController extends AbstractSceneController {
 
     @FXML
     private void fullScreenButtonAction(ActionEvent actionEvent) {
-        appManager.getStage().setFullScreen(((ToggleButton) actionEvent.getSource()).isSelected());
+        sceneManager.getStage().setFullScreen(((ToggleButton) actionEvent.getSource()).isSelected());
     }
 
     @FXML
@@ -327,7 +349,7 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private void flockTypeDropdownAction() {
         flock.controlFlockSize(0, getAnimationWindowDimension());
-        configureFlock();
+        configureFlock(flock);
         uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandom()));
         flock.setSelectedBall(flock.getRandomSelectedBall());
     }

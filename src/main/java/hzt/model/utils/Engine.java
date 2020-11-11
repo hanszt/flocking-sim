@@ -1,4 +1,4 @@
-package hzt.controller.utils;
+package hzt.model.utils;
 
 import hzt.model.entity.Boid;
 import javafx.geometry.Point2D;

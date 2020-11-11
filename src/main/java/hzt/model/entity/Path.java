@@ -7,8 +7,6 @@ import javafx.scene.Node;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 
-import static hzt.controller.AnimationService.LINE_STROKE_WIDTH;
-
 public class Path extends Group {
 
     private double lineWidth;

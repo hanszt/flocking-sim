@@ -1,11 +1,12 @@
 package hzt.model.entity;
 
-import hzt.controller.main_scene.MainSceneController;
-import hzt.controller.utils.Engine;
+import hzt.controller.MainSceneController;
+import hzt.model.utils.Engine;
 import javafx.collections.ObservableList;
 import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -13,17 +14,20 @@ import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.Random;
+import java.util.stream.Collectors;
 
-import static hzt.controller.utils.RandomGenerator.*;
+import static hzt.model.utils.RandomGenerator.*;
 
 // extends a Pane so it is resizable, so its size is set by its parent, which essentially determine its bounds.
 @Getter
 @Setter
-public class Flock extends Pane {
+public class Flock extends Group implements Iterable<Boid> {
 
     public static final int MIN_RADIUS = 3;
     public static final int MAX_RADIUS = 10;
@@ -43,7 +47,7 @@ public class Flock extends Pane {
 
     public Flock(MainSceneController mainSceneController) {
         //Size is zero so it does not influence the rest of the layout when balls are moved
-        this.setMaxSize(0, 0);
+//        this.setMaxSize(0, 0);
         this.sceneController = mainSceneController;
     }
 
@@ -86,6 +90,15 @@ public class Flock extends Pane {
         ball.getPath().setVisible(sceneController.getShowPathSelectedButton().isSelected());
         ball.getPerceptionCircle().setVisible(sceneController.getShowPerceptionSelectedBallButton().isSelected());
         return ball;
+    }
+
+    @NotNull
+    @Override
+    public Iterator<Boid> iterator() {
+        return getChildren().stream()
+                .filter(n -> n instanceof Boid)
+                .map(n -> (Boid) n)
+                .collect(Collectors.toList()).iterator();
     }
 
     public abstract static class FlockType {

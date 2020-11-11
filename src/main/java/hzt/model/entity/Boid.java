@@ -1,6 +1,6 @@
 package hzt.model.entity;
 
-import hzt.controller.main_scene.MainSceneController;
+import hzt.controller.MainSceneController;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static hzt.controller.AnimationService.LINE_STROKE_WIDTH;
-import static hzt.controller.utils.Engine.DENSITY;
+import static hzt.service.AnimationService.LINE_STROKE_WIDTH;
+import static hzt.model.utils.Engine.DENSITY;
 import static hzt.model.entity.Flock.MAX_PATH_SIZE;
 import static hzt.model.entity.Flock.MAX_VECTOR_LENGTH;
 import static javafx.scene.paint.Color.TRANSPARENT;

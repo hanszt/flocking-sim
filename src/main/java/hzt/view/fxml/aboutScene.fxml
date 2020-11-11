@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Font?>
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0"
       prefWidth="640.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="hzt.controller.about_scene.AboutController">
+      fx:controller="hzt.controller.AboutController">
 
     <MenuBar prefHeight="0.0" prefWidth="602.0" VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="File">
