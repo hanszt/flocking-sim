@@ -9,7 +9,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import lombok.Getter;
@@ -46,8 +45,6 @@ public class Flock extends Group implements Iterable<Boid> {
     private Engine.FlockingSim flockingSim;
 
     public Flock(MainSceneController mainSceneController) {
-        //Size is zero so it does not influence the rest of the layout when balls are moved
-//        this.setMaxSize(0, 0);
         this.sceneController = mainSceneController;
     }
 

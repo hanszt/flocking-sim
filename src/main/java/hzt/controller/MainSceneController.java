@@ -214,18 +214,19 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     private void addListenersToSliders() {
-        numberOfBallsSlider.valueProperty().addListener((oldVal, curVal, newVal) -> flock.controlFlockSize(newVal.intValue(), getAnimationWindowDimension()));
-        perceptionRadiusSlider.valueProperty().addListener((oldVal, curVal, newVal) -> flock.getChildren().stream()
-                .map(n -> (Boid) n).forEach(ball -> ball.setPerceptionRadius(ball.getBody().getRadius() * newVal.doubleValue())));
-        repelDistanceSlider.valueProperty().addListener((oldVal, curVal, newVal) -> flock.getChildren().stream()
-                .map(n -> (Boid) n).forEach(ball -> ball.setRepelRadius(ball.getBody().getRadius() * newVal.doubleValue())));
+        numberOfBallsSlider.valueProperty().addListener((oldVal, curVal, newVal) ->
+                flock.controlFlockSize(newVal.intValue(), getAnimationWindowDimension()));
+        perceptionRadiusSlider.valueProperty().addListener((oldVal, curVal, newVal) ->
+                flock.forEach(ball -> ball.setPerceptionRadius(ball.getBody().getRadius() * newVal.doubleValue())));
+        repelDistanceSlider.valueProperty().addListener((oldVal, curVal, newVal) ->
+                flock.forEach(ball -> ball.setRepelRadius(ball.getBody().getRadius() * newVal.doubleValue())));
         attractionSlider.valueProperty().addListener((oldVal, curVal, newVal) -> engine.setPullFactor(newVal.doubleValue()));
         repelFactorSlider.valueProperty().addListener((oldVal, curVal, newVal) -> engine.setRepelFactor(newVal.doubleValue()));
     }
 
     public void reset() {
         resetControls();
-        flock.getChildren().stream().map(n -> (Boid) n).forEach(this::setBallParams);
+        flock.forEach(this::setBallParams);
     }
 
     public void setBallParams(Boid boid) {
@@ -301,7 +302,7 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private void showPathsAllBallsButtonAction(ActionEvent event) {
         boolean showPaths = ((ToggleButton) event.getSource()).isSelected();
-        flock.getChildren().stream().map(n -> (Boid) n).forEach(ball2D -> ball2D.getPath().setVisible(showPaths));
+        flock.forEach(ball2D -> ball2D.getPath().setVisible(showPaths));
         showPathSelectedButton.setSelected(showPaths);
     }
 
@@ -313,7 +314,7 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private void showPerceptionRadiusButtonAction(ActionEvent event) {
         boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        flock.getChildren().stream().map(n -> (Boid) n).forEach(ball2D -> ball2D.getPerceptionCircle().setVisible(visible));
+        flock.forEach(ball2D -> ball2D.getPerceptionCircle().setVisible(visible));
         showPerceptionSelectedBallButton.setSelected(visible);
     }
 
@@ -326,7 +327,7 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     public void showRepelCircleButtonAction(ActionEvent event) {
         boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        flock.getChildren().stream().map(n -> (Boid) n).forEach(ball2D -> ball2D.getRepelCircle().setVisible(visible));
+        flock.forEach(ball2D -> ball2D.getRepelCircle().setVisible(visible));
     }
 
     @FXML
@@ -338,7 +339,7 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     public void showAccelerationsButtonAction(ActionEvent event) {
         boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        flock.getChildren().stream().map(n -> (Boid) n).forEach(ball2D -> ball2D.getVisibleAccelerationVector().setVisible(visible));
+        flock.forEach(ball2D -> ball2D.getVisibleAccelerationVector().setVisible(visible));
     }
 
     @FXML

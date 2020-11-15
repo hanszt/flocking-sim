@@ -105,11 +105,11 @@ public class Boid extends Group {
         acceleration = acceleration.add(addFriction(frictionFactor));
         acceleration = acceleration.add(userInputAcceleration);
         updatePositionAndVelocityBasedOnAcceleration(deltaT, maxSpeed, maxAcceleration);
-        manageComponentsVisibility(flock.getSceneController());
+        updateVisibleComponents(flock.getSceneController());
         updateBallsInPerceptionRadiusMap();
     }
 
-    private void manageComponentsVisibility(MainSceneController ms) {
+    private void updateVisibleComponents(MainSceneController ms) {
         double maxSpeed = ms.getMaxSpeedSlider().getValue();
         final int minSpeedLength = 300;
         updateVisibleVector(visibleVelocityVector, velocity, maxSpeed >= minSpeedLength ? maxSpeed : minSpeedLength);
