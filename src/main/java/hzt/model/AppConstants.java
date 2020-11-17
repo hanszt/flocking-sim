@@ -2,6 +2,7 @@ package hzt.model;
 
 import javafx.geometry.Dimension2D;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 import lombok.Getter;
 
 import static javafx.scene.paint.Color.NAVY;
@@ -9,6 +10,7 @@ import static javafx.scene.paint.Color.NAVY;
 public final class AppConstants {
 
     public static final int INIT_NUMBER_OF_BALLS = 120;
+    public static final int MAX_NUMBER_OF_BALLS = 200;
     public static final int INIT_ACCELERATION_USER_SELECTED_BALL = 50;
     public static final int INIT_ATTRACTION = 3;
     public static final int INIT_REPEL_FACTOR = 10;
@@ -23,7 +25,18 @@ public final class AppConstants {
     public static final boolean INIT_SHOW_VELOCITY = false;
     public static final boolean INIT_SHOW_ACCELERATION = false;
     public static final boolean INIT_SHOW_PERCEPTION = false;
+    public static final boolean INIT_SHOW_REPEL_CIRCLE = false;
 
+    public static final int INIT_FRAME_RATE = 30; // f/s
+    public static final Duration INIT_FRAME_DURATION = Duration.seconds(1. / INIT_FRAME_RATE); // s/f
+
+    public static final int MIN_RADIUS = 3;
+    public static final int MAX_RADIUS = 10;
+    public static final int MAX_PATH_SIZE_ALL = 200;
+    public static final int MAX_PATH_SIZE = 50;
+    public static final int MAX_VECTOR_LENGTH = 80;
+    public static final Color INIT_UNIFORM_BALL_COLOR = Color.ORANGE;
+    public static final Color INIT_SELECTED_BALL_COLOR = Color.RED;
     public static final Color INIT_BG_COLOR = NAVY;
 
     public static final Dimension2D MIN_STAGE_DIMENSION = new Dimension2D(750, 500);

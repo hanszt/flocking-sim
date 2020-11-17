@@ -1,70 +1,59 @@
 package hzt.model.entity;
 
-import hzt.controller.MainSceneController;
+import hzt.model.FlockProperties;
 import hzt.model.utils.Engine;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import javafx.util.Duration;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.Iterator;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import static hzt.model.AppConstants.*;
 import static hzt.model.utils.RandomGenerator.*;
+import static java.lang.Math.*;
 
-// extends a Pane so it is resizable, so its size is set by its parent, which essentially determine its bounds.
 @Getter
 @Setter
 public class Flock extends Group implements Iterable<Boid> {
 
-    public static final int MIN_RADIUS = 3;
-    public static final int MAX_RADIUS = 10;
-    static final int MAX_PATH_SIZE_ALL = 200;
-    static final int MAX_PATH_SIZE = 50;
-    static final int MAX_VECTOR_LENGTH = 80;
-    public static final Color INIT_UNIFORM_BALL_COLOR = Color.ORANGE;
-    public static final Color INIT_SELECTED_BALL_COLOR = Color.RED;
+    private final FlockProperties flockProperties = new FlockProperties();
+    private final Scene mainScene;
 
-    private final MainSceneController sceneController;
-
-    private Boid selectedBall;
+    private Boid selectedBoid;
     private Color uniformBallColor = INIT_UNIFORM_BALL_COLOR;
     private Color selectedBallColor = INIT_SELECTED_BALL_COLOR;
     private FlockType flockType;
     private Engine.FlockingSim flockingSim;
 
-    public Flock(MainSceneController mainSceneController) {
-        this.sceneController = mainSceneController;
+    public Flock(Scene mainScene) {
+        this.mainScene = mainScene;
     }
 
     public void controlFlockSize(int numberOfBalls, Dimension2D parentDimension) {
         while (this.getChildren().size() != numberOfBalls) {
-            if (this.getChildren().size() < numberOfBalls) addBallToFlock(parentDimension);
+            if (this.getChildren().size() < numberOfBalls) addBoidToFlock(parentDimension);
             else removeBallFromFLock();
         }
     }
 
-    private void addBallToFlock(Dimension2D parentDimension) {
-        double perceptionRadiusRatio = sceneController.getPerceptionRadiusSlider().getValue();
-        double repelRadiusRatio = sceneController.getRepelDistanceSlider().getValue();
-        Boid boid = flockType.createBall();
-        boid.setCenterPosition(getRandomPositionOnParent(parentDimension.getWidth(), parentDimension.getHeight()));
-        boid.setPerceptionRadius(boid.getBody().getRadius() * perceptionRadiusRatio);
-        boid.setRepelRadius(boid.getBody().getRadius() * repelRadiusRatio);
-        sceneController.setBallParams(boid);
-        addMouseFunctionality(boid);
+    private void addBoidToFlock(Dimension2D parentDimension) {
+        Boid boid = flockType.createBoid(flockProperties.getMaxBoidSize());
+        flockType.setCenterPosition(boid, parentDimension);
+
+        boid.setPerceptionRadius(boid.getBody().getRadius() * flockProperties.getPerceptionRadiusRatio());
+        boid.setRepelRadius(boid.getBody().getRadius() * flockProperties.getRepelRadiusRatio());
+        boid.addMouseFunctionality();
         this.getChildren().add(boid);
+        boid.setVisibilityBoidComponents(flockProperties);
     }
 
     private void removeBallFromFLock() {
@@ -75,18 +64,17 @@ public class Flock extends Group implements Iterable<Boid> {
             ball.getPerceptionRadiusMap().remove(boid);
             ball.getChildren().removeIf(n -> n instanceof Connection);
         });
-        if (boid.equals(selectedBall)) {
-            selectedBall = !list.isEmpty() ? getRandomSelectedBall() : null;
+        if (boid.equals(selectedBoid)) {
+            selectedBoid = !list.isEmpty() ? getRandomSelectedBoid() : null;
         }
     }
 
-    public Boid getRandomSelectedBall() {
-        Boid ball = (Boid) this.getChildren().get(new Random().nextInt(getChildren().size()));
-        ball.updatePaint(selectedBallColor);
-        ball.addKeyControlForAcceleration();
-        ball.getPath().setVisible(sceneController.getShowPathSelectedButton().isSelected());
-        ball.getPerceptionCircle().setVisible(sceneController.getShowPerceptionSelectedBallButton().isSelected());
-        return ball;
+    public Boid getRandomSelectedBoid() {
+        Boid boid = (Boid) this.getChildren().get(new Random().nextInt(getChildren().size()));
+        boid.updatePaint(selectedBallColor);
+        boid.addKeyControlForAcceleration();
+        updateSelectedBoidComponentsVisibility(boid);
+        return boid;
     }
 
     @NotNull
@@ -98,17 +86,39 @@ public class Flock extends Group implements Iterable<Boid> {
                 .collect(Collectors.toList()).iterator();
     }
 
+    public void updateSelectedBoidComponentsVisibility(Boid selectedBoid) {
+        selectedBoid.getPerceptionCircle().setVisible(flockProperties.isSelectedPerceptionCircleVisible());
+        selectedBoid.getPath().setVisible(flockProperties.isSelectedPathVisible());
+    }
+
+    public void updateBoidComponentsVisibility(Boid boid) {
+        boid.getPerceptionCircle().setVisible(flockProperties.isPerceptionCircleVisible());
+        boid.getPath().setVisible(flockProperties.isAllPathsVisible());
+    }
+
+
     public abstract static class FlockType {
-        abstract Boid createBall();
+
+        abstract Boid createBoid(double maxBallSize);
+
+        abstract void setCenterPosition(Boid boid, Dimension2D dimension);
 
         @Override
-        public abstract String toString();
+        public String toString() {
+            return "FlockType";
+        }
     }
+
 
     private final FlockType random = new FlockType() {
         @Override
-        Boid createBall() {
-            return new Boid(getRandomDouble(MIN_RADIUS, sceneController.getMaxBallSizeSlider().getValue()), getRandomColor());
+        Boid createBoid(double maxBoidSize) {
+            return new Boid(getRandomDouble(MIN_RADIUS, maxBoidSize), getRandomColor());
+        }
+
+        @Override
+        void setCenterPosition(Boid boid, Dimension2D dimension) {
+            boid.setCenterPosition(getRandomPositionOnParent(dimension.getWidth(), dimension.getHeight()));
         }
 
         @Override
@@ -117,10 +127,16 @@ public class Flock extends Group implements Iterable<Boid> {
         }
     };
 
+
     private final FlockType uniform = new FlockType() {
         @Override
-        Boid createBall() {
-            return new Boid(sceneController.getMaxBallSizeSlider().getValue(), uniformBallColor);
+        Boid createBoid(double maxBoidSize) {
+            return new Boid(maxBoidSize, uniformBallColor);
+        }
+
+        @Override
+        void setCenterPosition(Boid boid, Dimension2D dimension) {
+            boid.setCenterPosition(getRandomPositionOnParent(dimension.getWidth(), dimension.getHeight()));
         }
 
         @Override
@@ -129,39 +145,33 @@ public class Flock extends Group implements Iterable<Boid> {
         }
     };
 
-    public void addMouseFunctionality(Boid ball) {
-        Duration frameDuration = sceneController.getAnimationService().getTimeline().getCycleDuration();
-        Deque<Point2D> dragPoints = new ArrayDeque<>();
-        ball.getBody().setOnMousePressed(onMousePressed(ball));
-        ball.getBody().setOnMouseDragged(onMouseDragged(ball, dragPoints));
-        ball.getBody().setOnMouseReleased(e -> ball.setSpeedBasedOnMouseDrag(dragPoints, frameDuration));
-    }
 
-    private EventHandler<MouseEvent> onMousePressed(Boid ball) {
-        return mouseEvent -> {
-            ball.updatePaint(selectedBallColor);
-            ball.setCenterPosition(mouseEvent.getX(), mouseEvent.getY());
-            ball.setVelocity(Point2D.ZERO);
-            ball.getPath().setVisible(sceneController.getShowPathSelectedButton().isSelected());
-            if (!ball.equals(selectedBall)) {
-                ball.addKeyControlForAcceleration();
-                if (selectedBall != null) {
-                    selectedBall.removeKeyControlsForAcceleration();
-                    selectedBall.getPath().setVisible(sceneController.getShowAllPathsButton().isSelected());
-                    selectedBall.updatePaint(flockType.equals(uniform) ? uniformBallColor : selectedBall.getInitPaint());
-                }
-                selectedBall = ball;
-            }
-        };
-    }
+    private final FlockType uniformOrdered = new FlockType() {
+        @Override
+        Boid createBoid(double maxBoidSize) {
+            return new Boid(maxBoidSize, uniformBallColor);
+        }
 
-    private EventHandler<MouseEvent> onMouseDragged(Boid ball, Deque<Point2D> dragPoints) {
-        return e -> {
-            ball.getBody().setCenterX(e.getX());
-            ball.getBody().setCenterY(e.getY());
-            dragPoints.add(ball.getCenterPosition());
-        };
-    }
+        @Override
+        void setCenterPosition(Boid boid, Dimension2D dimension) {
+            int index = Boid.getNext() % MAX_NUMBER_OF_BALLS;
+            boid.setCenterPosition(getCirclePositionOnParent(dimension.getWidth(), dimension.getHeight(), index));
+        }
+
+        private Point2D getCirclePositionOnParent(double width, double height, int index) {
+            Point2D centerPosition = new Point2D(width / 2, height / 2);
+            double positionMultiplier = (width + height) / 8;
+            Point2D circularPosition = new Point2D(
+                    positionMultiplier * cos((2 * index * PI) / MAX_NUMBER_OF_BALLS),
+                    positionMultiplier * sin((2 * index * PI) / MAX_NUMBER_OF_BALLS));
+            return circularPosition.add(centerPosition);
+        }
+
+        @Override
+        public String toString() {
+            return "Uniform ordered Flock";
+        }
+    };
 
     public FlockType getRandom() {
         return random;

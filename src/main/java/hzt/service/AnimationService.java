@@ -1,6 +1,5 @@
 package hzt.service;
 
-import hzt.controller.MainSceneController;
 import hzt.model.entity.Boid;
 import hzt.model.entity.Flock;
 import javafx.animation.KeyFrame;
@@ -12,22 +11,20 @@ import javafx.util.Duration;
 
 import java.time.LocalTime;
 
+import static hzt.model.AppConstants.INIT_FRAME_DURATION;
 import static javafx.animation.Animation.INDEFINITE;
 
 public class AnimationService {
 
-    public static final int INIT_FRAME_RATE = 30; // f/s
-    public static final Duration INIT_FRAME_DURATION = Duration.seconds(1. / INIT_FRAME_RATE); // s/f
-
     public static final int LINE_STROKE_WIDTH = 2;
 
-    private final MainSceneController mainSceneController;
+    private final LocalTime startTimeSim;
     private final StatisticsService statisticsService;
     private final Timeline timeline;
 
-    public AnimationService(MainSceneController mainSceneController) {
-        this.mainSceneController = mainSceneController;
-        this.statisticsService = new StatisticsService(mainSceneController);
+    public AnimationService(LocalTime startTimeSim, StatisticsService statisticsService) {
+        this.startTimeSim = startTimeSim;
+        this.statisticsService = statisticsService;
         this.timeline = setupTimeLine();
     }
 
@@ -43,10 +40,8 @@ public class AnimationService {
         if (start) timeline.play();
     }
 
-    public void run(Flock flock, double accelerationMultiplier, double frictionFactor, boolean bounce, double maxSpeed) {
-        Boid selected = mainSceneController.getFlock().getSelectedBall();
-        Dimension2D animationWindowSize = mainSceneController.getAnimationWindowDimension();
-        LocalTime startTimeSim = mainSceneController.getStartTimeSim();
+    public void run(Flock flock, Dimension2D animationWindowSize, double accelerationMultiplier, double frictionFactor, boolean bounce, double maxSpeed) {
+        Boid selected = flock.getSelectedBoid();
         Duration runTimeSim = Duration.millis((LocalTime.now().toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
         statisticsService.showStatisticsAboutSelectedBall(selected);
         statisticsService.showGlobalStatistics(frictionFactor, timeline.getCycleDuration(), flock.getChildren().size(), runTimeSim);

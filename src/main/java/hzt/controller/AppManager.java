@@ -42,7 +42,7 @@ public class AppManager {
         stage.setMinWidth(MIN_STAGE_DIMENSION.getWidth());
         stage.setMinHeight(MIN_STAGE_DIMENSION.getHeight());
         stage.setOnCloseRequest(e -> printClosingText());
-        if (instances == 1) stage.setMaximized(true);
+//        if (instances == 1) stage.setMaximized(true);
     }
 
     private void printClosingText() {

@@ -1,6 +1,6 @@
 package hzt.model.entity;
 
-import hzt.controller.MainSceneController;
+import hzt.model.FlockProperties;
 import javafx.event.EventHandler;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
@@ -9,6 +9,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -17,15 +18,11 @@ import javafx.util.Duration;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
-import static hzt.service.AnimationService.LINE_STROKE_WIDTH;
+import static hzt.model.AppConstants.INIT_FRAME_DURATION;
 import static hzt.model.utils.Engine.DENSITY;
-import static hzt.model.entity.Flock.MAX_PATH_SIZE;
-import static hzt.model.entity.Flock.MAX_VECTOR_LENGTH;
+import static hzt.service.AnimationService.LINE_STROKE_WIDTH;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
 @ToString
@@ -95,7 +92,7 @@ public class Boid extends Group {
         line.startYProperty().bind(body.centerYProperty());
     }
 
-    public void update(Duration deltaT, double accelerationMultiplier, double frictionFactor, double maxSpeed) {
+    public void update(Duration deltaT, double accelerationMultiplier, double frictionFactor, double maxVelocity) {
         acceleration = Point2D.ZERO;
         Flock flock = (Flock) this.getParent();
         maxAcceleration = accelerationMultiplier / deltaT.toSeconds();
@@ -104,31 +101,33 @@ public class Boid extends Group {
         acceleration = acceleration.add(physicsEngineAcceleration);
         acceleration = acceleration.add(addFriction(frictionFactor));
         acceleration = acceleration.add(userInputAcceleration);
-        updatePositionAndVelocityBasedOnAcceleration(deltaT, maxSpeed, maxAcceleration);
-        updateVisibleComponents(flock.getSceneController());
+        updatePositionAndVelocityBasedOnAcceleration(deltaT, maxVelocity, maxAcceleration);
+        updateVisibleComponents(maxVelocity);
         updateBallsInPerceptionRadiusMap();
     }
 
-    private void updateVisibleComponents(MainSceneController ms) {
-        double maxSpeed = ms.getMaxSpeedSlider().getValue();
-        final int minSpeedLength = 300;
-        updateVisibleVector(visibleVelocityVector, velocity, maxSpeed >= minSpeedLength ? maxSpeed : minSpeedLength);
-        updateVisibleVector(visibleAccelerationVector, acceleration, 2000);
-        updatePath();
-        if (ms.getShowAllPathsButton().isSelected()) path.fadeOut();
-        if (ms.getShowConnectionsButton().isSelected()) strokeConnections();
+    private void updateVisibleComponents(double maxVelocity) {
+        Flock flock = (Flock) getParent();
+        FlockProperties flockProperties = flock.getFlockProperties();
+        final int minVelocityLength = 300;
+        double velocityCorrection = maxVelocity >= minVelocityLength ? maxVelocity : minVelocityLength;
+        updateVisibleVector(visibleVelocityVector, velocity, velocityCorrection, flockProperties.getVelocityVectorLength());
+        updateVisibleVector(visibleAccelerationVector, acceleration, 2000, flockProperties.getAccelerationVectorLength());
+        updatePath(flockProperties.getTailLength());
+        if (flockProperties.isAllPathsVisible()) path.fadeOut();
+        if (flockProperties.isShowConnections()) strokeConnections();
         else getChildren().removeIf(n -> n instanceof Connection);
     }
 
-    private void updateVisibleVector(Line line, Point2D vector, double correction) {
+    private void updateVisibleVector(Line line, Point2D vector, double correction, double maxVectorLength) {
         Point2D begin = getCenterPosition();
         Point2D end = begin.add(vector);
         Point2D unitVector = end.subtract(begin).normalize();
         Point2D radiusInVectorDir = unitVector.multiply(body.getRadius() - line.getStrokeWidth());
         begin = begin.add(radiusInVectorDir);
-        end = begin.add(unitVector.multiply(MAX_VECTOR_LENGTH * vector.magnitude() / correction));
+        end = begin.add(unitVector.multiply(maxVectorLength * vector.magnitude() / correction));
         double visibleVectorMagnitude = end.subtract(begin).magnitude();
-        if (visibleVectorMagnitude > MAX_VECTOR_LENGTH) end = begin.add(unitVector.multiply(MAX_VECTOR_LENGTH));
+        if (visibleVectorMagnitude > maxVectorLength) end = begin.add(unitVector.multiply(maxVectorLength));
         line.setEndX(end.getX());
         line.setEndY(end.getY());
     }
@@ -148,9 +147,9 @@ public class Boid extends Group {
         });
     }
 
-    private void updatePath() {
+    private void updatePath(double maxPathLength) {
         path.addLine(getCenterPosition(), prevCenterPosition);
-        if (path.getElements().size() >= MAX_PATH_SIZE) path.removeLine(0);
+        while (maxPathLength != 0 && path.getElements().size() >= maxPathLength) path.removeLine(0);
     }
 
     private void updateBallsInPerceptionRadiusMap() {
@@ -194,7 +193,7 @@ public class Boid extends Group {
             Point2D last = dragPoints.pop();
             if (!dragPoints.isEmpty()) {
                 Point2D secondLast = dragPoints.pop();
-                velocity = last.subtract(secondLast).multiply(duration.toMillis() * speedMultiplier);
+                velocity = secondLast.subtract(last).multiply(duration.toMillis() * speedMultiplier);
             }
         }
     }
@@ -269,7 +268,7 @@ public class Boid extends Group {
     public void addKeyControlForAcceleration(KeyCode up, KeyCode down, KeyCode left, KeyCode right) {
         keyPressed = keyPressed(up, down, left, right);
         keyReleased = keyReleased(up, down, left, right);
-        Scene scene = ((Flock) getParent()).getSceneController().getScene();
+        Scene scene = ((Flock) getParent()).getMainScene();
         scene.addEventFilter(KeyEvent.KEY_PRESSED, keyPressed);
         scene.addEventFilter(KeyEvent.KEY_RELEASED, keyReleased);
     }
@@ -310,7 +309,7 @@ public class Boid extends Group {
 
     public void removeKeyControlsForAcceleration() {
         upPressed = dPressed = lPressed = rPressed = false;
-        Scene scene = ((Flock) getParent()).getSceneController().getScene();
+        Scene scene = ((Flock) getParent()).getMainScene();
         scene.removeEventFilter(KeyEvent.KEY_PRESSED, keyPressed);
         scene.removeEventFilter(KeyEvent.KEY_RELEASED, keyReleased);
     }
@@ -322,6 +321,53 @@ public class Boid extends Group {
         visibleVelocityVector.setStroke(paint);
         visibleAccelerationVector.setStroke(paint);
         path.setStroke(paint);
+    }
+
+    public static int getNext() {
+        return next;
+    }
+
+    public void setVisibilityBoidComponents(FlockProperties flockProperties) {
+        visibleVelocityVector.setVisible(flockProperties.isVelocityVectorVisible());
+        visibleAccelerationVector.setVisible(flockProperties.isAccelerationVectorVisible());
+        perceptionCircle.setVisible(flockProperties.isPerceptionCircleVisible());
+        repelCircle.setVisible(flockProperties.isRepelCircleVisible());
+        path.setVisible(flockProperties.isAllPathsVisible());
+    }
+
+    public void addMouseFunctionality() {
+        Deque<Point2D> dragPoints = new ArrayDeque<>();
+        body.setOnMousePressed(onMousePressed());
+        body.setOnMouseDragged(onMouseDragged(dragPoints));
+        body.setOnMouseReleased(e -> this.setSpeedBasedOnMouseDrag(dragPoints, INIT_FRAME_DURATION));
+    }
+
+    private EventHandler<MouseEvent> onMousePressed() {
+        return mouseEvent -> {
+            Flock flock = (Flock) getParent();
+            Boid selected = flock.getSelectedBoid();
+            updatePaint(flock.getSelectedBallColor());
+            setCenterPosition(mouseEvent.getX(), mouseEvent.getY());
+            setVelocity(Point2D.ZERO);
+            if (!this.equals(selected)) {
+               addKeyControlForAcceleration();
+                if (selected != null) {
+                    selected.removeKeyControlsForAcceleration();
+                    selected.updatePaint(selected.getInitPaint());
+                    flock.updateBoidComponentsVisibility(selected);
+                }
+                flock.setSelectedBoid(this);
+                flock.updateSelectedBoidComponentsVisibility(this);
+            }
+        };
+    }
+
+    private EventHandler<MouseEvent> onMouseDragged(Deque<Point2D> dragPoints) {
+        return e -> {
+            body.setCenterX(e.getX());
+            body.setCenterY(e.getY());
+            dragPoints.add(getCenterPosition());
+        };
     }
 
     public void setVelocity(Point2D velocity) {

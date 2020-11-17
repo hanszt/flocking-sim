@@ -44,7 +44,7 @@ public abstract class AbstractSceneController {
 
     @FXML
     public void newInstance() {
-        new Launcher().start(new Stage());
+       new AppManager(new Stage()).start();
     }
 
     @FXML

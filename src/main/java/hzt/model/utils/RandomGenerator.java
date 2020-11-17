@@ -19,7 +19,7 @@ public class RandomGenerator {
     }
 
     public static Color getRandomColor() {
-        return javafx.scene.paint.Color.color(Math.random(), Math.random(), Math.random());
+        return Color.color(Math.random(), Math.random(), Math.random());
     }
 
 }
