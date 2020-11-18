@@ -1,12 +1,10 @@
 package hzt.controller;
 
-import hzt.view.Launcher;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import lombok.Getter;
 
 import java.io.IOException;
 import java.time.LocalTime;
@@ -14,7 +12,6 @@ import java.time.LocalTime;
 import static hzt.model.AppConstants.FXML_FILE_LOCATION;
 import static hzt.model.AppConstants.Scene.ABOUT_SCENE;
 
-@Getter
 public abstract class AbstractSceneController {
 
     private final String fxmlFileName;
@@ -35,7 +32,7 @@ public abstract class AbstractSceneController {
     //to be able to pass arguments to the constructor, it's necessary to specify the controller factory of the loader
     private void setControllerFactory(FXMLLoader loader) {
         loader.setControllerFactory(c -> getBean());
-        loader.setLocation(getClass().getResource(FXML_FILE_LOCATION + getFxmlFileName()));
+        loader.setLocation(getClass().getResource(FXML_FILE_LOCATION + fxmlFileName));
     }
 
     protected abstract Object getBean();

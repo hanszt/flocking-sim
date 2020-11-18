@@ -29,7 +29,7 @@ public class AppManager {
         sceneManager.setupScene(Scene.MAIN_SCENE);
         configureStage(stage);
         String startingMessage = String.format("Starting instance %d of %s at %s...%n",
-                instance, TITLE, sceneManager.getCurSceneController().getStartTimeSim().format(DateTimeFormatter.ISO_TIME));
+                instance, TITLE, sceneManager.getCurSceneController().startTimeSim.format(DateTimeFormatter.ISO_TIME));
         LOGGER.trace(startingMessage);
 
         stage.show();
@@ -46,7 +46,7 @@ public class AppManager {
     }
 
     private void printClosingText() {
-        LocalTime startTimeSim = sceneManager.getCurSceneController().getStartTimeSim();
+        LocalTime startTimeSim = sceneManager.getCurSceneController().startTimeSim;
         LocalTime stopTimeSim = LocalTime.now();
         Duration runTimeSim = Duration.millis((stopTimeSim.toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
         String message = String.format("%s%nAnimation Runtime of instance %d: %.2f seconds%n%s%n", CLOSING_MESSAGE,

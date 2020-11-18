@@ -60,7 +60,7 @@
                                           <ToggleButton fx:id="bounceWallsButton" layoutX="14.0" layoutY="72.0" mnemonicParsing="false" prefWidth="1000.0" text="Bounce of walls" />
                                           <ToggleButton fx:id="showVelocityVectorButton" mnemonicParsing="false" onAction="#showVelocitiesButtonAction" prefWidth="1000.0" text="Show velocities" />
                                           <ToggleButton fx:id="showConnectionsButton" mnemonicParsing="false" prefWidth="1000.0" text="Show connections" />
-                                          <ToggleButton fx:id="showAllPathsButton" mnemonicParsing="false" onAction="#showPathsAllBallsButtonAction" prefWidth="1000.0" text="Show path all" />
+                                          <ToggleButton fx:id="showAllPathsButton" mnemonicParsing="false" onAction="#showPathsAllBoidsButtonAction" prefWidth="1000.0" text="Show path all" />
                                           <ToggleButton fx:id="showPathSelectedButton" mnemonicParsing="false" onAction="#showPathSelectedBallButtonAction" prefWidth="1000.0" text="Show path selected" />
                                       </VBox>
                                       <VBox prefWidth="150.0" spacing="4.0">
@@ -69,7 +69,7 @@
                                           </padding>
                                           <Button mnemonicParsing="false" onAction="#newInstance" prefWidth="1000.0" text="New instance" />
                                           <ToggleButton fx:id="fullScreenButton" mnemonicParsing="false" onAction="#fullScreenButtonAction" prefWidth="1000.0" text="Full scene" />
-                                          <ToggleButton mnemonicParsing="false" onAction="#transparentButtonAction" prefWidth="1000.0" text="Transparent" />
+                                          <ToggleButton fx:id="transparencyButton" mnemonicParsing="false" onAction="#transparentButtonAction" prefWidth="1000.0" text="Transparent" />
                                           <ToggleButton fx:id="showAccelerationVectorButton" layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#showAccelerationsButtonAction" prefWidth="1000.0" text="Show accelerations" />
                                           <ToggleButton fx:id="showRepelCircleButton" mnemonicParsing="false" onAction="#showRepelCircleButtonAction" prefWidth="1000.0" text="Show repel circles" />
                                           <ToggleButton fx:id="showPerceptionButton" layoutX="14.0" layoutY="72.0" mnemonicParsing="false" onAction="#showPerceptionRadiusButtonAction" prefWidth="1000.0" text="Show perception" />
@@ -85,14 +85,14 @@
                                           <Label text="Background color" />
                                           <ColorPicker fx:id="backgroundColorPicker" onAction="#backgroundColorPickerAction" prefHeight="30" prefWidth="1000.0" />
                                           <Label text="Selected boid color" />
-                                          <ColorPicker fx:id="selectedBallColorPicker" onAction="#selectedBallColorPickerAction" prefHeight="30" prefWidth="1000.0" />
+                                          <ColorPicker fx:id="selectedBallColorPicker" onAction="#selectedBoidColorPickerAction" prefHeight="30" prefWidth="1000.0" />
                                       </VBox>
                                       <VBox prefWidth="150.0" spacing="4.0">
                                           <padding>
                                               <Insets bottom="4.0" left="4.0" right="4.0" top="4.0" />
                                           </padding>
                                           <Label text="Boid color" />
-                                          <ColorPicker fx:id="uniformBallColorPicker" onAction="#uniformBallColorPickerAction" prefHeight="30" prefWidth="1000.0" />
+                                          <ColorPicker fx:id="uniformBallColorPicker" onAction="#uniformBoidColorPickerAction" prefHeight="30" prefWidth="1000.0" />
                                       </VBox>
                                   </HBox>
                               </VBox>
@@ -220,7 +220,7 @@
                                            <Label text="Position y:" />
                                            <Label text="Velocity:" />
                                            <Label text="Acceleration:" />
-                                           <Label text="boid size: " />
+                                           <Label text="Boid size: " />
                                            <Label text="#Near boids: " />
                                        </VBox>
                                        <VBox layoutX="10.0" layoutY="10.0">

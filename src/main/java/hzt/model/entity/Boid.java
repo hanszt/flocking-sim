@@ -351,6 +351,7 @@ public class Boid extends Group {
             setVelocity(Point2D.ZERO);
             if (!this.equals(selected)) {
                addKeyControlForAcceleration();
+               toFront();
                 if (selected != null) {
                     selected.removeKeyControlsForAcceleration();
                     selected.updatePaint(selected.getInitPaint());

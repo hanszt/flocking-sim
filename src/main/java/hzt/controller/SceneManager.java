@@ -2,7 +2,6 @@ package hzt.controller;
 
 import hzt.model.AppConstants;
 import javafx.stage.Stage;
-import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -12,14 +11,13 @@ import java.util.EnumMap;
 import static hzt.model.AppConstants.Scene.ABOUT_SCENE;
 import static hzt.model.AppConstants.Scene.MAIN_SCENE;
 
-@Getter
 public class SceneManager {
 
     private static final Logger LOGGER = LogManager.getLogger(SceneManager.class);
 
     private final Stage stage;
     private final EnumMap<AppConstants.Scene, AbstractSceneController> sceneControllerMap;
-    AbstractSceneController curSceneController;
+    private AbstractSceneController curSceneController;
 
     public SceneManager(Stage stage) {
         this.stage = stage;
@@ -41,7 +39,15 @@ public class SceneManager {
         String message = "setting up " + scene.getEnglishDescription() + "...";
         LOGGER.trace(message);
         curSceneController = sceneControllerMap.get(scene);
-        stage.setScene(curSceneController.getScene());
+        stage.setScene(curSceneController.scene);
         curSceneController.setup();
+    }
+
+    public Stage getStage() {
+        return stage;
+    }
+
+    public AbstractSceneController getCurSceneController() {
+        return curSceneController;
     }
 }

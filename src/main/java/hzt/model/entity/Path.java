@@ -30,9 +30,9 @@ public class Path extends Group {
     }
 
    public void fadeOut() {
-        int size = getChildren().size();
         ObservableList<Node> children = getChildren();
-        for (int i = 0, childrenSize = children.size(); i < childrenSize; i++) {
+        int size = children.size();
+        for (int i = 0; i < size; i++) {
             Node node = children.get(i);
             Line line = (Line) node;
             line.setOpacity((float) i / size);

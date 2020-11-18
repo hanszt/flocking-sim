@@ -73,6 +73,7 @@ public class Flock extends Group implements Iterable<Boid> {
         Boid boid = (Boid) this.getChildren().get(new Random().nextInt(getChildren().size()));
         boid.updatePaint(selectedBallColor);
         boid.addKeyControlForAcceleration();
+        boid.toFront();
         updateSelectedBoidComponentsVisibility(boid);
         return boid;
     }

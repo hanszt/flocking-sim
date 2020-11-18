@@ -18,27 +18,16 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import lombok.Getter;
 
 import java.io.IOException;
 
 import static hzt.model.AppConstants.*;
 import static hzt.model.AppConstants.Scene.MAIN_SCENE;
 
-@Getter
 public class MainSceneController extends AbstractSceneController {
 
     @FXML
-    private VBox root;
-    @FXML
-    private MenuBar menuBar;
-    @FXML
     private AnchorPane animationPane;
-    @FXML
-    private VBox mainControlPanel;
-    @FXML
-    private HBox slidersPane;
-
     @FXML
     private ComboBox<Engine.FlockingSim> physicsEngineComboBox;
     @FXML
@@ -123,20 +112,19 @@ public class MainSceneController extends AbstractSceneController {
     private Color backgroundColor = INIT_BG_COLOR;
 
     private final SubScene subScene2D;
-    private final Group subSceneRoot;
     private final Flock flock;
     private final AnimationService animationService;
     private final Engine engine;
 
     public MainSceneController(SceneManager sceneManager) throws IOException {
         super(MAIN_SCENE.getFxmlFileName(), sceneManager);
-        this.subSceneRoot = new Group();
+        Group subSceneRoot = new Group();
         this.subScene2D = new SubScene(subSceneRoot, 0, 0, true, SceneAntialiasing.BALANCED);
-        this.flock = new Flock(getScene());
+        this.flock = new Flock(scene);
         this.engine = new Engine();
         StatisticsService statisticsService = new StatisticsService(getSelectedBoidLabelDto(), getGeneralStatsLabelDto());
-        this.animationService = new AnimationService(getStartTimeSim(), statisticsService);
-        this.subSceneRoot.getChildren().addAll(flock);
+        this.animationService = new AnimationService(startTimeSim, statisticsService);
+        subSceneRoot.getChildren().addAll(flock);
         this.animationPane.getChildren().add(subScene2D);
     }
 
@@ -160,7 +148,7 @@ public class MainSceneController extends AbstractSceneController {
         configureControls();
         configureColorPickers();
         addListenersToSliders();
-        bindFlockProperties(flock);
+        bindFlockPropertiesToControlsProperties(flock);
         configureFlock(flock);
         engine.setPullFactor(attractionSlider.getValue());
         engine.setRepelFactor(repelFactorSlider.getValue());
@@ -187,7 +175,7 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     private void bindFullScreenButtonToFullScreen(ToggleButton fullScreenButton, Stage stage) {
-        stage.fullScreenProperty().addListener((observableValue, curVal, newVal) -> fullScreenButton.setSelected(newVal));
+        stage.fullScreenProperty().addListener((observableValue, curVal, isFullScreen) -> fullScreenButton.setSelected(isFullScreen));
         stage.addEventFilter(KeyEvent.KEY_PRESSED, key -> {
             if (key.getCode() == KeyCode.F11) stage.setFullScreen(!stage.isFullScreen());
         });
@@ -243,7 +231,7 @@ public class MainSceneController extends AbstractSceneController {
         repelFactorSlider.valueProperty().addListener((oldVal, curVal, newVal) -> engine.setRepelFactor(newVal.doubleValue()));
     }
 
-    private void bindFlockProperties(Flock flock) {
+    private void bindFlockPropertiesToControlsProperties(Flock flock) {
         FlockProperties flockProperties = flock.getFlockProperties();
         bindFlockPropertiesToButtonProperties(flockProperties);
         bindFlockPropertiesToSliderProperties(flockProperties);
@@ -303,7 +291,7 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     @FXML
-    private void uniformBallColorPickerAction(ActionEvent event) {
+    private void uniformBoidColorPickerAction(ActionEvent event) {
         Color color = ((ColorPicker) event.getSource()).getValue();
         flock.setUniformBallColor(color);
         flock.getChildren().stream().map(n -> (Boid) n)
@@ -311,7 +299,7 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     @FXML
-    private void selectedBallColorPickerAction(ActionEvent event) {
+    private void selectedBoidColorPickerAction(ActionEvent event) {
         Color color = ((ColorPicker) event.getSource()).getValue();
         flock.setSelectedBallColor(color);
         flock.getSelectedBoid().updatePaint(color);
@@ -334,7 +322,7 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     private void transparentButtonAction(ActionEvent actionEvent) {
         boolean transparent = ((ToggleButton) actionEvent.getSource()).isSelected();
-        getSceneManager().getStage().setOpacity(transparent ? STAGE_OPACITY : 1);
+        sceneManager.getStage().setOpacity(transparent ? STAGE_OPACITY : 1);
     }
 
     @FXML
@@ -345,7 +333,7 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     @FXML
-    private void showPathsAllBallsButtonAction(ActionEvent event) {
+    private void showPathsAllBoidsButtonAction(ActionEvent event) {
         boolean showPaths = ((ToggleButton) event.getSource()).isSelected();
         flock.forEach(ball2D -> ball2D.getPath().setVisible(showPaths));
         showPathSelectedButton.setSelected(showPaths);
