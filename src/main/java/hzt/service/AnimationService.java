@@ -44,7 +44,7 @@ public class AnimationService {
         Boid selected = flock.getSelectedBoid();
         Duration runTimeSim = Duration.millis((LocalTime.now().toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
         statisticsService.showStatisticsAboutSelectedBall(selected);
-        statisticsService.showGlobalStatistics(frictionFactor, timeline.getCycleDuration(), flock.getChildren().size(), runTimeSim);
+        statisticsService.showGlobalStatistics(frictionFactor, flock.getChildren().size(), runTimeSim);
         flock.getChildren().stream().map(ball2D -> (Boid) ball2D).forEach(ball -> {
             if (bounce) ball.bounceOfEdges(animationWindowSize);
             else ball.floatThroughEdges(animationWindowSize);
@@ -58,10 +58,6 @@ public class AnimationService {
 
     public void pauseTimeline() {
         timeline.pause();
-    }
-
-    public Timeline getTimeline() {
-        return timeline;
     }
 
 }

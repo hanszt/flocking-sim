@@ -2,8 +2,8 @@ package hzt.controller;
 
 import hzt.model.AppConstants;
 import javafx.stage.Stage;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.EnumMap;
@@ -37,7 +37,7 @@ public class SceneManager {
 
     public void setupScene(AppConstants.Scene scene) {
         String message = "setting up " + scene.getEnglishDescription() + "...";
-        LOGGER.trace(message);
+        LOGGER.info(message);
         curSceneController = sceneControllerMap.get(scene);
         stage.setScene(curSceneController.scene);
         curSceneController.setup();

@@ -25,6 +25,7 @@
 *.iws
 *.iml
 *.ipr
+help
 
 # Logs and databases #
 ######################

@@ -1,19 +1,23 @@
 package hzt.service;
 
+import hzt.model.AppConstants;
 import hzt.model.entity.Boid;
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Label;
 import javafx.util.Duration;
-import lombok.Getter;
+import lombok.Data;
 
 public class StatisticsService {
 
    private final SelectedBoidLabelDto selectedDto;
    private final GeneralStatsLabelDto generalStatsDto;
+    private final SimpleFrameRateMeter frameRateMeter = new SimpleFrameRateMeter();
 
     public StatisticsService(SelectedBoidLabelDto selectedDto, GeneralStatsLabelDto generalStatsDto) {
         this.selectedDto = selectedDto;
         this.generalStatsDto = generalStatsDto;
+        frameRateMeter.initialize();
     }
 
     private static final String TWO_DEC_DOUBLE = "%-4.2f";
@@ -31,14 +35,42 @@ public class StatisticsService {
         }
     }
 
-    public void showGlobalStatistics(double friction, Duration cycleDuration, int size, Duration runTimeSim) {
+    public void showGlobalStatistics(double friction, int size, Duration runTimeSim) {
         generalStatsDto.getFrictionLabel().setText(String.format(TWO_DEC_DOUBLE, friction));
-        generalStatsDto.getFrameRateLabel().setText(String.format(TWO_DEC_DOUBLE + " f/s", 1 / cycleDuration.toSeconds()));
+        generalStatsDto.getFrameRateLabel().setText(String.format(TWO_DEC_DOUBLE + " f/s", frameRateMeter.frameRate));
         generalStatsDto.getNrOfBoidsLabel().setText(String.format("%-3d", size));
         generalStatsDto.getRunTimeLabel().setText(String.format("%-4.3f seconds", runTimeSim.toSeconds()));
     }
 
-    @Getter
+    private static class SimpleFrameRateMeter {
+
+        private final long[] frameTimes = new long[100];
+        private int frameTimeIndex = 0;
+        private boolean arrayFilled = false;
+        private double frameRate = AppConstants.INIT_FRAME_RATE;
+
+        private void initialize() {
+            AnimationTimer frameRateTimer = new AnimationTimer() {
+
+                @Override
+                public void handle(long now) {
+                    long oldFrameTime = frameTimes[frameTimeIndex];
+                    frameTimes[frameTimeIndex] = now;
+                    frameTimeIndex = (frameTimeIndex + 1) % frameTimes.length;
+                    if (frameTimeIndex == 0) arrayFilled = true;
+                    if (arrayFilled) {
+                        long elapsedNanos = now - oldFrameTime;
+                        long elapsedNanosPerFrame = elapsedNanos / frameTimes.length;
+                        frameRate = 1e9 / elapsedNanosPerFrame;
+                    }
+                }
+            };
+            frameRateTimer.start();
+        }
+
+    }
+
+    @Data
     public static class SelectedBoidLabelDto {
 
         private final Label boidNameLabel;
@@ -49,24 +81,9 @@ public class StatisticsService {
         private final Label nrOfBallsInPerceptionRadiusLabel;
         private final Label boidSizeLabel;
 
-        public SelectedBoidLabelDto(Label boidNameLabel,
-                                    Label positionXLabel,
-                                    Label positionYLabel,
-                                    Label velocityMagnitudeLabel,
-                                    Label accelerationMagnitudeLabel,
-                                    Label nrOfBallsInPerceptionRadiusLabel,
-                                    Label boidSizeLabel) {
-            this.boidNameLabel = boidNameLabel;
-            this.positionXLabel = positionXLabel;
-            this.positionYLabel = positionYLabel;
-            this.velocityMagnitudeLabel = velocityMagnitudeLabel;
-            this.accelerationMagnitudeLabel = accelerationMagnitudeLabel;
-            this.nrOfBallsInPerceptionRadiusLabel = nrOfBallsInPerceptionRadiusLabel;
-            this.boidSizeLabel = boidSizeLabel;
-        }
     }
 
-    @Getter
+    @Data
     public static class GeneralStatsLabelDto {
 
         private final Label frictionLabel;
@@ -74,15 +91,5 @@ public class StatisticsService {
         private final Label nrOfBoidsLabel;
         private final Label runTimeLabel;
 
-
-        public GeneralStatsLabelDto(Label frictionLabel,
-                                    Label frameRateLabel,
-                                    Label nrOfBoidsLabel,
-                                    Label runTimeLabel) {
-            this.frictionLabel = frictionLabel;
-            this.frameRateLabel = frameRateLabel;
-            this.nrOfBoidsLabel = nrOfBoidsLabel;
-            this.runTimeLabel = runTimeLabel;
-        }
     }
 }
