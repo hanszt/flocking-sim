@@ -40,8 +40,8 @@ public final class AppConstants {
     public static final Color INIT_BG_COLOR = NAVY;
 
     public static final Dimension2D MIN_STAGE_DIMENSION = new Dimension2D(750, 500);
+    public static final Dimension2D INIT_SCENE_DIMENSION = new Dimension2D(1200, 800);
 
-    public static final String FXML_FILE_LOCATION = "/hzt/view/fxml/";
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_BLUE = "\u001B[34m";
     public static final String TITLE = "Flocking Simulation";
@@ -51,7 +51,6 @@ public final class AppConstants {
 
     private AppConstants() {
     }
-
 
     @Getter
     public enum Scene {

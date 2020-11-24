@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.geometry.Insets?>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="480.0"
+      prefWidth="640.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="hzt.controller.AboutController">
+
+    <MenuBar prefHeight="0.0" prefWidth="602.0" VBox.vgrow="NEVER">
+        <Menu mnemonicParsing="false" text="File">
+            <MenuItem mnemonicParsing="false" onAction="#newInstance" text="New instance…"/>
+            <SeparatorMenuItem mnemonicParsing="false"/>
+            <MenuItem mnemonicParsing="false" onAction="#quitInstance" text="Quit instance"/>
+            <SeparatorMenuItem mnemonicParsing="false"/>
+            <MenuItem mnemonicParsing="false" onAction="#exitProgram" text="Exit"/>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Help">
+            <MenuItem mnemonicParsing="false" text="Go back" onAction="#goBack"/>
+        </Menu>
+    </MenuBar>
+    <AnchorPane>
+        <VBox maxWidth="300.0" prefHeight="744.0" prefWidth="536.0" spacing="4.0"
+              AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
+            </padding>
+            <Label layoutX="15.0" layoutY="6.0" text="About a Flocking Simulation">
+                <font>
+                    <Font size="24.0"/>
+                </font>
+            </Label>
+            <TextArea fx:id="textArea" layoutX="15.0" layoutY="49.0" prefHeight="332.0" prefWidth="602.0"
+                      text="Boids is an artificial life program, developed by Craig Reynolds in 1986, which simulates the flockingSim behaviour of birds. His paper on this topic was published in 1987 in the proceedings of the ACM SIGGRAPH conference. [1] The name &quot;boid&quot; corresponds to a shortened version of &quot;bird-oid object&quot;, which refers to a bird-like object.[2] Incidentally, &quot;boid&quot; is also a New York Metropolitan dialect pronunciation for &quot;bird&quot;.&#10;Rules applied in simple Boids&#10;Separation&#10;Alignment&#10;Cohesion&#10;&#10;As with most artificial life simulations, Boids is an example of emergent behavior; that is, the complexity of Boids arises from the interaction of individual agents (the boids, in this case) adhering to a set of simple rules. The rules applied in the simplest Boids world are as follows:&#10;&#10;    separation: steer to avoid crowding local flockmates&#10;    alignment: steer towards the average heading of local flockmates&#10;    cohesion: steer to move towards the average position (center of mass) of local flockmates&#10;&#10;More complex rules can be added, such as obstacle avoidance and goal seeking. &#10;&#10;The basic model has been extended in several different ways since Reynolds proposed it. For instance, Delgado-Mata et al.[3] extended the basic model to incorporate the effects of fear. Olfaction was used to transmit emotion between animals, through pheromones modelled as particles in a free expansion gas. Hartman and Benes[4] introduced a complementary force to the alignment that they call the change of leadership. This steer defines the chance of the boid to become a leader and try to escape.&#10;&#10;The movement of Boids can be characterized as either chaotic (splitting groups and wild behaviour) or orderly. Unexpected behaviours, such as splitting flocks and reuniting after avoiding obstacles, can be considered emergent.&#10;&#10;The boids framework is often used in computer graphics, providing realistic-looking representations of flocks of birds and other creatures, such as schools of fish or herds of animals. It was for instance used in the 1998 video game Half-Life for the flying bird-like creatures seen at the end of the game on Xen, named &quot;boid&quot; in the game files.&#10;&#10;The Boids model can be used for direct control and stabilization of teams of simple Unmanned Ground Vehicles (UGV)[5] or Micro Aerial Vehicles (MAV)[6] in swarm robotics. For stabilization of heterogeneous UAV-UGV teams, the model was adapted for using onboard relative localization by Saska et al.[7]&#10;&#10;At the time of proposal, Reynolds' approach represented a giant step forward compared to the traditional techniques used in computer animation for motion pictures. The first animation created with the model was Stanley and Stella in: Breaking the Ice (1987), followed by a feature film debut in Tim Burton's film Batman Returns (1992) with computer generated bat swarms and armies of penguins marching through the streets of Gotham City.[8]&#10;&#10;The boids model has been used for other interesting applications. It has been applied to automatically program Internet multi-channel radio stations.[9] It has also been used for visualizing information[10] and for optimization tasks.["/>
+            <Button layoutX="456.0" layoutY="396.0" mnemonicParsing="false" onAction="#goBack" prefHeight="26.0"
+                    prefWidth="162.0" text="Go Back"/>
+        </VBox>
+    </AnchorPane>
+</VBox>

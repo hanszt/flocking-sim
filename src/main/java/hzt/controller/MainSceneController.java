@@ -1,11 +1,14 @@
 package hzt.controller;
 
 import hzt.model.FlockProperties;
+import hzt.model.Theme;
 import hzt.model.entity.Boid;
 import hzt.model.entity.Flock;
 import hzt.model.utils.Engine;
 import hzt.service.AnimationService;
 import hzt.service.StatisticsService;
+import hzt.service.ThemeService;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -32,6 +35,8 @@ public class MainSceneController extends AbstractSceneController {
     private ComboBox<Engine.FlockingSim> physicsEngineComboBox;
     @FXML
     private ComboBox<Flock.FlockType> flockSettingsComboBox;
+    @FXML
+    public ComboBox<Theme> themeCombobox;
 
     @FXML
     private ToggleButton showVelocityVectorButton;
@@ -115,6 +120,7 @@ public class MainSceneController extends AbstractSceneController {
     private final Flock flock;
     private final AnimationService animationService;
     private final Engine engine;
+    private final ThemeService themeService = new ThemeService();
 
     public MainSceneController(SceneManager sceneManager) throws IOException {
         super(MAIN_SCENE.getFxmlFileName(), sceneManager);
@@ -187,6 +193,11 @@ public class MainSceneController extends AbstractSceneController {
 
         physicsEngineComboBox.getItems().addAll(engine.getType1(), engine.getType2(), engine.getType3());
         physicsEngineComboBox.setValue(engine.getType1());
+        for (Theme theme : themeService.getThemes()) {
+            themeCombobox.getItems().add(theme);
+        }
+        themeCombobox.setValue(ThemeService.DEFAULT_THEME);
+        themeService.currentThemeProperty().bind(themeCombobox.valueProperty());
     }
 
     private EventHandler<ActionEvent> initializeAnimationLoop() {
@@ -385,6 +396,15 @@ public class MainSceneController extends AbstractSceneController {
         flock.controlFlockSize(0, getAnimationWindowDimension());
         configureFlock(flock);
         uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandom()));
+    }
+
+    @FXML
+    private void themeComboBoxAction() {
+        sceneManager.getSceneControllerMap().values().stream().map(sceneController -> sceneController.scene.getStylesheets()).forEach(styleSheets -> {
+            String styleSheet = themeService.getStyleSheet();
+            styleSheets.removeIf(filter -> !styleSheets.isEmpty());
+            if (styleSheet != null) styleSheets.add(styleSheet);
+        });
     }
 
     protected AbstractSceneController getBean() {

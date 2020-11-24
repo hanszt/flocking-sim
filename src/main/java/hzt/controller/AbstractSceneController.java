@@ -9,10 +9,14 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.time.LocalTime;
 
-import static hzt.model.AppConstants.FXML_FILE_LOCATION;
+import static hzt.model.AppConstants.*;
 import static hzt.model.AppConstants.Scene.ABOUT_SCENE;
 
 public abstract class AbstractSceneController {
+
+    private static final String FXML_FILE_LOCATION = "../../fxml/";
+
+    private boolean setup;
 
     private final String fxmlFileName;
     protected final SceneManager sceneManager;
@@ -26,7 +30,7 @@ public abstract class AbstractSceneController {
         FXMLLoader fxmlLoader = new FXMLLoader();
         setControllerFactory(fxmlLoader);
         Parent root = fxmlLoader.load();
-        scene = new Scene(root);
+        scene = new Scene(root, INIT_SCENE_DIMENSION.getWidth(), INIT_SCENE_DIMENSION.getHeight());
     }
 
     //to be able to pass arguments to the constructor, it's necessary to specify the controller factory of the loader
@@ -59,4 +63,11 @@ public abstract class AbstractSceneController {
         sceneManager.setupScene(ABOUT_SCENE);
     }
 
+    public boolean isSetup() {
+        return setup;
+    }
+
+    public void setSetup(boolean setup) {
+        this.setup = setup;
+    }
 }

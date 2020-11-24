@@ -1,6 +1,5 @@
 package hzt.controller;
 
-import hzt.model.AppConstants;
 import javafx.stage.Stage;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -8,6 +7,7 @@ import org.apache.log4j.Logger;
 import java.io.IOException;
 import java.util.EnumMap;
 
+import static hzt.model.AppConstants.Scene;
 import static hzt.model.AppConstants.Scene.ABOUT_SCENE;
 import static hzt.model.AppConstants.Scene.MAIN_SCENE;
 
@@ -16,12 +16,12 @@ public class SceneManager {
     private static final Logger LOGGER = LogManager.getLogger(SceneManager.class);
 
     private final Stage stage;
-    private final EnumMap<AppConstants.Scene, AbstractSceneController> sceneControllerMap;
+    private final EnumMap<Scene, AbstractSceneController> sceneControllerMap;
     private AbstractSceneController curSceneController;
 
     public SceneManager(Stage stage) {
         this.stage = stage;
-        this.sceneControllerMap = new EnumMap<>(AppConstants.Scene.class);
+        this.sceneControllerMap = new EnumMap<>(Scene.class);
         loadFrontend();
     }
 
@@ -35,12 +35,15 @@ public class SceneManager {
         }
     }
 
-    public void setupScene(AppConstants.Scene scene) {
-        String message = "setting up " + scene.getEnglishDescription() + "...";
-        LOGGER.info(message);
+    public void setupScene(Scene scene) {
         curSceneController = sceneControllerMap.get(scene);
         stage.setScene(curSceneController.scene);
-        curSceneController.setup();
+        if (!curSceneController.isSetup()) {
+            String message = "setting up " + scene.getEnglishDescription() + "...";
+            LOGGER.info(message);
+            curSceneController.setup();
+            curSceneController.setSetup(true);
+        }
     }
 
     public Stage getStage() {
@@ -49,5 +52,9 @@ public class SceneManager {
 
     public AbstractSceneController getCurSceneController() {
         return curSceneController;
+    }
+
+    public EnumMap<Scene, AbstractSceneController> getSceneControllerMap() {
+        return sceneControllerMap;
     }
 }
