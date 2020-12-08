@@ -2,11 +2,9 @@ package hzt.model.utils;
 
 import hzt.model.entity.Boid;
 import javafx.geometry.Point2D;
-import lombok.Getter;
 
 import java.util.Set;
 
-@Getter
 public class Engine {
 
     public static final double DENSITY = 100; // kg/m^3
@@ -22,7 +20,7 @@ public class Engine {
      * <p>
      * a = (G * m_other) / r^2
      */
-    public static abstract class FlockingSim {
+    public abstract static class FlockingSim {
 
         public Point2D getTotalAcceleration(Boid self, Set<Boid> boidSet) {
             Point2D totalAcceleration = Point2D.ZERO;
@@ -49,12 +47,9 @@ public class Engine {
             float attractionMagnitude = pullFactor * part2Formula;
             float repelMagnitude = repelFactor * part2Formula;
 
-            Point2D acceleration;
             float repelDistance = self.getRepelRadius() + other.getRepelRadius();
-            if (distance <= self.getBody().getRadius() + other.getBody().getRadius()) acceleration = Point2D.ZERO;
-            else if (distance <= repelDistance) acceleration = unitVectorInAccDir.multiply(-repelMagnitude);
-            else acceleration = unitVectorInAccDir.multiply(attractionMagnitude);
-            return acceleration;
+            if (distance <= repelDistance) return unitVectorInAccDir.multiply(-repelMagnitude);
+            else return unitVectorInAccDir.multiply(attractionMagnitude);
         }
 
         @Override
@@ -74,11 +69,9 @@ public class Engine {
             float curveFitConstant = (float) (other.getMass() * (pullFactor + repelFactor) / (repelDistance * repelDistance));
             float attractionMagnitude = pullFactor * part2Formula;
             float repelMagnitude = -repelFactor * part2Formula + curveFitConstant;
-            Point2D acceleration;
-            if (distance <= self.getBody().getRadius() + other.getBody().getRadius()) acceleration = Point2D.ZERO;
-            else if (distance <= repelDistance) acceleration = unitVectorInAccDir.multiply(repelMagnitude);
-            else acceleration = unitVectorInAccDir.multiply(attractionMagnitude);
-            return acceleration;
+
+            if (distance <= repelDistance) return unitVectorInAccDir.multiply(repelMagnitude);
+            else return unitVectorInAccDir.multiply(attractionMagnitude);
         }
 
         @Override
@@ -95,11 +88,9 @@ public class Engine {
             Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
             float distance = (float) vectorSelfToOther.magnitude();
             float repelDistance = self.getRepelRadius() + other.getRepelRadius();
-            Point2D acceleration;
-            if (distance <= self.getBody().getRadius() + other.getBody().getRadius()) acceleration = Point2D.ZERO;
-            else if (distance <= repelDistance) acceleration = unitVectorInAccDir.multiply(-repelFactor * multiplier);
-            else acceleration = unitVectorInAccDir.multiply(pullFactor * multiplier);
-            return acceleration;
+
+            if (distance <= repelDistance) return unitVectorInAccDir.multiply(-repelFactor * multiplier);
+            else return unitVectorInAccDir.multiply(pullFactor * multiplier);
         }
 
         @Override
@@ -115,5 +106,18 @@ public class Engine {
     public void setRepelFactor(double repelFactor) {
         this.repelFactor = (float) repelFactor;
     }
+
+    public FlockingSim getType1() {
+        return type1;
+    }
+
+    public FlockingSim getType2() {
+        return type2;
+    }
+
+    public FlockingSim getType3() {
+        return type3;
+    }
+
 
 }
