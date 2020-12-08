@@ -20,12 +20,14 @@ public class AnimationService {
 
     private final LocalTime startTimeSim;
     private final StatisticsService statisticsService;
-    private final Timeline timeline;
+    private final Timeline animationTimeline;
+    private final Timeline statisticsTimeline;
 
     public AnimationService(LocalTime startTimeSim, StatisticsService statisticsService) {
         this.startTimeSim = startTimeSim;
         this.statisticsService = statisticsService;
-        this.timeline = setupTimeLine();
+        this.animationTimeline = setupTimeLine();
+        this.statisticsTimeline = setupTimeLine();
     }
 
     public Timeline setupTimeLine() {
@@ -34,10 +36,20 @@ public class AnimationService {
         return t;
     }
 
-    public void addAnimationLoopToTimeline(EventHandler<ActionEvent> animationLoop, boolean start) {
-        KeyFrame animationLoopKeyFrame = new KeyFrame(INIT_FRAME_DURATION, "Ball sim", animationLoop);
-        timeline.getKeyFrames().add(animationLoopKeyFrame);
-        if (start) timeline.play();
+    public void addAnimationLoopToTimeline(EventHandler<ActionEvent> animationLoop, EventHandler<ActionEvent> statisticsLoop, boolean start) {
+        animationTimeline.getKeyFrames().add(new KeyFrame(INIT_FRAME_DURATION, "Animation keyframe", animationLoop));
+        statisticsTimeline.getKeyFrames().add(new KeyFrame(INIT_FRAME_DURATION, "Statistics keyframe", statisticsLoop));
+        if (start) {
+            animationTimeline.play();
+            statisticsTimeline.play();
+        }
+    }
+
+    public void runStatistics(Flock flock, double frictionFactor) {
+        Boid selected = flock.getSelectedBoid();
+        Duration runTimeSim = Duration.millis((LocalTime.now().toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
+        statisticsService.showStatisticsAboutSelectedBall(selected);
+        statisticsService.showGlobalStatistics(frictionFactor, flock.getChildren().size(), runTimeSim);
     }
 
     public void run(Flock flock, Dimension2D animationWindowSize, double accelerationMultiplier, double frictionFactor, boolean bounce, double maxSpeed) {
@@ -48,16 +60,16 @@ public class AnimationService {
         flock.getChildren().stream().map(ball2D -> (Boid) ball2D).forEach(ball -> {
             if (bounce) ball.bounceOfEdges(animationWindowSize);
             else ball.floatThroughEdges(animationWindowSize);
-            ball.update(timeline.getCycleDuration(), accelerationMultiplier, frictionFactor, maxSpeed);
+            ball.update(animationTimeline.getCycleDuration(), accelerationMultiplier, frictionFactor, maxSpeed);
         });
     }
 
-    public void startTimeline() {
-        timeline.play();
+    public void startAnimationTimeline() {
+        animationTimeline.play();
     }
 
-    public void pauseTimeline() {
-        timeline.pause();
+    public void pauseAnimationTimeline() {
+        animationTimeline.pause();
     }
 
 }

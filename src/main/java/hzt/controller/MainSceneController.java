@@ -8,7 +8,6 @@ import hzt.model.utils.Engine;
 import hzt.service.AnimationService;
 import hzt.service.StatisticsService;
 import hzt.service.ThemeService;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -158,7 +157,7 @@ public class MainSceneController extends AbstractSceneController {
         configureFlock(flock);
         engine.setPullFactor(attractionSlider.getValue());
         engine.setRepelFactor(repelFactorSlider.getValue());
-        animationService.addAnimationLoopToTimeline(initializeAnimationLoop(), true);
+        animationService.addAnimationLoopToTimeline(initializeAnimationLoop(), initializeStatisticsLoop(), true);
         uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandom()));
     }
 
@@ -208,6 +207,10 @@ public class MainSceneController extends AbstractSceneController {
             boolean bounce = bounceWallsButton.isSelected();
             animationService.run(flock, getAnimationWindowDimension(), accelerationMultiplier, friction, bounce, maxSpeed);
         };
+    }
+
+    private EventHandler<ActionEvent> initializeStatisticsLoop() {
+        return loop -> animationService.runStatistics(flock, frictionSlider.getValue());
     }
 
     private void configureColorPickers() {
@@ -318,8 +321,8 @@ public class MainSceneController extends AbstractSceneController {
 
     @FXML
     private void pauseSimButtonAction(ActionEvent actionEvent) {
-        if (((ToggleButton) actionEvent.getSource()).isSelected()) animationService.pauseTimeline();
-        else animationService.startTimeline();
+        if (((ToggleButton) actionEvent.getSource()).isSelected()) animationService.pauseAnimationTimeline();
+        else animationService.startAnimationTimeline();
     }
 
     @FXML
