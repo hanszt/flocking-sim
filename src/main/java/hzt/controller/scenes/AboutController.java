@@ -1,5 +1,7 @@
-package hzt.controller;
+package hzt.controller.scenes;
 
+import hzt.controller.SceneManager;
+import hzt.controller.scenes.SceneController;
 import hzt.service.AboutService;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -11,7 +13,7 @@ import static hzt.model.AppConstants.INIT_SCENE_DIMENSION;
 import static hzt.model.AppConstants.Scene.ABOUT_SCENE;
 import static hzt.model.AppConstants.Scene.MAIN_SCENE;
 
-public class AboutController extends AbstractSceneController {
+public class AboutController extends SceneController {
     @FXML
     private ComboBox<AboutService.AboutText> textComboBox;
     @FXML
@@ -26,6 +28,7 @@ public class AboutController extends AbstractSceneController {
     @Override
     public void setup() {
         textArea.setPrefSize(INIT_SCENE_DIMENSION.getWidth(), INIT_SCENE_DIMENSION.getHeight());
+        textArea.setEditable(false);
         aboutService.loadContent().forEach(aboutText -> textComboBox.getItems().add(aboutText));
         textComboBox.setValue(textComboBox.getItems().get(0));
     }
@@ -40,7 +43,7 @@ public class AboutController extends AbstractSceneController {
         sceneManager.setupScene(MAIN_SCENE);
     }
 
-    protected AbstractSceneController getBean() {
+    protected SceneController getBean() {
         return this;
     }
 }

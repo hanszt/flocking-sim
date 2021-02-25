@@ -10,8 +10,8 @@ import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ThemeService {
 
@@ -23,30 +23,27 @@ public class ThemeService {
     private final StringProperty styleSheet = new SimpleStringProperty();
     private final ObjectProperty<Theme> currentTheme = new SimpleObjectProperty<>();
 
-    private final List<Theme> themes;
+    private final Set<Theme> themes;
 
     public ThemeService() {
         this.themes = scanForThemeStyleSheets();
         currentTheme.addListener((observableValue, theme, newTheme) -> loadThemeStyleSheet(newTheme));
     }
 
-    private List<Theme> scanForThemeStyleSheets() {
-        List<Theme> themeList = new ArrayList<>();
-        themeList.add(DEFAULT_THEME);
-        try {
-            File styleDirectory = new File(getClass().getResource(RELATIVE_STYLE_SHEET_RESOURCE_DIR).getFile());
+    private Set<Theme> scanForThemeStyleSheets() {
+        Set<Theme> themeSet = new HashSet<>(Set.of(DEFAULT_THEME));
+        URL url = getClass().getResource(RELATIVE_STYLE_SHEET_RESOURCE_DIR);
+        if (url != null) {
+            File styleDirectory = new File(url.getFile());
             if (styleDirectory.isDirectory()) {
                 String[] fileNames = styleDirectory.list();
                 for (String fileName : fileNames) {
                     String themeName = extractThemeName(fileName);
-                    if (!themeName.equals(DEFAULT_THEME.getName())) themeList.add(new Theme(themeName, fileName));
+                    themeSet.add(new Theme(themeName, fileName));
                 }
             }
-        } catch (NullPointerException e) {
-            LOGGER.error("Stylesheet resource folder not found...");
-            e.printStackTrace();
-        }
-        return themeList;
+        } else LOGGER.error("Stylesheet resource folder not found...");
+        return themeSet;
     }
 
     private String extractThemeName(String fileName) {
@@ -78,7 +75,7 @@ public class ThemeService {
         return currentTheme;
     }
 
-    public List<Theme> getThemes() {
+    public Set<Theme> getThemes() {
         return themes;
     }
 

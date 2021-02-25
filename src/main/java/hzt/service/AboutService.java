@@ -66,10 +66,6 @@ public class AboutService {
             this.text = text;
         }
 
-        public String getTitle() {
-            return title;
-        }
-
         public String getText() {
             return text.get();
         }

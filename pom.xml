@@ -7,6 +7,7 @@
     <groupId>org.example</groupId>
     <artifactId>FlockingSim</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -110,18 +111,9 @@
                     <source>11</source>
                     <target>11</target>
 <!--                    VM args: attempt to resolve them in maven-->
-                    <compilerArgs>
-                        <arg>--add-exports=javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls</arg>
-                        <arg>--add-exports=javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls</arg>
-                        <arg>--add-exports=javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls</arg>
-                        <arg>--add-exports=javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls</arg>
-                        <arg>--add-exports=javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls</arg>
-                        <arg>--add-exports=javafx.base/com.sun.javafx.event=org.controlsfx.controls</arg>
-                        <arg>--add-exports=javafx.base/com.sun.javafx.collections=org.controlsfx.controls</arg>
-                        <arg>--add-exports=javafx.base/com.sun.javafx.runtime=org.controlsfx.controls</arg>
-                        <arg>--add-opens=javafx.controls/javafx.scene.control.skin=org.controlsfx.controls</arg>
-                        <arg>--add-opens=javafx.graphics/javafx.scene=org.controlsfx.controls</arg>
-                    </compilerArgs>
+<!--                    <compilerArgs>-->
+<!--                        <arg>&#45;&#45;module-path C:\Program Files\javafx-sdk-15.0.1\lib &#45;&#45;add-modules javafx.controls,javafx.fxml</arg>-->
+<!--                    </compilerArgs>-->
                 </configuration>
             </plugin>
 

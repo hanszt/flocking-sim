@@ -1,6 +1,8 @@
 package hzt.model.utils;
 
 import hzt.model.entity.Boid;
+import javafx.beans.property.FloatProperty;
+import javafx.beans.property.SimpleFloatProperty;
 import javafx.geometry.Point2D;
 
 import java.util.Set;
@@ -9,8 +11,8 @@ public class Engine {
 
     public static final double DENSITY = 100; // kg/m^3
 
-    private float pullFactor;
-    private float repelFactor;
+    private final FloatProperty pullFactor = new SimpleFloatProperty();
+    private final FloatProperty repelFactor = new SimpleFloatProperty();
 
     /*
      * Fg = (G * m_self * m_other) / r^2
@@ -44,8 +46,8 @@ public class Engine {
             Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
             float distance = (float) vectorSelfToOther.magnitude();
             float part2Formula = (float) other.getMass() / (distance * distance);
-            float attractionMagnitude = pullFactor * part2Formula;
-            float repelMagnitude = repelFactor * part2Formula;
+            float attractionMagnitude = pullFactor.get() * part2Formula;
+            float repelMagnitude = repelFactor.get() * part2Formula;
 
             float repelDistance = self.getRepelRadius() + other.getRepelRadius();
             if (distance <= repelDistance) return unitVectorInAccDir.multiply(-repelMagnitude);
@@ -66,9 +68,9 @@ public class Engine {
             float distance = (float) vectorSelfToOther.magnitude();
             float part2Formula = (float) other.getMass() / (distance * distance);
             float repelDistance = self.getRepelRadius() + other.getRepelRadius();
-            float curveFitConstant = (float) (other.getMass() * (pullFactor + repelFactor) / (repelDistance * repelDistance));
-            float attractionMagnitude = pullFactor * part2Formula;
-            float repelMagnitude = -repelFactor * part2Formula + curveFitConstant;
+            float curveFitConstant = (float) (other.getMass() * (pullFactor.get() + repelFactor.get()) / (repelDistance * repelDistance));
+            float attractionMagnitude = pullFactor.get() * part2Formula;
+            float repelMagnitude = -repelFactor.get() * part2Formula + curveFitConstant;
 
             if (distance <= repelDistance) return unitVectorInAccDir.multiply(repelMagnitude);
             else return unitVectorInAccDir.multiply(attractionMagnitude);
@@ -89,8 +91,8 @@ public class Engine {
             float distance = (float) vectorSelfToOther.magnitude();
             float repelDistance = self.getRepelRadius() + other.getRepelRadius();
 
-            if (distance <= repelDistance) return unitVectorInAccDir.multiply(-repelFactor * multiplier);
-            else return unitVectorInAccDir.multiply(pullFactor * multiplier);
+            if (distance <= repelDistance) return unitVectorInAccDir.multiply(-repelFactor.get() * multiplier);
+            else return unitVectorInAccDir.multiply(pullFactor.get() * multiplier);
         }
 
         @Override
@@ -99,12 +101,12 @@ public class Engine {
         }
     };
 
-    public void setPullFactor(double pullFactor) {
-        this.pullFactor = (float) pullFactor;
+    public FloatProperty pullFactorProperty() {
+        return pullFactor;
     }
 
-    public void setRepelFactor(double repelFactor) {
-        this.repelFactor = (float) repelFactor;
+    public FloatProperty repelFactorProperty() {
+        return repelFactor;
     }
 
     public FlockingSim getType1() {

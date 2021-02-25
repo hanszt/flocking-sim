@@ -1,7 +1,6 @@
 package hzt.controller;
 
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -30,7 +29,7 @@ public class AppManager {
         sceneManager.setupScene(Scene.MAIN_SCENE);
         configureStage(stage);
         String startingMessage = String.format("Starting instance %d of %s at %s...%n",
-                instance, TITLE, sceneManager.getCurSceneController().startTimeSim.format(DateTimeFormatter.ofPattern("hh:mm:ss")));
+                instance, TITLE, sceneManager.getCurSceneController().getStartTimeSim().format(DateTimeFormatter.ofPattern("hh:mm:ss")));
         LOGGER.info(startingMessage);
 
         stage.show();
@@ -47,7 +46,7 @@ public class AppManager {
     }
 
     private void printClosingText() {
-        LocalTime startTimeSim = sceneManager.getCurSceneController().startTimeSim;
+        LocalTime startTimeSim = sceneManager.getCurSceneController().getStartTimeSim();
         LocalTime stopTimeSim = LocalTime.now();
         Duration runTimeSim = Duration.millis((stopTimeSim.toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
         String message = String.format("%s%nAnimation Runtime of instance %d: %.2f seconds%n%s%n", CLOSING_MESSAGE,

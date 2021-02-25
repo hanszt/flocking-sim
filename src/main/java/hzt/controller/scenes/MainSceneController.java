@@ -1,16 +1,16 @@
-package hzt.controller;
+package hzt.controller.scenes;
 
+import hzt.controller.SceneManager;
+import hzt.controller.sub_pane.StatisticsController;
 import hzt.model.FlockProperties;
 import hzt.model.Theme;
 import hzt.model.entity.Boid;
 import hzt.model.entity.Flock;
 import hzt.model.utils.Engine;
 import hzt.service.AnimationService;
-import hzt.service.StatisticsService;
 import hzt.service.ThemeService;
-import javafx.collections.ObservableList;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
@@ -21,14 +21,20 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
+import java.time.LocalTime;
+import java.util.List;
 
 import static hzt.model.AppConstants.*;
 import static hzt.model.AppConstants.Scene.MAIN_SCENE;
+import static java.util.function.Predicate.not;
 
-public class MainSceneController extends AbstractSceneController {
+public class MainSceneController extends SceneController {
 
+    @FXML
+    private Tab statisticsTab;
     @FXML
     private AnchorPane animationPane;
     @FXML
@@ -91,28 +97,6 @@ public class MainSceneController extends AbstractSceneController {
     private Slider boidVelocityVectorLengthSlider;
     @FXML
     private Slider boidAccelerationVectorLengthSlider;
-    @FXML
-    private Label boidNameLabel;
-    @FXML
-    private Label positionXLabel;
-    @FXML
-    private Label positionYLabel;
-    @FXML
-    private Label velocityStatsLabel;
-    @FXML
-    private Label accelerationStatsLabel;
-    @FXML
-    private Label frictionStatsLabel;
-    @FXML
-    private Label frameRateStatsLabel;
-    @FXML
-    private Label nrOfBoidsInPerceptionRadiusLabel;
-    @FXML
-    private Label boidSizeLabel;
-    @FXML
-    private Label numberOfBoidsLabel;
-    @FXML
-    private Label runTimeLabel;
 
     private Color backgroundColor = INIT_BG_COLOR;
 
@@ -120,6 +104,8 @@ public class MainSceneController extends AbstractSceneController {
     private final Flock flock;
     private final AnimationService animationService;
     private final Engine engine;
+
+    private final StatisticsController statisticsController = new StatisticsController();
     private final ThemeService themeService = new ThemeService();
 
     public MainSceneController(SceneManager sceneManager) throws IOException {
@@ -128,21 +114,10 @@ public class MainSceneController extends AbstractSceneController {
         this.subScene2D = new SubScene(subSceneRoot, 0, 0, true, SceneAntialiasing.BALANCED);
         this.flock = new Flock(scene);
         this.engine = new Engine();
-        StatisticsService statisticsService = new StatisticsService(getSelectedBoidLabelDto(), getGeneralStatsLabelDto());
-        this.animationService = new AnimationService(startTimeSim, statisticsService);
+        this.animationService = new AnimationService();
         subSceneRoot.getChildren().addAll(flock);
+        statisticsTab.setContent(statisticsController.getRoot());
         this.animationPane.getChildren().add(subScene2D);
-    }
-
-    private StatisticsService.GeneralStatsLabelDto getGeneralStatsLabelDto() {
-        return new StatisticsService.GeneralStatsLabelDto(
-                frictionStatsLabel, frameRateStatsLabel, numberOfBoidsLabel, runTimeLabel);
-    }
-
-    private StatisticsService.SelectedBoidLabelDto getSelectedBoidLabelDto() {
-        return new StatisticsService.SelectedBoidLabelDto(
-                boidNameLabel, positionXLabel, positionYLabel,
-                velocityStatsLabel, accelerationStatsLabel, nrOfBoidsInPerceptionRadiusLabel, boidSizeLabel);
     }
 
     @Override
@@ -156,10 +131,20 @@ public class MainSceneController extends AbstractSceneController {
         addListenersToSliders();
         bindFlockPropertiesToControlsProperties(flock);
         configureFlock(flock);
-        engine.setPullFactor(attractionSlider.getValue());
-        engine.setRepelFactor(repelFactorSlider.getValue());
-        animationService.addAnimationLoopToTimeline(initializeAnimationLoop(), true);
+        engine.pullFactorProperty().bind(attractionSlider.valueProperty());
+        engine.repelFactorProperty().bind(repelFactorSlider.valueProperty());
+        animationService.addAnimationLoopToTimeline(this::animationLoop, true);
         uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandom()));
+    }
+
+    private void animationLoop(ActionEvent loop) {
+        double maxSpeed = maxVelocitySlider.getValue();
+        double friction = frictionSlider.getValue();
+        double accelerationMultiplier = accelerationSlider.getValue();
+        boolean bounce = bounceWallsButton.isSelected();
+        Duration runTimeSim = Duration.millis((LocalTime.now().toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
+        statisticsController.showStatists(flock.getSelectedBoid(), friction, flock.getChildren().size(), runTimeSim);
+        animationService.run(flock, getAnimationWindowDimension(), accelerationMultiplier, friction, bounce, maxSpeed);
     }
 
     private void configureSubScene(SubScene subScene, Pane animationPane) {
@@ -200,16 +185,6 @@ public class MainSceneController extends AbstractSceneController {
         themeService.currentThemeProperty().bind(themeCombobox.valueProperty());
     }
 
-    private EventHandler<ActionEvent> initializeAnimationLoop() {
-        return loop -> {
-            double maxSpeed = maxVelocitySlider.getValue();
-            double friction = frictionSlider.getValue();
-            double accelerationMultiplier = accelerationSlider.getValue();
-            boolean bounce = bounceWallsButton.isSelected();
-            animationService.run(flock, getAnimationWindowDimension(), accelerationMultiplier, friction, bounce, maxSpeed);
-        };
-    }
-
     private void configureColorPickers() {
         backgroundColorPicker.setValue(INIT_BG_COLOR);
         uniformBallColorPicker.setValue(INIT_UNIFORM_BALL_COLOR);
@@ -232,14 +207,21 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     private void addListenersToSliders() {
-        numberOfBoidsSlider.valueProperty().addListener((oldVal, curVal, newVal) ->
-                flock.controlFlockSize(newVal.intValue(), getAnimationWindowDimension()));
-        perceptionRadiusSlider.valueProperty().addListener((oldVal, curVal, newVal) ->
-                flock.forEach(ball -> ball.setPerceptionRadius(ball.getBody().getRadius() * newVal.doubleValue())));
-        repelDistanceSlider.valueProperty().addListener((oldVal, curVal, newVal) ->
-                flock.forEach(ball -> ball.setRepelRadius(ball.getBody().getRadius() * newVal.doubleValue())));
-        attractionSlider.valueProperty().addListener((oldVal, curVal, newVal) -> engine.setPullFactor(newVal.doubleValue()));
-        repelFactorSlider.valueProperty().addListener((oldVal, curVal, newVal) -> engine.setRepelFactor(newVal.doubleValue()));
+        numberOfBoidsSlider.valueProperty().addListener(this::numberOfBoidsSliderChanged);
+        perceptionRadiusSlider.valueProperty().addListener(this::perceptionRadiusSliderChanged);
+        repelDistanceSlider.valueProperty().addListener(this::repelDistanceSliderChanged);
+    }
+
+    private void numberOfBoidsSliderChanged(ObservableValue<? extends Number> o, Number c, Number n) {
+        flock.controlFlockSize(n.intValue(), getAnimationWindowDimension());
+    }
+
+    private void perceptionRadiusSliderChanged(ObservableValue<? extends Number> o, Number c, Number n) {
+        flock.forEach(ball -> ball.setPerceptionRadius(ball.getBody().getRadius() * n.doubleValue()));
+    }
+
+    private void repelDistanceSliderChanged(ObservableValue<? extends Number> o, Number c, Number n) {
+        flock.forEach(ball -> ball.setRepelRadius(ball.getBody().getRadius() * n.doubleValue()));
     }
 
     private void bindFlockPropertiesToControlsProperties(Flock flock) {
@@ -271,11 +253,32 @@ public class MainSceneController extends AbstractSceneController {
     }
 
     private void configureControls() {
+        configureSliders();
+        setToggleButtons();
+    }
+
+    private static final int INIT_ACCELERATION_USER_SELECTED_BALL = 50;
+    private static final int INIT_ATTRACTION = 3;
+    private static final int INIT_REPEL_FACTOR = 10;
+    private static final int INIT_REPEL_DISTANCE_FACTOR = 3;
+    private static final int INIT_MAX_BALL_SIZE = 5;
+    private static final int INIT_PERCEPTION_RADIUS = 25;
+    private static final int INIT_MAX_SPEED = 150;
+    private static final double INIT_FRICTION = 1;
+    private static final int MAX_PATH_SIZE_ALL = 200;
+
+    private static final int MAX_VECTOR_LENGTH = 80;
+    private static final int INIT_NUMBER_OF_BOIDS = parsedIntAppProp("init_number_of_boids", 120);
+
+    public static final int MAX_NUMBER_OF_BOIDS = parsedIntAppProp("max_number_of_boids", 200);
+
+    private void configureSliders() {
         maxBoidSizeSlider.setValue(INIT_MAX_BALL_SIZE);
         boidTailLengthSlider.setValue(MAX_PATH_SIZE_ALL);
         boidVelocityVectorLengthSlider.setValue(MAX_VECTOR_LENGTH);
         boidAccelerationVectorLengthSlider.setValue(MAX_VECTOR_LENGTH);
-        numberOfBoidsSlider.setValue(INIT_NUMBER_OF_BALLS);
+        numberOfBoidsSlider.setValue(INIT_NUMBER_OF_BOIDS);
+        numberOfBoidsSlider.setMax(MAX_NUMBER_OF_BOIDS);
         accelerationSlider.setValue(INIT_ACCELERATION_USER_SELECTED_BALL);
         attractionSlider.setValue(INIT_ATTRACTION);
         repelDistanceSlider.setValue(INIT_REPEL_DISTANCE_FACTOR);
@@ -283,16 +286,18 @@ public class MainSceneController extends AbstractSceneController {
         frictionSlider.setValue(INIT_FRICTION);
         perceptionRadiusSlider.setValue(INIT_PERCEPTION_RADIUS);
         maxVelocitySlider.setValue(INIT_MAX_SPEED);
+    }
 
-        showConnectionsButton.setSelected(INIT_SHOW_CONNECTIONS);
-        showPathSelectedButton.setSelected(INIT_SHOW_PATH);
-        showAllPathsButton.setSelected(INIT_SHOW_PATH);
-        showVelocityVectorButton.setSelected(INIT_SHOW_VELOCITY);
-        showAccelerationVectorButton.setSelected(INIT_SHOW_ACCELERATION);
-        showPerceptionButton.setSelected(INIT_SHOW_PERCEPTION);
-        showRepelCircleButton.setSelected(INIT_SHOW_REPEL_CIRCLE);
-        showPerceptionSelectedBallButton.setSelected(INIT_SHOW_PERCEPTION);
-        bounceWallsButton.setSelected(INIT_BOUNCE_WALLS_BUTTON_VALUE);
+    private void setToggleButtons() {
+        showConnectionsButton.setSelected(false);
+        showPathSelectedButton.setSelected(false);
+        showAllPathsButton.setSelected(false);
+        showVelocityVectorButton.setSelected(false);
+        showAccelerationVectorButton.setSelected(false);
+        showPerceptionButton.setSelected(false);
+        showRepelCircleButton.setSelected(false);
+        showPerceptionSelectedBallButton.setSelected(false);
+        bounceWallsButton.setSelected(true);
     }
 
     @FXML
@@ -305,8 +310,9 @@ public class MainSceneController extends AbstractSceneController {
     private void uniformBoidColorPickerAction(ActionEvent event) {
         Color color = ((ColorPicker) event.getSource()).getValue();
         flock.setUniformBallColor(color);
-        flock.getChildren().stream().map(n -> (Boid) n)
-                .filter(ball -> !ball.equals(flock.getSelectedBoid())).forEach(ball2D -> ball2D.updatePaint(color));
+        flock.getChildren().stream().map(Boid.class::cast)
+                .filter(not(ball -> ball.equals(flock.getSelectedBoid())))
+                .forEach(ball2D -> ball2D.updatePaint(color));
     }
 
     @FXML
@@ -377,7 +383,8 @@ public class MainSceneController extends AbstractSceneController {
     @FXML
     public void showVelocitiesButtonAction(ActionEvent event) {
         boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        flock.getChildren().stream().map(n -> (Boid) n).forEach(ball2D -> ball2D.getVisibleVelocityVector().setVisible(visible));
+        flock.getChildren().stream().map(Boid.class::cast)
+                .forEach(ball2D -> ball2D.getVisibleVelocityVector().setVisible(visible));
     }
 
     @FXML
@@ -400,14 +407,22 @@ public class MainSceneController extends AbstractSceneController {
 
     @FXML
     private void themeComboBoxAction() {
-        sceneManager.getSceneControllerMap().values().stream().map(sceneController -> sceneController.scene.getStylesheets()).forEach(styleSheets -> {
-            String styleSheet = themeService.getStyleSheet();
-            styleSheets.removeIf(filter -> !styleSheets.isEmpty());
-            if (styleSheet != null) styleSheets.add(styleSheet);
-        });
+        sceneManager.getSceneControllerMap().values().stream()
+                .map(this::toStyleSheets)
+                .forEach(this::changeStyleSheet);
     }
 
-    protected AbstractSceneController getBean() {
+    private List<String> toStyleSheets(SceneController sceneController) {
+        return sceneController.scene.getStylesheets();
+    }
+
+    private void changeStyleSheet(List<String> styleSheets) {
+        String styleSheet = themeService.getStyleSheet();
+        styleSheets.removeIf(not(e -> styleSheets.isEmpty()));
+        if (styleSheet != null) styleSheets.add(styleSheet);
+    }
+
+    protected SceneController getBean() {
         return this;
     }
 

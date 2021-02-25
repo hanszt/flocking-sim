@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="hzt.controller.sub_pane.StatisticsController">
+    <Label text="Global statistics:">
+        <font>
+            <Font name="System Bold" size="12.0"/>
+        </font>
+    </Label>
+    <HBox>
+        <VBox prefWidth="100.0">
+            <Label text="Friction: "/>
+            <Label text="Framerate:"/>
+            <Label text="#Boids:"/>
+            <Label text="Runtime:"/>
+        </VBox>
+        <VBox layoutX="10.0" layoutY="10.0">
+            <Label fx:id="frictionStatsLabel" text="NaN"/>
+            <Label fx:id="frameRateStatsLabel" text="NaN"/>
+            <Label fx:id="numberOfBoidsLabel" text="NaN"/>
+            <Label fx:id="runTimeLabel" text="NaN"/>
+        </VBox>
+    </HBox>
+    <Label text="Statistics about selected boid:">
+        <font>
+            <Font name="System Bold" size="12.0"/>
+        </font>
+    </Label>
+    <HBox>
+        <VBox prefWidth="100.0">
+            <Label text="Name:"/>
+            <Label text="Position x:"/>
+            <Label text="Position y:"/>
+            <Label text="Velocity:"/>
+            <Label text="Acceleration:"/>
+            <Label text="Boid size: "/>
+            <Label text="#Near boids: "/>
+        </VBox>
+        <VBox layoutX="10.0" layoutY="10.0">
+            <Label fx:id="boidNameLabel" text="Unknown"/>
+            <Label fx:id="positionXLabel"/>
+            <Label fx:id="positionYLabel"/>
+            <Label fx:id="velocitySelectedBoidLabel"/>
+            <Label fx:id="accelerationSelectedBoidLabel"/>
+            <Label fx:id="boidSizeLabel" text="0"/>
+            <Label fx:id="nrOfBoidsInPerceptionRadiusLabel" text="0"/>
+        </VBox>
+    </HBox>
+</VBox>

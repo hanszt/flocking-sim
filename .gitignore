@@ -29,6 +29,7 @@ help
 
 # Logs and databases #
 ######################
+logs
 *.log
 *.sql
 *.sqlite

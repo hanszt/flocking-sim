@@ -9,20 +9,17 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.paint.Color;
-import lombok.Getter;
-import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+import static hzt.controller.scenes.MainSceneController.MAX_NUMBER_OF_BOIDS;
 import static hzt.model.AppConstants.*;
 import static hzt.model.utils.RandomGenerator.*;
 import static java.lang.Math.*;
 
-@Getter
-@Setter
 public class Flock extends Group implements Iterable<Boid> {
 
     private final FlockProperties flockProperties = new FlockProperties();
@@ -41,7 +38,7 @@ public class Flock extends Group implements Iterable<Boid> {
     public void controlFlockSize(int numberOfBalls, Dimension2D parentDimension) {
         while (this.getChildren().size() != numberOfBalls) {
             if (this.getChildren().size() < numberOfBalls) addBoidToFlock(parentDimension);
-            else removeBallFromFLock();
+            else removeBoidFromFLock();
         }
     }
 
@@ -56,14 +53,15 @@ public class Flock extends Group implements Iterable<Boid> {
         boid.setVisibilityBoidComponents(flockProperties);
     }
 
-    private void removeBallFromFLock() {
+    private void removeBoidFromFLock() {
         ObservableList<Node> list = this.getChildren();
         Boid boid = (Boid) list.get(0);
         this.getChildren().remove(boid);
-        this.getChildren().stream().map(n -> (Boid) n).forEach(ball -> {
-            ball.getPerceptionRadiusMap().remove(boid);
-            ball.getChildren().removeIf(n -> n instanceof Connection);
-        });
+        for (Node node : this.getChildren()) {
+            Boid other = (Boid) node;
+            other.getPerceptionRadiusMap().remove(boid);
+            other.getChildren().removeIf(n -> n instanceof Connection);
+        }
         if (boid.equals(selectedBoid)) {
             selectedBoid = !list.isEmpty() ? getRandomSelectedBoid() : null;
         }
@@ -82,8 +80,8 @@ public class Flock extends Group implements Iterable<Boid> {
     @Override
     public Iterator<Boid> iterator() {
         return getChildren().stream()
-                .filter(n -> n instanceof Boid)
-                .map(n -> (Boid) n)
+                .filter(Boid.class::isInstance)
+                .map(Boid.class::cast)
                 .collect(Collectors.toList()).iterator();
     }
 
@@ -108,8 +106,8 @@ public class Flock extends Group implements Iterable<Boid> {
         public String toString() {
             return "FlockType";
         }
-    }
 
+    }
 
     private final FlockType random = new FlockType() {
         @Override
@@ -155,7 +153,7 @@ public class Flock extends Group implements Iterable<Boid> {
 
         @Override
         void setCenterPosition(Boid boid, Dimension2D dimension) {
-            int index = Boid.getNext() % MAX_NUMBER_OF_BALLS;
+            int index = Boid.getNext() % MAX_NUMBER_OF_BOIDS;
             boid.setCenterPosition(getCirclePositionOnParent(dimension.getWidth(), dimension.getHeight(), index));
         }
 
@@ -163,8 +161,8 @@ public class Flock extends Group implements Iterable<Boid> {
             Point2D centerPosition = new Point2D(width / 2, height / 2);
             double positionMultiplier = (width + height) / 8;
             Point2D circularPosition = new Point2D(
-                    positionMultiplier * cos((2 * index * PI) / MAX_NUMBER_OF_BALLS),
-                    positionMultiplier * sin((2 * index * PI) / MAX_NUMBER_OF_BALLS));
+                    positionMultiplier * cos((2 * index * PI) / MAX_NUMBER_OF_BOIDS),
+                    positionMultiplier * sin((2 * index * PI) / MAX_NUMBER_OF_BOIDS));
             return circularPosition.add(centerPosition);
         }
 
@@ -174,7 +172,59 @@ public class Flock extends Group implements Iterable<Boid> {
         }
     };
 
+    public FlockType getUniformOrdered() {
+        return uniformOrdered;
+    }
+
+    public FlockType getUniform() {
+        return uniform;
+    }
+
     public FlockType getRandom() {
         return random;
+    }
+
+    public FlockType getFlockType() {
+        return flockType;
+    }
+
+    public FlockProperties getFlockProperties() {
+        return flockProperties;
+    }
+
+    public Engine.FlockingSim getFlockingSim() {
+        return flockingSim;
+    }
+
+    public Scene getMainScene() {
+        return mainScene;
+    }
+
+    public Boid getSelectedBoid() {
+        return selectedBoid;
+    }
+
+    public void setSelectedBoid(Boid selectedBoid) {
+        this.selectedBoid = selectedBoid;
+    }
+
+    public void setUniformBallColor(Color uniformBallColor) {
+        this.uniformBallColor = uniformBallColor;
+    }
+
+    public Color getSelectedBallColor() {
+        return selectedBallColor;
+    }
+
+    public void setSelectedBallColor(Color selectedBallColor) {
+        this.selectedBallColor = selectedBallColor;
+    }
+
+    public void setFlockType(FlockType flockType) {
+        this.flockType = flockType;
+    }
+
+    public void setFlockingSim(Engine.FlockingSim flockingSim) {
+        this.flockingSim = flockingSim;
     }
 }

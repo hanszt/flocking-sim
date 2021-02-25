@@ -23,6 +23,7 @@ import java.util.*;
 import static hzt.model.AppConstants.INIT_FRAME_DURATION;
 import static hzt.model.utils.Engine.DENSITY;
 import static hzt.service.AnimationService.LINE_STROKE_WIDTH;
+import static java.util.function.Predicate.not;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
 @ToString
@@ -46,7 +47,7 @@ public class Boid extends Group {
     private Point2D acceleration; // pixel/s^2
 
     public Boid(double radius, Paint paint) {
-        this("Ball" + ++next, radius, paint);
+        this("Boid " + ++next, radius, paint);
     }
 
     public Boid(String name, double radius, Paint initPaint) {
@@ -154,16 +155,18 @@ public class Boid extends Group {
 
     private void updateBallsInPerceptionRadiusMap() {
         Flock flock = (Flock) getParent();
-        flock.getChildrenUnmodifiable().stream().filter(node -> !node.equals(this)).map(node -> (Boid) node).forEach(boid -> {
-            double distance = boid.getCenterPosition().subtract(this.getCenterPosition()).magnitude();
-            if (distance < perceptionCircle.getRadius()) {
-                if (!perceptionRadiusMap.containsKey(boid)) perceptionRadiusMap.put(boid, new Connection());
-            } else {
-                Line lineToOther = perceptionRadiusMap.get(boid);
-                this.getChildren().remove(lineToOther);
-                perceptionRadiusMap.remove(boid);
-            }
-        });
+        flock.getChildrenUnmodifiable().stream()
+                .filter(not(this::equals))
+                .map(Boid.class::cast)
+                .forEach(this::determineIfBoidInPerceptionRadius);
+    }
+
+    private void determineIfBoidInPerceptionRadius(Boid other) {
+        double distance = other.getCenterPosition().subtract(this.getCenterPosition()).magnitude();
+        if (distance >= perceptionCircle.getRadius()) {
+            Line lineToOther = perceptionRadiusMap.remove(other);
+            this.getChildren().remove(lineToOther);
+        } else perceptionRadiusMap.computeIfAbsent(other, e -> new Connection());
     }
 
     public Point2D addFriction(double frictionFactor) {
