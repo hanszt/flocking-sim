@@ -13,7 +13,7 @@ import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ThemeService {
+public class ThemeService implements IThemeService {
 
     private static final String RELATIVE_STYLE_SHEET_RESOURCE_DIR = "../../css";
 
@@ -71,10 +71,17 @@ public class ThemeService {
         return styleSheet.get();
     }
 
+    @Override
+    public StringProperty styleSheetProperty() {
+        return styleSheet;
+    }
+
+    @Override
     public ObjectProperty<Theme> currentThemeProperty() {
         return currentTheme;
     }
 
+    @Override
     public Set<Theme> getThemes() {
         return themes;
     }

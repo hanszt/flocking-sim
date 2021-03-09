@@ -1,14 +1,13 @@
 package hzt.controller.scenes;
 
 import hzt.controller.SceneManager;
+import hzt.controller.sub_pane.AppearanceController;
 import hzt.controller.sub_pane.StatisticsController;
 import hzt.model.FlockProperties;
-import hzt.model.Theme;
 import hzt.model.entity.Boid;
 import hzt.model.entity.Flock;
 import hzt.model.utils.Engine;
 import hzt.service.AnimationService;
-import hzt.service.ThemeService;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -25,7 +24,6 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.time.LocalTime;
-import java.util.List;
 
 import static hzt.model.AppConstants.*;
 import static hzt.model.AppConstants.Scene.MAIN_SCENE;
@@ -34,6 +32,8 @@ import static java.util.function.Predicate.not;
 public class MainSceneController extends SceneController {
 
     @FXML
+    private Tab appearanceTab;
+    @FXML
     private Tab statisticsTab;
     @FXML
     private AnchorPane animationPane;
@@ -41,8 +41,6 @@ public class MainSceneController extends SceneController {
     private ComboBox<Engine.FlockingSim> physicsEngineComboBox;
     @FXML
     private ComboBox<Flock.FlockType> flockSettingsComboBox;
-    @FXML
-    public ComboBox<Theme> themeCombobox;
 
     @FXML
     private ToggleButton showVelocityVectorButton;
@@ -106,7 +104,6 @@ public class MainSceneController extends SceneController {
     private final Engine engine;
 
     private final StatisticsController statisticsController = new StatisticsController();
-    private final ThemeService themeService = new ThemeService();
 
     public MainSceneController(SceneManager sceneManager) throws IOException {
         super(MAIN_SCENE.getFxmlFileName(), sceneManager);
@@ -129,12 +126,23 @@ public class MainSceneController extends SceneController {
         configureControls();
         configureColorPickers();
         addListenersToSliders();
+        setupAppearancePane();
         bindFlockPropertiesToControlsProperties(flock);
         configureFlock(flock);
         engine.pullFactorProperty().bind(attractionSlider.valueProperty());
         engine.repelFactorProperty().bind(repelFactorSlider.valueProperty());
         animationService.addAnimationLoopToTimeline(this::animationLoop, true);
         uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandom()));
+    }
+
+    private void setupAppearancePane() {
+        try {
+            AppearanceController appearanceController = new AppearanceController(this);
+            this.appearanceTab.setContent(appearanceController.getRoot());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private void animationLoop(ActionEvent loop) {
@@ -151,6 +159,7 @@ public class MainSceneController extends SceneController {
         subScene.widthProperty().bind(animationPane.widthProperty());
         subScene.heightProperty().bind(animationPane.heightProperty());
         subScene.setCamera(getConfiguredCamera());
+        animationPane.setOnMouseDragged(e -> flock.addBoidToFlockAtMouseTip(e, getAnimationWindowDimension(), numberOfBoidsSlider));
     }
 
     private Camera getConfiguredCamera() {
@@ -167,9 +176,13 @@ public class MainSceneController extends SceneController {
 
     private void bindFullScreenButtonToFullScreen(ToggleButton fullScreenButton, Stage stage) {
         stage.fullScreenProperty().addListener((observableValue, curVal, isFullScreen) -> fullScreenButton.setSelected(isFullScreen));
-        stage.addEventFilter(KeyEvent.KEY_PRESSED, key -> {
-            if (key.getCode() == KeyCode.F11) stage.setFullScreen(!stage.isFullScreen());
-        });
+        stage.addEventFilter(KeyEvent.KEY_TYPED, key -> switchFullScreenIfF11Typed(stage, key));
+    }
+
+    private void switchFullScreenIfF11Typed(Stage stage, KeyEvent key) {
+        if (key.getCode() == KeyCode.F11) {
+            stage.setFullScreen(!stage.isFullScreen());
+        }
     }
 
     private void configureComboBoxes() {
@@ -178,11 +191,6 @@ public class MainSceneController extends SceneController {
 
         physicsEngineComboBox.getItems().addAll(engine.getType1(), engine.getType2(), engine.getType3());
         physicsEngineComboBox.setValue(engine.getType1());
-        for (Theme theme : themeService.getThemes()) {
-            themeCombobox.getItems().add(theme);
-        }
-        themeCombobox.setValue(ThemeService.DEFAULT_THEME);
-        themeService.currentThemeProperty().bind(themeCombobox.valueProperty());
     }
 
     private void configureColorPickers() {
@@ -405,26 +413,16 @@ public class MainSceneController extends SceneController {
         uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandom()));
     }
 
-    @FXML
-    private void themeComboBoxAction() {
-        sceneManager.getSceneControllerMap().values().stream()
-                .map(this::toStyleSheets)
-                .forEach(this::changeStyleSheet);
-    }
-
-    private List<String> toStyleSheets(SceneController sceneController) {
-        return sceneController.scene.getStylesheets();
-    }
-
-    private void changeStyleSheet(List<String> styleSheets) {
-        String styleSheet = themeService.getStyleSheet();
-        styleSheets.removeIf(not(e -> styleSheets.isEmpty()));
-        if (styleSheet != null) styleSheets.add(styleSheet);
-    }
-
+    @Override
     protected SceneController getBean() {
         return this;
     }
 
+    public AnchorPane getAnimationPane() {
+        return animationPane;
+    }
 
+    public ColorPicker getBackgroundColorPicker() {
+        return backgroundColorPicker;
+    }
 }

@@ -8,6 +8,8 @@ import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Slider;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import org.jetbrains.annotations.NotNull;
 
@@ -42,7 +44,7 @@ public class Flock extends Group implements Iterable<Boid> {
         }
     }
 
-    private void addBoidToFlock(Dimension2D parentDimension) {
+    private Boid addBoidToFlock(Dimension2D parentDimension) {
         Boid boid = flockType.createBoid(flockProperties.getMaxBoidSize());
         flockType.setCenterPosition(boid, parentDimension);
 
@@ -51,6 +53,7 @@ public class Flock extends Group implements Iterable<Boid> {
         boid.addMouseFunctionality();
         this.getChildren().add(boid);
         boid.setVisibilityBoidComponents(flockProperties);
+        return boid;
     }
 
     private void removeBoidFromFLock() {
@@ -64,6 +67,22 @@ public class Flock extends Group implements Iterable<Boid> {
         }
         if (boid.equals(selectedBoid)) {
             selectedBoid = !list.isEmpty() ? getRandomSelectedBoid() : null;
+        }
+    }
+
+    public void addBoidToFlockAtMouseTip(MouseEvent mouseEvent, Dimension2D dimension2D, Slider numberOfBoidsSlider) {
+        int numberOfBoids = getChildren().size();
+        boolean isMiddleOrSecondary = mouseEvent.isMiddleButtonDown() || mouseEvent.isSecondaryButtonDown();
+        if (isMiddleOrSecondary) {
+            if (numberOfBoids < MAX_NUMBER_OF_BOIDS) {
+                numberOfBoidsSlider.setValue(numberOfBoids);
+                Boid boid = addBoidToFlock(dimension2D);
+                boid.setCenterPosition(new Point2D(mouseEvent.getX(), mouseEvent.getY()));
+            } else {
+                removeBoidFromFLock();
+                Boid boid = addBoidToFlock(dimension2D);
+                boid.setCenterPosition(new Point2D(mouseEvent.getX(), mouseEvent.getY()));
+            }
         }
     }
 

@@ -126,25 +126,7 @@
                             </AnchorPane>
                         </content>
                     </Tab>
-                    <Tab text="General settings">
-                        <content>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                                <children>
-                                    <VBox maxWidth="300.0" prefHeight="744.0" prefWidth="536.0" spacing="4.0"
-                                          AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                        <padding>
-                                            <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
-                                        </padding>
-                                        <Label text="Choose theme"/>
-                                        <ComboBox fx:id="themeCombobox"
-                                                  onAction="#themeComboBoxAction" prefWidth="300.0"
-                                                  promptText="Themes"/>
-                                    </VBox>
-                                </children>
-                            </AnchorPane>
-                        </content>
-                    </Tab>
+                    <Tab fx:id="appearanceTab" text="Appearance"/>
                 </tabs>
             </TabPane>
             <SplitPane dividerPositions="0.6864784546805349" orientation="VERTICAL">
