@@ -12,7 +12,8 @@ public class Launcher extends Application {
 
     @Override
     public void start(Stage stage) {
-        new AppManager(stage).start();
+        AppManager appManager = new AppManager(stage);
+        appManager.start();
     }
 
 }

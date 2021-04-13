@@ -4,11 +4,12 @@ import hzt.controller.scenes.AboutController;
 import hzt.controller.scenes.MainSceneController;
 import hzt.controller.scenes.SceneController;
 import javafx.stage.Stage;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.Map;
 
 import static hzt.model.AppConstants.Scene;
 import static hzt.model.AppConstants.Scene.ABOUT_SCENE;
@@ -19,7 +20,7 @@ public class SceneManager {
     private static final Logger LOGGER = LogManager.getLogger(SceneManager.class);
 
     private final Stage stage;
-    private final EnumMap<Scene, SceneController> sceneControllerMap;
+    private final Map<Scene, SceneController> sceneControllerMap;
     private SceneController curSceneController;
 
     public SceneManager(Stage stage) {
@@ -42,8 +43,7 @@ public class SceneManager {
         curSceneController = sceneControllerMap.get(scene);
         stage.setScene(curSceneController.getScene());
         if (!curSceneController.isSetup()) {
-            String message = "setting up " + scene.getEnglishDescription() + "...";
-            LOGGER.info(message);
+            LOGGER.info(() -> "setting up " + scene.getEnglishDescription() + "...");
             curSceneController.setup();
         }
     }
@@ -56,7 +56,7 @@ public class SceneManager {
         return curSceneController;
     }
 
-    public EnumMap<Scene, SceneController> getSceneControllerMap() {
+    public Map<Scene, SceneController> getSceneControllerMap() {
         return sceneControllerMap;
     }
 }

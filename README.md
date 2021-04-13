@@ -69,5 +69,7 @@ The boids model has been used for other interesting applications. It has been ap
 ## Motivation
 I was curious about the workings of this kind of simulations. It was a lot of fun making it! Enjoy!
 ## Sources
-[Flocking sim](https://en.wikipedia.org/wiki/Boids)
+- [Flocking sim](https://en.wikipedia.org/wiki/Boids)
+- [Configuration of Log4j 2](https://logging.apache.org/log4j/log4j-2.7/manual/configuration.html)
+
 

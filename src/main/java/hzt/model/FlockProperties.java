@@ -91,16 +91,8 @@ public class FlockProperties {
         return showConnections;
     }
 
-    public double getMaxVelocity() {
-        return maxVelocity.get();
-    }
-
     public DoubleProperty maxVelocityProperty() {
         return maxVelocity;
-    }
-
-    public double getMaxAcceleration() {
-        return maxAcceleration.get();
     }
 
     public DoubleProperty maxAccelerationProperty() {

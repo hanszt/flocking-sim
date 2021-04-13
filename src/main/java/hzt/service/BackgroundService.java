@@ -1,17 +1,17 @@
 package hzt.service;
 
 import hzt.model.Resource;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.net.URL;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 public class BackgroundService implements IBackgroundService {
 
-    public static final Resource NO_PICTURE = new Resource("No picture", "");
+    public static final Resource NO_PICTURE = new Resource("No picture");
     private static final String RELATIVE_BG_IMAGES_RESOURCE_DIR = "/images/backgrounds";
 
     private static final Logger LOGGER = LogManager.getLogger(BackgroundService.class);
@@ -23,7 +23,7 @@ public class BackgroundService implements IBackgroundService {
     }
 
     private Set<Resource> scanForResourceImages() {
-        Set<Resource> set = new HashSet<>();
+        Set<Resource> set = new TreeSet<>();
         set.add(NO_PICTURE);
         URL url = getClass().getResource(RELATIVE_BG_IMAGES_RESOURCE_DIR);
         if (url != null) {
@@ -32,7 +32,7 @@ public class BackgroundService implements IBackgroundService {
                 String[] fileNames = styleDirectory.list();
                 for (String fileName : fileNames) {
                     String name = extractName(fileName);
-                    set.add(new Resource(name, fileName, RELATIVE_BG_IMAGES_RESOURCE_DIR + "/" + fileName));
+                    set.add(new Resource(name, RELATIVE_BG_IMAGES_RESOURCE_DIR + "/" + fileName));
                 }
             }
         } else LOGGER.error("Resource folder at " + RELATIVE_BG_IMAGES_RESOURCE_DIR + " not found...");

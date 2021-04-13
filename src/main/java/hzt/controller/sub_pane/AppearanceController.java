@@ -5,7 +5,6 @@ import hzt.controller.SceneManager;
 import hzt.controller.scenes.MainSceneController;
 import hzt.controller.scenes.SceneController;
 import hzt.model.Resource;
-import hzt.model.Theme;
 import hzt.service.BackgroundService;
 import hzt.service.IBackgroundService;
 import hzt.service.IThemeService;
@@ -38,7 +37,7 @@ public class AppearanceController extends FXMLController {
     @FXML
     private ComboBox<Resource> backgroundCombobox;
     @FXML
-    private ComboBox<Theme> themeCombobox;
+    private ComboBox<Resource> themeCombobox;
     @FXML
     private ToggleButton fullScreenButton;
     @FXML

@@ -1,7 +1,6 @@
 package hzt.controller.scenes;
 
 import hzt.controller.SceneManager;
-import hzt.controller.scenes.SceneController;
 import hzt.service.AboutService;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;

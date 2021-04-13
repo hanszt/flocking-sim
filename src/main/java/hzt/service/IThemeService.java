@@ -1,17 +1,17 @@
 package hzt.service;
 
-import hzt.model.Theme;
+import hzt.model.Resource;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.StringProperty;
 
 public interface IThemeService {
 
-    Theme DEFAULT_THEME = new Theme("Light", "");
-    Theme DARK_THEME = new Theme("Dark", "style-dark.css");
+    Resource DEFAULT_THEME = new Resource("Light");
+    Resource DARK_THEME = new Resource("Dark", "style-dark.css");
 
-    Iterable<Theme> getThemes();
+    Iterable<Resource> getThemes();
 
-    ObjectProperty<Theme> currentThemeProperty();
+    ObjectProperty<Resource> currentThemeProperty();
 
     StringProperty styleSheetProperty();
 

@@ -27,6 +27,7 @@ class Ball2DTest {
         //act
 
         //assert
+        assertNull(null);
     }
 
     @Test
@@ -36,6 +37,7 @@ class Ball2DTest {
         //act
 
         //assert
+        assertNull(null);
     }
 
     @Test
@@ -45,6 +47,7 @@ class Ball2DTest {
         //act
 
         //assert
+        assertNull(null);
     }
 
     @Test

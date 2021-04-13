@@ -1,21 +1,30 @@
 package hzt.model;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
-public class Resource {
+public class Resource implements Comparable<Resource> {
 
     private final String name;
-    private final String fileName;
     private final String pathToResource;
 
-    public Resource(String name, String fileName) {
-        this(name, fileName, "");
+    public Resource(String name) {
+        this(name, "");
     }
 
-    public Resource(String name, String fileName, String pathToResource) {
+    public Resource(String name, String pathToResource) {
         this.name = name;
-        this.fileName = fileName;
         this.pathToResource = pathToResource;
+    }
+
+    public String getPathToResource() {
+        return pathToResource;
+    }
+
+    @Override
+    public int compareTo(@NotNull Resource o) {
+        return name.compareTo(o.name);
     }
 
     @Override
@@ -31,20 +40,9 @@ public class Resource {
         return Objects.hash(name);
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getFileName() {
-        return fileName;
-    }
-
-    public String getPathToResource() {
-        return pathToResource;
-    }
-
     @Override
     public String toString() {
         return name;
     }
+
 }

@@ -4,8 +4,8 @@ import javafx.geometry.Dimension2D;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import lombok.Getter;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.Properties;
@@ -57,7 +57,7 @@ public final class AppConstants {
                 LOGGER.warn(String.format("Property '%s' with value '%s' could not be parsed to a double... " +
                         "Falling back to default: %f...", property, propertyVal, defaultVal));
             }
-        } else LOGGER.warn(String.format("Property '%s' not found. Falling back to default: %f",
+        } else LOGGER.warn(() -> String.format("Property '%s' not found. Falling back to default: %f",
                 property, defaultVal));
         return value;
     }
@@ -72,7 +72,7 @@ public final class AppConstants {
                 LOGGER.warn(String.format("Property '%s' with value '%s' could not be parsed to an int... " +
                         "Falling back to default: %d...", property, propertyVal, defaultVal));
             }
-        } else LOGGER.warn(String.format("Property '%s' not found. Falling back to default: %d",
+        } else LOGGER.warn(() -> String.format("Property '%s' not found. Falling back to default: %d",
                 property, defaultVal));
         return value;
     }
@@ -95,7 +95,7 @@ public final class AppConstants {
         try (InputStream stream = new BufferedInputStream(new FileInputStream(file))) {
             properties.load(stream);
         } catch (IOException e) {
-            LOGGER.warn(pathName + " not found...");
+            LOGGER.warn(() -> pathName + " not found...");
         }
         return properties;
     }
