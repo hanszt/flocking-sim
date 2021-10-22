@@ -10,12 +10,15 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
 public class ThemeService implements IThemeService {
 
-    private static final String RELATIVE_STYLE_SHEET_RESOURCE_DIR = "../../css";
+    private static final String RELATIVE_STYLE_SHEET_RESOURCE_DIR = "/css";
 
     private static final Logger LOGGER = LogManager.getLogger(ThemeService.class);
     public static final Resource DEFAULT_THEME = new Resource("Light",
@@ -32,22 +35,30 @@ public class ThemeService implements IThemeService {
     }
 
     private Set<Resource> scanForThemeStyleSheets() {
-        Set<Resource> themeSet = new TreeSet<>(Set.of(DEFAULT_THEME));
-        URL url = getClass().getResource(RELATIVE_STYLE_SHEET_RESOURCE_DIR);
-        if (url != null) {
-            File styleDirectory = new File(url.getFile());
-            if (styleDirectory.isDirectory()) {
-                String[] fileNames = styleDirectory.list();
-                for (String fileName : fileNames) {
-                    String themeName = extractThemeName(fileName);
-                    themeSet.add(new Resource(themeName, RELATIVE_STYLE_SHEET_RESOURCE_DIR + "/" + fileName));
-                }
-            }
-        } else LOGGER.error("Stylesheet resource folder not found...");
+        final var themeResources = Optional.ofNullable(getClass().getResource(RELATIVE_STYLE_SHEET_RESOURCE_DIR))
+                .map(URL::getFile)
+                .map(File::new)
+                .filter(File::isDirectory)
+                .map(File::list)
+                .stream()
+                .flatMap(Arrays::stream)
+                .map(ThemeService::toThemeResource)
+                .toList();
+
+        if (themeResources.isEmpty()) {
+            LOGGER.error("{} not found...", RELATIVE_STYLE_SHEET_RESOURCE_DIR);
+        }
+        Set<Resource> themeSet = new TreeSet<>(themeResources);
+        themeSet.add(DEFAULT_THEME);
         return themeSet;
     }
 
-    private String extractThemeName(String fileName) {
+    private static Resource toThemeResource(String fileName) {
+        String themeName = extractThemeName(fileName);
+        return new Resource(themeName, RELATIVE_STYLE_SHEET_RESOURCE_DIR + "/" + fileName);
+    }
+
+    private static String extractThemeName(String fileName) {
         String themeName = fileName
                 .replace("style-", "")
                 .replace('-', ' ')
@@ -62,7 +73,9 @@ public class ThemeService implements IThemeService {
                 LOGGER.debug(styleSheetUrl);
                 this.styleSheet.set(styleSheetUrl.toExternalForm());
                 LOGGER.debug(styleSheetUrl::toExternalForm);
-            }else LOGGER.error(() -> "stylesheet of " + theme.getPathToResource() + " could not be loaded...");
+            }else {
+                LOGGER.error(() -> "stylesheet of " + theme.getPathToResource() + " could not be loaded...");
+            }
 
     }
 
@@ -78,7 +91,7 @@ public class ThemeService implements IThemeService {
 
     @Override
     public Set<Resource> getThemes() {
-        return themes;
+        return Collections.unmodifiableSet(themes);
     }
 
 }

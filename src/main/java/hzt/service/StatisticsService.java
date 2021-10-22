@@ -34,7 +34,9 @@ public class StatisticsService {
             long oldFrameTime = frameTimes[frameTimeIndex];
             frameTimes[frameTimeIndex] = now;
             frameTimeIndex = (frameTimeIndex + 1) % frameTimes.length;
-            if (frameTimeIndex == 0) arrayFilled = true;
+            if (frameTimeIndex == 0) {
+                arrayFilled = true;
+            }
             if (arrayFilled) {
                 long elapsedNanos = now - oldFrameTime;
                 long elapsedNanosPerFrame = elapsedNanos / frameTimes.length;

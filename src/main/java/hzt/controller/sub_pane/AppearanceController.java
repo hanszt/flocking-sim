@@ -15,17 +15,24 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.ComboBoxBase;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.CornerRadii;
 import javafx.stage.Stage;
-import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Collection;
+import java.util.Optional;
 
 import static hzt.model.AppConstants.INIT_BG_COLOR;
 import static java.lang.Boolean.TRUE;
@@ -61,7 +68,7 @@ public class AppearanceController extends FXMLController {
                 .bindBidirectional(backgroundColorPicker.valueProperty());
     }
 
-    public void configureStageControlButtons() {
+    public final void configureStageControlButtons() {
         Stage stage = mainSceneController.getSceneManager().getStage();
         fullScreenButton.setOnAction(e -> stage.setFullScreen(!stage.isFullScreen()));
         stage.fullScreenProperty().addListener((o, c, n) -> fullScreenButton.setSelected(n));
@@ -69,7 +76,7 @@ public class AppearanceController extends FXMLController {
         bindStageOpacityToOpacityButton(stage);
     }
 
-    private void setFullScreenWhenF11Pressed(Stage stage, KeyEvent keyEvent) {
+    private static void setFullScreenWhenF11Pressed(Stage stage, KeyEvent keyEvent) {
         if (keyEvent.getCode() == KeyCode.F11) {
             stage.setFullScreen(!stage.isFullScreen());
         }
@@ -78,7 +85,6 @@ public class AppearanceController extends FXMLController {
     private void bindStageOpacityToOpacityButton(Stage stage) {
         opacityStageButton.selectedProperty().addListener((o, c, n) -> stage.setOpacity(TRUE.equals(n) ? .8 : 1));
     }
-
 
     private void configureComboBoxes() {
         themeService.getThemes().forEach(theme -> themeCombobox.getItems().add(theme));
@@ -97,30 +103,20 @@ public class AppearanceController extends FXMLController {
         for (SceneController sceneController : sceneControllers) {
             ObservableList<String> styleSheets = sceneController.getScene().getStylesheets();
             styleSheets.removeIf(filter -> !styleSheets.isEmpty());
-            if (newVal != null) styleSheets.add(newVal);
+            if (newVal != null) {
+                styleSheets.add(newVal);
+            }
         }
     }
 
     @FXML
     private void backgroundComboBoxAction() {
-        String path = backgroundCombobox.getValue().getPathToResource();
-        path = path != null ? path : "";
-        if (!path.isEmpty()) {
-            InputStream inputStream = backgroundService.getClass().getResourceAsStream(path);
-            Image image = new Image(inputStream);
-            AnchorPane animationPane = mainSceneController.getAnimationPane();
-            animationPane.setBackground(background(image, animationPane));
-        } else backgroundColorPickerAction();
-    }
-
-    @NotNull
-    private Background background(Image image, AnchorPane animationPane) {
-        return new Background(new BackgroundImage(image,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                new BackgroundSize(animationPane.getWidth(), animationPane.getHeight(),
-                        false, false, false, true)));
+        Optional.of(backgroundCombobox)
+                .map(ComboBoxBase::getValue)
+                .map(Resource::getPathToResource)
+                .map(path -> backgroundService.getClass().getResourceAsStream(path))
+                .map(Image::new)
+                .ifPresentOrElse(this::setBackgroundImage, this::backgroundColorPickerAction);
     }
 
     @FXML
@@ -131,7 +127,17 @@ public class AppearanceController extends FXMLController {
     }
 
     @Override
-    protected FXMLController getBean() {
+    protected FXMLController getController() {
         return this;
+    }
+
+    private void setBackgroundImage(Image image) {
+        AnchorPane animationPane = mainSceneController.getAnimationPane();
+        animationPane.setBackground(new Background(new BackgroundImage(image,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                new BackgroundSize(animationPane.getWidth(), animationPane.getHeight(),
+                        false, false, false, true))));
     }
 }

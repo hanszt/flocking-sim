@@ -1,4 +1,4 @@
-package hzt.model.entity;
+package hzt.model.entity.boid;
 
 import javafx.geometry.Point2D;
 import org.apache.commons.math3.util.Precision;
@@ -6,57 +6,16 @@ import org.junit.jupiter.api.Test;
 
 import static javafx.scene.paint.Color.BLACK;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 class Ball2DTest {
 
     @Test
-    void update() {
-        //arrange
-
-        //act
-
-        //assert
-        assertNull(null);
-    }
-
-    @Test
-    void addComponentToAcceleration() {
-        //arrange
-
-        //act
-
-        //assert
-        assertNull(null);
-    }
-
-    @Test
-    void setSpeedBasedOnMouseDrag() {
-        //arrange
-
-        //act
-
-        //assert
-        assertNull(null);
-    }
-
-    @Test
-    void bounceOfEdges() {
-        //arrange
-
-        //act
-
-        //assert
-        assertNull(null);
-    }
-
-    @Test
-    void limitSpeedWhenMaxSpeedExceeded() {
+    void testLimitSpeedWhenMaxSpeedExceeded() {
         //arrange
         final int nrOftestCases = 10000, maxValue = 100, decimalPlaces = 10;
         double[] expectedSpeeds = new double[nrOftestCases], actualSpeeds = new double[nrOftestCases];
         for (int caseNr = 0; caseNr < nrOftestCases; caseNr++) {
-            Boid ball2D = new Boid(getRandomNumber(0, maxValue), BLACK);
+            Boid ball2D = new CircleBoid(getRandomNumber(0, maxValue), BLACK);
             Point2D point2D = new Point2D(Math.random(), Math.random());
             double maxSpeed = getRandomNumber(0, maxValue);
             Point2D velocity = point2D.normalize().multiply(maxSpeed + getRandomNumber(0, maxValue));

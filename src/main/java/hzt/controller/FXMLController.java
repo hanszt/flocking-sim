@@ -8,19 +8,19 @@ import java.net.URL;
 
 public abstract class FXMLController {
 
-    private static final String FXML_FILE_LOCATION = "../../../fxml/";
+    private static final String FXML_FILE_LOCATION = "/fxml/";
 
     private final Parent root;
 
     protected FXMLController(String fxmlFileName) throws IOException {
         FXMLLoader loader = new FXMLLoader();
-        loader.setControllerFactory(c -> getBean());
+        loader.setControllerFactory(c -> getController());
         URL url = getClass().getResource(FXML_FILE_LOCATION + fxmlFileName);
         loader.setLocation(url);
         this.root = loader.load();
     }
 
-    protected abstract FXMLController getBean();
+    protected abstract FXMLController getController();
 
     public Parent getRoot() {
         return root;

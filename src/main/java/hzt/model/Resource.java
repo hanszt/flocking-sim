@@ -29,10 +29,7 @@ public class Resource implements Comparable<Resource> {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Resource resource = (Resource) o;
-        return Objects.equals(name, resource.name);
+        return this == o || (o instanceof Resource resource && Objects.equals(name, resource.name));
     }
 
     @Override

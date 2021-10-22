@@ -1,7 +1,7 @@
 package hzt.controller.sub_pane;
 
 import hzt.controller.FXMLController;
-import hzt.model.entity.Boid;
+import hzt.model.entity.boid.Boid;
 import hzt.service.StatisticsService;
 import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
@@ -54,7 +54,7 @@ public class StatisticsController extends FXMLController {
 
     private void showStatisticsAboutSelectedObject(Boid selected) {
         if (selected != null) {
-            Point2D centerPos = selected.getCenterPosition();
+            Point2D centerPos = selected.getTranslation();
             boidNameLabel.setText(format("%s", selected.getName()));
             positionXLabel.setText(format(TWO_DEC_DOUBLE + " p", centerPos.getX()));
             positionYLabel.setText(format(TWO_DEC_DOUBLE + " p", centerPos.getY()));
@@ -62,7 +62,7 @@ public class StatisticsController extends FXMLController {
             velocitySelectedBoidLabel.setText(format(TWO_DEC_DOUBLE + " p/s", selected.getVelocity().magnitude()));
             accelerationSelectedBoidLabel.setText(format(TWO_DEC_DOUBLE + " p/s^2", selected.getAcceleration().magnitude()));
             nrOfBoidsInPerceptionRadiusLabel.setText(format("%-3d", selected.getPerceptionRadiusMap().size()));
-            boidSizeLabel.setText(format(TWO_DEC_DOUBLE + " p", selected.getBody().getRadius() * 2));
+            boidSizeLabel.setText(format(TWO_DEC_DOUBLE + " p", selected.getDistanceFromCenterToOuterEdge() * 2));
         }
     }
 
@@ -73,7 +73,7 @@ public class StatisticsController extends FXMLController {
         runTimeLabel.setText(format("%-4.3f seconds", runTimeSim.toSeconds()));
     }
 
-    public StatisticsController getBean() {
+    public StatisticsController getController() {
         return this;
     }
 }

@@ -34,8 +34,7 @@ public class SceneManager {
             sceneControllerMap.put(MAIN_SCENE, new MainSceneController(this));
             sceneControllerMap.put(ABOUT_SCENE, new AboutController(this));
         } catch (IOException e) {
-            e.printStackTrace();
-            LOGGER.fatal("Something went wrong when loading fxml frontend...");
+            LOGGER.fatal("Something went wrong when loading fxml frontend...", e);
         }
     }
 

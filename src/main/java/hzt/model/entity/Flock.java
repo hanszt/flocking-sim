@@ -1,6 +1,9 @@
 package hzt.model.entity;
 
 import hzt.model.FlockProperties;
+import hzt.model.entity.boid.Boid;
+import hzt.model.entity.boid.CircleBoid;
+import hzt.model.entity.boid.RectangleBoid;
 import hzt.model.utils.Engine;
 import javafx.collections.ObservableList;
 import javafx.geometry.Dimension2D;
@@ -15,15 +18,65 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 import static hzt.controller.scenes.MainSceneController.MAX_NUMBER_OF_BOIDS;
 import static hzt.model.AppConstants.*;
 import static hzt.model.utils.RandomGenerator.*;
-import static java.lang.Math.*;
 
 public class Flock extends Group implements Iterable<Boid> {
 
+    private final FlockType randomRectangleFlock = new FlockType() {
+        @Override
+        Boid createBoid(double maxBoidSize) {
+            return new RectangleBoid(getRandomDouble(MIN_SIZE, maxBoidSize),
+                    getRandomDouble(MIN_SIZE, maxBoidSize), getRandomColor());
+        }
+
+        @Override
+        void setCenterPosition(Boid boid, Dimension2D dimension) {
+            boid.setBodyTranslate(getRandomPositionOnParent(dimension.getWidth(), dimension.getHeight()));
+        }
+
+        @Override
+        public String toString() {
+            return "Random rectangle flock";
+        }
+    };
+
+
+    private final FlockType uniformCircleFlock = new FlockType() {
+        @Override
+        Boid createBoid(double maxBoidSize) {
+            return new CircleBoid(maxBoidSize, uniformBallColor);
+        }
+
+        @Override
+        void setCenterPosition(Boid boid, Dimension2D dimension) {
+            boid.setBodyTranslate(getRandomPositionOnParent(dimension.getWidth(), dimension.getHeight()));
+        }
+
+        @Override
+        public String toString() {
+            return "Uniform circle flock";
+        }
+    };
+
+    private final FlockType randomCircleFlock = new FlockType() {
+        @Override
+        Boid createBoid(double maxBoidSize) {
+            return new CircleBoid(getRandomDouble(MIN_SIZE, maxBoidSize), getRandomColor());
+        }
+
+        @Override
+        void setCenterPosition(Boid boid, Dimension2D dimension) {
+            boid.setBodyTranslate(getRandomPositionOnParent(dimension.getWidth(), dimension.getHeight()));
+        }
+
+        @Override
+        public String toString() {
+            return "Random circle flock";
+        }
+    };
     private final FlockProperties flockProperties = new FlockProperties();
     private final Scene mainScene;
 
@@ -33,14 +86,19 @@ public class Flock extends Group implements Iterable<Boid> {
     private FlockType flockType;
     private Engine.FlockingSim flockingSim;
 
+
+
     public Flock(Scene mainScene) {
         this.mainScene = mainScene;
     }
 
     public void controlFlockSize(int numberOfBalls, Dimension2D parentDimension) {
         while (this.getChildren().size() != numberOfBalls) {
-            if (this.getChildren().size() < numberOfBalls) addBoidToFlock(parentDimension);
-            else removeBoidFromFLock();
+            if (this.getChildren().size() < numberOfBalls) {
+                addBoidToFlock(parentDimension);
+            } else {
+                removeBoidFromFLock();
+            }
         }
     }
 
@@ -48,8 +106,8 @@ public class Flock extends Group implements Iterable<Boid> {
         Boid boid = flockType.createBoid(flockProperties.getMaxBoidSize());
         flockType.setCenterPosition(boid, parentDimension);
 
-        boid.setPerceptionRadius(boid.getBody().getRadius() * flockProperties.getPerceptionRadiusRatio());
-        boid.setRepelRadius(boid.getBody().getRadius() * flockProperties.getRepelRadiusRatio());
+        boid.setPerceptionRadius(boid.getDistanceFromCenterToOuterEdge() * flockProperties.getPerceptionRadiusRatio());
+        boid.setRepelRadius(boid.getDistanceFromCenterToOuterEdge() * flockProperties.getRepelRadiusRatio());
         boid.addMouseFunctionality();
         this.getChildren().add(boid);
         boid.setVisibilityBoidComponents(flockProperties);
@@ -63,7 +121,7 @@ public class Flock extends Group implements Iterable<Boid> {
         for (Node node : this.getChildren()) {
             Boid other = (Boid) node;
             other.getPerceptionRadiusMap().remove(boid);
-            other.getChildren().removeIf(n -> n instanceof Connection);
+            other.getChildren().removeIf(Connection.class::isInstance);
         }
         if (boid.equals(selectedBoid)) {
             selectedBoid = !list.isEmpty() ? getRandomSelectedBoid() : null;
@@ -77,11 +135,11 @@ public class Flock extends Group implements Iterable<Boid> {
             if (numberOfBoids < MAX_NUMBER_OF_BOIDS) {
                 numberOfBoidsSlider.setValue(numberOfBoids);
                 Boid boid = addBoidToFlock(dimension2D);
-                boid.setCenterPosition(new Point2D(mouseEvent.getX(), mouseEvent.getY()));
+                boid.setBodyTranslate(new Point2D(mouseEvent.getX(), mouseEvent.getY()));
             } else {
                 removeBoidFromFLock();
                 Boid boid = addBoidToFlock(dimension2D);
-                boid.setCenterPosition(new Point2D(mouseEvent.getX(), mouseEvent.getY()));
+                boid.setBodyTranslate(new Point2D(mouseEvent.getX(), mouseEvent.getY()));
             }
         }
     }
@@ -101,7 +159,7 @@ public class Flock extends Group implements Iterable<Boid> {
         return getChildren().stream()
                 .filter(Boid.class::isInstance)
                 .map(Boid.class::cast)
-                .collect(Collectors.toList()).iterator();
+                .iterator();
     }
 
     public void updateSelectedBoidComponentsVisibility(Boid selectedBoid) {
@@ -113,9 +171,9 @@ public class Flock extends Group implements Iterable<Boid> {
         boid.getPerceptionCircle().setVisible(flockProperties.isPerceptionCircleVisible());
         boid.getPath().setVisible(flockProperties.isAllPathsVisible());
     }
-
-
     public abstract static class FlockType {
+
+
 
         abstract Boid createBoid(double maxBallSize);
 
@@ -128,79 +186,44 @@ public class Flock extends Group implements Iterable<Boid> {
 
     }
 
-    private final FlockType random = new FlockType() {
+
+    public class CircleFlock extends FlockType {
         @Override
         Boid createBoid(double maxBoidSize) {
-            return new Boid(getRandomDouble(MIN_RADIUS, maxBoidSize), getRandomColor());
-        }
-
-        @Override
-        void setCenterPosition(Boid boid, Dimension2D dimension) {
-            boid.setCenterPosition(getRandomPositionOnParent(dimension.getWidth(), dimension.getHeight()));
-        }
-
-        @Override
-        public String toString() {
-            return "Random flock";
-        }
-    };
-
-
-    private final FlockType uniform = new FlockType() {
-        @Override
-        Boid createBoid(double maxBoidSize) {
-            return new Boid(maxBoidSize, uniformBallColor);
-        }
-
-        @Override
-        void setCenterPosition(Boid boid, Dimension2D dimension) {
-            boid.setCenterPosition(getRandomPositionOnParent(dimension.getWidth(), dimension.getHeight()));
-        }
-
-        @Override
-        public String toString() {
-            return "Uniform Flock";
-        }
-    };
-
-
-    private final FlockType uniformOrdered = new FlockType() {
-        @Override
-        Boid createBoid(double maxBoidSize) {
-            return new Boid(maxBoidSize, uniformBallColor);
+            return new CircleBoid(maxBoidSize, uniformBallColor);
         }
 
         @Override
         void setCenterPosition(Boid boid, Dimension2D dimension) {
             int index = Boid.getNext() % MAX_NUMBER_OF_BOIDS;
-            boid.setCenterPosition(getCirclePositionOnParent(dimension.getWidth(), dimension.getHeight(), index));
+            boid.setBodyTranslate(getCirclePositionOnParent(dimension.getWidth(), dimension.getHeight(), index));
         }
 
         private Point2D getCirclePositionOnParent(double width, double height, int index) {
             Point2D centerPosition = new Point2D(width / 2, height / 2);
             double positionMultiplier = (width + height) / 8;
             Point2D circularPosition = new Point2D(
-                    positionMultiplier * cos((2 * index * PI) / MAX_NUMBER_OF_BOIDS),
-                    positionMultiplier * sin((2 * index * PI) / MAX_NUMBER_OF_BOIDS));
+                    positionMultiplier * Math.cos((2 * index * Math.PI) / MAX_NUMBER_OF_BOIDS),
+                    positionMultiplier * Math.sin((2 * index * Math.PI) / MAX_NUMBER_OF_BOIDS));
             return circularPosition.add(centerPosition);
         }
 
         @Override
         public String toString() {
-            return "Uniform ordered Flock";
+            return "Uniform ordered circle flock";
         }
-    };
-
-    public FlockType getUniformOrdered() {
-        return uniformOrdered;
     }
 
-    public FlockType getUniform() {
-        return uniform;
+    public FlockType getUniformCircleFlock() {
+        return uniformCircleFlock;
     }
 
-    public FlockType getRandom() {
-        return random;
+    public FlockType getRandomCircleFlock() {
+        return randomCircleFlock;
+    }
+
+    public FlockType getRandomRectangleFlock() {
+        return randomRectangleFlock;
     }
 
     public FlockType getFlockType() {

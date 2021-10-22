@@ -7,7 +7,11 @@ import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import static javafx.scene.paint.Color.NAVY;
@@ -20,7 +24,7 @@ public final class AppConstants {
     public static final int INIT_FRAME_RATE = parsedIntAppProp("framerate", 30); // f/s
     public static final Duration INIT_FRAME_DURATION = Duration.seconds(1. / INIT_FRAME_RATE); // s/f
 
-    public static final int MIN_RADIUS = 3;
+    public static final int MIN_SIZE = 3;
 
     public static final Color INIT_UNIFORM_BALL_COLOR = Color.ORANGE;
     public static final Color INIT_SELECTED_BALL_COLOR = Color.RED;
@@ -57,8 +61,10 @@ public final class AppConstants {
                 LOGGER.warn(String.format("Property '%s' with value '%s' could not be parsed to a double... " +
                         "Falling back to default: %f...", property, propertyVal, defaultVal));
             }
-        } else LOGGER.warn(() -> String.format("Property '%s' not found. Falling back to default: %f",
-                property, defaultVal));
+        } else {
+            LOGGER.warn(() -> String.format("Property '%s' not found. Falling back to default: %f",
+                    property, defaultVal));
+        }
         return value;
     }
 
@@ -72,8 +78,10 @@ public final class AppConstants {
                 LOGGER.warn(String.format("Property '%s' with value '%s' could not be parsed to an int... " +
                         "Falling back to default: %d...", property, propertyVal, defaultVal));
             }
-        } else LOGGER.warn(() -> String.format("Property '%s' not found. Falling back to default: %d",
-                property, defaultVal));
+        } else {
+            LOGGER.warn(() -> String.format("Property '%s' not found. Falling back to default: %d",
+                    property, defaultVal));
+        }
         return value;
     }
 
@@ -95,7 +103,7 @@ public final class AppConstants {
         try (InputStream stream = new BufferedInputStream(new FileInputStream(file))) {
             properties.load(stream);
         } catch (IOException e) {
-            LOGGER.warn(() -> pathName + " not found...");
+            LOGGER.warn(() -> pathName + " not found...", e);
         }
         return properties;
     }

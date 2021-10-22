@@ -12,7 +12,7 @@ Before you run the program, make sure you modify the following in Intellij:
 - Type the following in the VM Options section: --module-path ${PATH_TO_FX} --add-modules javafx.controls,javafx.fxml
 - Click Apply and Run the application. It should work now.
     
-source: https://openjfx.io/openjfx-docs/#IDE-Intellij
+source: [JavaFX and IntelliJ IDEA](https://openjfx.io/openjfx-docs/#IDE-Intellij)
 
 ## Requirements
 

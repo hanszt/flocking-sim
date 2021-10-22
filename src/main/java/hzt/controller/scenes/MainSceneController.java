@@ -4,7 +4,7 @@ import hzt.controller.SceneManager;
 import hzt.controller.sub_pane.AppearanceController;
 import hzt.controller.sub_pane.StatisticsController;
 import hzt.model.FlockProperties;
-import hzt.model.entity.Boid;
+import hzt.model.entity.boid.Boid;
 import hzt.model.entity.Flock;
 import hzt.model.utils.Engine;
 import hzt.service.AnimationService;
@@ -13,14 +13,28 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
-import javafx.scene.*;
-import javafx.scene.control.*;
+import javafx.scene.Camera;
+import javafx.scene.Group;
+import javafx.scene.ParallelCamera;
+import javafx.scene.SceneAntialiasing;
+import javafx.scene.SubScene;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Slider;
+import javafx.scene.control.Tab;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.time.LocalTime;
@@ -30,6 +44,23 @@ import static hzt.model.AppConstants.Scene.MAIN_SCENE;
 import static java.util.function.Predicate.not;
 
 public class MainSceneController extends SceneController {
+
+    private static final Logger LOGGER = LogManager.getLogger(MainSceneController.class);
+
+    private static final int INIT_ACCELERATION_USER_SELECTED_BALL = 50;
+    private static final int INIT_ATTRACTION = 3;
+    private static final int INIT_REPEL_FACTOR = 10;
+    private static final int INIT_REPEL_DISTANCE_FACTOR = 3;
+    private static final int INIT_MAX_BALL_SIZE = 5;
+    private static final int INIT_PERCEPTION_RADIUS = 25;
+    private static final int INIT_MAX_SPEED = 150;
+    private static final double INIT_FRICTION = 1;
+    private static final int MAX_PATH_SIZE_ALL = 200;
+
+    private static final int MAX_VECTOR_LENGTH = 80;
+    private static final int INIT_NUMBER_OF_BOIDS = parsedIntAppProp("init_number_of_boids", 120);
+
+    public static final int MAX_NUMBER_OF_BOIDS = parsedIntAppProp("max_number_of_boids", 200);
 
     @FXML
     private Tab appearanceTab;
@@ -131,17 +162,16 @@ public class MainSceneController extends SceneController {
         configureFlock(flock);
         engine.pullFactorProperty().bind(attractionSlider.valueProperty());
         engine.repelFactorProperty().bind(repelFactorSlider.valueProperty());
-        animationService.addAnimationLoopToTimeline(this::animationLoop, true);
-        uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandom()));
+        animationService.addAnimationLoopToTimeline(this::animationLoop);
+        uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandomCircleFlock()));
     }
 
     private void setupAppearancePane() {
         try {
             AppearanceController appearanceController = new AppearanceController(this);
             this.appearanceTab.setContent(appearanceController.getRoot());
-
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Appearance pane was not correctly loaded...", e);
         }
     }
 
@@ -162,7 +192,7 @@ public class MainSceneController extends SceneController {
         animationPane.setOnMouseDragged(e -> flock.addBoidToFlockAtMouseTip(e, getAnimationWindowDimension(), numberOfBoidsSlider));
     }
 
-    private Camera getConfiguredCamera() {
+    private static Camera getConfiguredCamera() {
         Camera camera = new ParallelCamera();
         camera.setFarClip(1000);
         camera.setNearClip(.01);
@@ -174,20 +204,21 @@ public class MainSceneController extends SceneController {
         animationPane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
     }
 
-    private void bindFullScreenButtonToFullScreen(ToggleButton fullScreenButton, Stage stage) {
+    private static void bindFullScreenButtonToFullScreen(ToggleButton fullScreenButton, Stage stage) {
         stage.fullScreenProperty().addListener((observableValue, curVal, isFullScreen) -> fullScreenButton.setSelected(isFullScreen));
         stage.addEventFilter(KeyEvent.KEY_TYPED, key -> switchFullScreenIfF11Typed(stage, key));
     }
 
-    private void switchFullScreenIfF11Typed(Stage stage, KeyEvent key) {
+    private static void switchFullScreenIfF11Typed(Stage stage, KeyEvent key) {
         if (key.getCode() == KeyCode.F11) {
             stage.setFullScreen(!stage.isFullScreen());
         }
     }
 
     private void configureComboBoxes() {
-        flockSettingsComboBox.getItems().addAll(flock.getRandom(), flock.getUniform(), flock.getUniformOrdered());
-        flockSettingsComboBox.setValue(flock.getRandom());
+        flockSettingsComboBox.getItems().addAll(flock.getRandomCircleFlock(),
+                flock.getUniformCircleFlock(), flock.getRandomRectangleFlock(), flock.new CircleFlock());
+        flockSettingsComboBox.setValue(flock.getRandomCircleFlock());
 
         physicsEngineComboBox.getItems().addAll(engine.getType1(), engine.getType2(), engine.getType3());
         physicsEngineComboBox.setValue(engine.getType1());
@@ -200,11 +231,11 @@ public class MainSceneController extends SceneController {
     }
 
     public Dimension2D getAnimationWindowDimension() {
-        Dimension2D animationPaneDimension;
-        if (subScene2D.getWidth() == 0 && subScene2D.getHeight() == 0) {
-            animationPaneDimension = new Dimension2D(animationPane.getPrefWidth(), animationPane.getPrefHeight());
-        } else animationPaneDimension = new Dimension2D(subScene2D.getWidth(), subScene2D.getHeight());
-        return animationPaneDimension;
+        if (subScene2D.getWidth() < 1 && subScene2D.getHeight() < 1) {
+            return new Dimension2D(animationPane.getPrefWidth(), animationPane.getPrefHeight());
+        } else {
+            return new Dimension2D(subScene2D.getWidth(), subScene2D.getHeight());
+        }
     }
 
     private void configureFlock(Flock flock) {
@@ -225,11 +256,11 @@ public class MainSceneController extends SceneController {
     }
 
     private void perceptionRadiusSliderChanged(ObservableValue<? extends Number> o, Number c, Number n) {
-        flock.forEach(ball -> ball.setPerceptionRadius(ball.getBody().getRadius() * n.doubleValue()));
+        flock.forEach(boid -> boid.setPerceptionRadius(boid.getDistanceFromCenterToOuterEdge() * n.doubleValue()));
     }
 
     private void repelDistanceSliderChanged(ObservableValue<? extends Number> o, Number c, Number n) {
-        flock.forEach(ball -> ball.setRepelRadius(ball.getBody().getRadius() * n.doubleValue()));
+        flock.forEach(boid -> boid.setRepelRadius(boid.getDistanceFromCenterToOuterEdge() * n.doubleValue()));
     }
 
     private void bindFlockPropertiesToControlsProperties(Flock flock) {
@@ -264,21 +295,6 @@ public class MainSceneController extends SceneController {
         configureSliders();
         setToggleButtons();
     }
-
-    private static final int INIT_ACCELERATION_USER_SELECTED_BALL = 50;
-    private static final int INIT_ATTRACTION = 3;
-    private static final int INIT_REPEL_FACTOR = 10;
-    private static final int INIT_REPEL_DISTANCE_FACTOR = 3;
-    private static final int INIT_MAX_BALL_SIZE = 5;
-    private static final int INIT_PERCEPTION_RADIUS = 25;
-    private static final int INIT_MAX_SPEED = 150;
-    private static final double INIT_FRICTION = 1;
-    private static final int MAX_PATH_SIZE_ALL = 200;
-
-    private static final int MAX_VECTOR_LENGTH = 80;
-    private static final int INIT_NUMBER_OF_BOIDS = parsedIntAppProp("init_number_of_boids", 120);
-
-    public static final int MAX_NUMBER_OF_BOIDS = parsedIntAppProp("max_number_of_boids", 200);
 
     private void configureSliders() {
         maxBoidSizeSlider.setValue(INIT_MAX_BALL_SIZE);
@@ -332,8 +348,11 @@ public class MainSceneController extends SceneController {
 
     @FXML
     private void pauseSimButtonAction(ActionEvent actionEvent) {
-        if (((ToggleButton) actionEvent.getSource()).isSelected()) animationService.pauseTimeline();
-        else animationService.startTimeline();
+        if (((ToggleButton) actionEvent.getSource()).isSelected()) {
+            animationService.pauseTimeline();
+        } else {
+            animationService.startTimeline();
+        }
     }
 
     @FXML
@@ -354,7 +373,9 @@ public class MainSceneController extends SceneController {
     private void showPathSelectedBallButtonAction(ActionEvent event) {
         boolean showPath = ((ToggleButton) event.getSource()).isSelected();
         Boid ball = flock.getSelectedBoid();
-        if (ball != null) ball.getPath().setVisible(showPath);
+        if (ball != null) {
+            ball.getPath().setVisible(showPath);
+        }
     }
 
     @FXML
@@ -410,11 +431,11 @@ public class MainSceneController extends SceneController {
     private void flockTypeDropdownAction() {
         flock.controlFlockSize(0, getAnimationWindowDimension());
         configureFlock(flock);
-        uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandom()));
+        uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandomCircleFlock()));
     }
 
     @Override
-    protected SceneController getBean() {
+    protected SceneController getController() {
         return this;
     }
 

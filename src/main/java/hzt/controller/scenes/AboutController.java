@@ -42,7 +42,7 @@ public class AboutController extends SceneController {
         sceneManager.setupScene(MAIN_SCENE);
     }
 
-    protected SceneController getBean() {
+    protected SceneController getController() {
         return this;
     }
 }

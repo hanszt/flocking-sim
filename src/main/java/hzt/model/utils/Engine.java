@@ -1,11 +1,9 @@
 package hzt.model.utils;
 
-import hzt.model.entity.Boid;
+import hzt.model.entity.boid.Boid;
 import javafx.beans.property.FloatProperty;
 import javafx.beans.property.SimpleFloatProperty;
 import javafx.geometry.Point2D;
-
-import java.util.Set;
 
 public class Engine {
 
@@ -24,7 +22,7 @@ public class Engine {
      */
     public abstract static class FlockingSim {
 
-        public Point2D getTotalAcceleration(Boid self, Set<Boid> boidSet) {
+        public Point2D getTotalAcceleration(Boid self, Iterable<Boid> boidSet) {
             Point2D totalAcceleration = Point2D.ZERO;
             for (Boid other : boidSet) {
                 Point2D acceleration = getAccelerationBetweenTwoBalls(self, other);
@@ -42,7 +40,7 @@ public class Engine {
     private final FlockingSim type1 = new FlockingSim() {
 
         Point2D getAccelerationBetweenTwoBalls(Boid self, Boid other) {
-            Point2D vectorSelfToOther = other.getCenterPosition().subtract(self.getCenterPosition());
+            Point2D vectorSelfToOther = other.getTranslation().subtract(self.getTranslation());
             Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
             float distance = (float) vectorSelfToOther.magnitude();
             float part2Formula = (float) other.getMass() / (distance * distance);
@@ -50,8 +48,8 @@ public class Engine {
             float repelMagnitude = repelFactor.get() * part2Formula;
 
             float repelDistance = self.getRepelRadius() + other.getRepelRadius();
-            if (distance <= repelDistance) return unitVectorInAccDir.multiply(-repelMagnitude);
-            else return unitVectorInAccDir.multiply(attractionMagnitude);
+            return distance <= repelDistance ? unitVectorInAccDir.multiply(-repelMagnitude) :
+                    unitVectorInAccDir.multiply(attractionMagnitude);
         }
 
         @Override
@@ -63,7 +61,7 @@ public class Engine {
     private final FlockingSim type2 = new FlockingSim() {
 
         Point2D getAccelerationBetweenTwoBalls(Boid self, Boid other) {
-            Point2D vectorSelfToOther = other.getCenterPosition().subtract(self.getCenterPosition());
+            Point2D vectorSelfToOther = other.getTranslation().subtract(self.getTranslation());
             Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
             float distance = (float) vectorSelfToOther.magnitude();
             float part2Formula = (float) other.getMass() / (distance * distance);
@@ -72,8 +70,8 @@ public class Engine {
             float attractionMagnitude = pullFactor.get() * part2Formula;
             float repelMagnitude = -repelFactor.get() * part2Formula + curveFitConstant;
 
-            if (distance <= repelDistance) return unitVectorInAccDir.multiply(repelMagnitude);
-            else return unitVectorInAccDir.multiply(attractionMagnitude);
+            return distance <= repelDistance ? unitVectorInAccDir.multiply(repelMagnitude) :
+                    unitVectorInAccDir.multiply(attractionMagnitude);
         }
 
         @Override
@@ -85,14 +83,14 @@ public class Engine {
     private final FlockingSim type3 = new FlockingSim() {
 
         Point2D getAccelerationBetweenTwoBalls(Boid self, Boid other) {
-            final int multiplier = 10;
-            Point2D vectorSelfToOther = other.getCenterPosition().subtract(self.getCenterPosition());
+            final int MULTIPLIER = 10;
+            Point2D vectorSelfToOther = other.getTranslation().subtract(self.getTranslation());
             Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
             float distance = (float) vectorSelfToOther.magnitude();
             float repelDistance = self.getRepelRadius() + other.getRepelRadius();
 
-            if (distance <= repelDistance) return unitVectorInAccDir.multiply(-repelFactor.get() * multiplier);
-            else return unitVectorInAccDir.multiply(pullFactor.get() * multiplier);
+            return distance <= repelDistance ? unitVectorInAccDir.multiply(-repelFactor.get() * MULTIPLIER) :
+                    unitVectorInAccDir.multiply(pullFactor.get() * MULTIPLIER);
         }
 
         @Override
