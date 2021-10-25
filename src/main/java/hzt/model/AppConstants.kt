@@ -5,9 +5,8 @@ import javafx.scene.paint.Color
 import javafx.util.Duration
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.util.Supplier
-import java.lang.NumberFormatException
-import java.io.File
 import java.io.BufferedInputStream
+import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
@@ -15,29 +14,40 @@ import java.util.*
 object AppConstants {
     private val LOGGER = LogManager.getLogger(AppConstants::class.java)
     private val PROPS = configProperties()
+
     @JvmField
     val INIT_FRAME_RATE = parsedIntAppProp("framerate", 30) // f/s
+
     @JvmField
-    val INIT_FRAME_DURATION = Duration.seconds(1.0 / INIT_FRAME_RATE) // s/f
+    val INIT_FRAME_DURATION: Duration = Duration.seconds(1.0 / INIT_FRAME_RATE) // s/f
     const val MIN_SIZE = 3
+
     @JvmField
-    val INIT_UNIFORM_BALL_COLOR = Color.ORANGE
+    val INIT_UNIFORM_BALL_COLOR: Color = Color.ORANGE
+
     @JvmField
-    val INIT_SELECTED_BALL_COLOR = Color.RED
+    val INIT_SELECTED_BALL_COLOR: Color = Color.RED
+
     @JvmField
-    val INIT_BG_COLOR = Color.NAVY
+    val INIT_BG_COLOR: Color = Color.NAVY
+
     @JvmField
     var MIN_STAGE_DIMENSION: Dimension2D? = null
+
     @JvmField
     var INIT_SCENE_DIMENSION: Dimension2D? = null
+
     private const val ANSI_RESET = "\u001B[0m"
     private const val ANSI_BLUE = "\u001B[34m"
     const val TITLE = "Flocking Simulation"
     const val DOTTED_LINE = "----------------------------------------------------------------------------------------\n"
     const val CLOSING_MESSAGE = ANSI_BLUE + "See you next Time! :)" + ANSI_RESET
+
     @JvmField
     val STAGE_OPACITY = parsedDoubleAppProp("stage_opacity", .8)
-    fun parsedDoubleAppProp(property: String?, defaultVal: Double): Double {
+
+    @Suppress("SameParameterValue")
+    private fun parsedDoubleAppProp(property: String?, defaultVal: Double): Double {
         var value = defaultVal
         val propertyVal = PROPS.getProperty(property)
         if (propertyVal != null) {
@@ -92,9 +102,11 @@ object AppConstants {
         val defaultMinStageWidth = 750
         val defaultMinStageHeight = 500
         val minStageWidth =
-            if (INIT_SCENE_DIMENSION!!.width < defaultMinStageWidth) INIT_SCENE_DIMENSION!!.width else defaultMinStageWidth.toDouble()
+            if (INIT_SCENE_DIMENSION!!.width < defaultMinStageWidth) INIT_SCENE_DIMENSION!!.width
+            else defaultMinStageWidth.toDouble()
         val minStageHeight =
-            if (INIT_SCENE_DIMENSION!!.height < defaultMinStageHeight) INIT_SCENE_DIMENSION!!.height else defaultMinStageHeight.toDouble()
+            if (INIT_SCENE_DIMENSION!!.height < defaultMinStageHeight) INIT_SCENE_DIMENSION!!.height
+            else defaultMinStageHeight.toDouble()
         return Dimension2D(minStageWidth, minStageHeight)
     }
 
@@ -111,8 +123,8 @@ object AppConstants {
     }
 
     enum class Scene(val fxmlFileName: String, val englishDescription: String) {
-        MAIN_SCENE("mainScene.fxml", "Main Scene"), ABOUT_SCENE("aboutScene.fxml", "About Scene");
-
+        MAIN_SCENE("mainScene.fxml", "Main Scene"),
+        ABOUT_SCENE("aboutScene.fxml", "About Scene");
     }
 
     init {
