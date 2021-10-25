@@ -1,149 +1,144 @@
-package hzt.model;
+package hzt.model
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.BooleanProperty
+import javafx.beans.property.SimpleBooleanProperty
+import javafx.beans.property.DoubleProperty
+import javafx.beans.property.SimpleDoubleProperty
 
-public class FlockProperties {
-
-    private final BooleanProperty velocityVectorVisible = new SimpleBooleanProperty();
-    private final BooleanProperty accelerationVectorVisible = new SimpleBooleanProperty();
-    private final BooleanProperty repelCircleVisible = new SimpleBooleanProperty();
-    private final BooleanProperty perceptionCircleVisible = new SimpleBooleanProperty();
-    private final BooleanProperty allPathsVisible = new SimpleBooleanProperty();
-    private final BooleanProperty selectedPathVisible = new SimpleBooleanProperty();
-    private final BooleanProperty selectedPerceptionCircleVisible = new SimpleBooleanProperty();
-    private final BooleanProperty showConnections = new SimpleBooleanProperty();
-
-    private final DoubleProperty maxVelocity = new SimpleDoubleProperty();
-    private final DoubleProperty maxAcceleration  = new SimpleDoubleProperty();
-
-    private final DoubleProperty maxBoidSize = new SimpleDoubleProperty();
-    private final DoubleProperty perceptionRadiusRatio = new SimpleDoubleProperty();
-    private final DoubleProperty repelRadiusRatio = new SimpleDoubleProperty();
-
-    private final DoubleProperty velocityVectorLength = new SimpleDoubleProperty();
-    private final DoubleProperty accelerationVectorLength = new SimpleDoubleProperty();
-    private final DoubleProperty tailLength = new SimpleDoubleProperty();
-
-    public boolean isVelocityVectorVisible() {
-        return velocityVectorVisible.get();
+class FlockProperties {
+    private val velocityVectorVisible: BooleanProperty = SimpleBooleanProperty()
+    private val accelerationVectorVisible: BooleanProperty = SimpleBooleanProperty()
+    private val repelCircleVisible: BooleanProperty = SimpleBooleanProperty()
+    private val perceptionCircleVisible: BooleanProperty = SimpleBooleanProperty()
+    private val allPathsVisible: BooleanProperty = SimpleBooleanProperty()
+    private val selectedPathVisible: BooleanProperty = SimpleBooleanProperty()
+    private val selectedPerceptionCircleVisible: BooleanProperty = SimpleBooleanProperty()
+    private val showConnections: BooleanProperty = SimpleBooleanProperty()
+    private val maxVelocity: DoubleProperty = SimpleDoubleProperty()
+    private val maxAcceleration: DoubleProperty = SimpleDoubleProperty()
+    private val maxBoidSize: DoubleProperty = SimpleDoubleProperty()
+    private val perceptionRadiusRatio: DoubleProperty = SimpleDoubleProperty()
+    private val repelRadiusRatio: DoubleProperty = SimpleDoubleProperty()
+    private val velocityVectorLength: DoubleProperty = SimpleDoubleProperty()
+    private val accelerationVectorLength: DoubleProperty = SimpleDoubleProperty()
+    private val tailLength: DoubleProperty = SimpleDoubleProperty()
+    fun isVelocityVectorVisible(): Boolean {
+        return velocityVectorVisible.get()
     }
 
-    public BooleanProperty velocityVectorVisibleProperty() {
-        return velocityVectorVisible;
+    fun velocityVectorVisibleProperty(): BooleanProperty {
+        return velocityVectorVisible
     }
 
-    public boolean isAccelerationVectorVisible() {
-        return accelerationVectorVisible.get();
+    fun isAccelerationVectorVisible(): Boolean {
+        return accelerationVectorVisible.get()
     }
 
-    public BooleanProperty accelerationVectorVisibleProperty() {
-        return accelerationVectorVisible;
+    fun accelerationVectorVisibleProperty(): BooleanProperty {
+        return accelerationVectorVisible
     }
 
-    public boolean isRepelCircleVisible() {
-        return repelCircleVisible.get();
+    fun isRepelCircleVisible(): Boolean {
+        return repelCircleVisible.get()
     }
 
-    public BooleanProperty repelCircleVisibleProperty() {
-        return repelCircleVisible;
+    fun repelCircleVisibleProperty(): BooleanProperty {
+        return repelCircleVisible
     }
 
-    public boolean isPerceptionCircleVisible() {
-        return perceptionCircleVisible.get();
+    fun isPerceptionCircleVisible(): Boolean {
+        return perceptionCircleVisible.get()
     }
 
-    public BooleanProperty perceptionCircleVisibleProperty() {
-        return perceptionCircleVisible;
+    fun perceptionCircleVisibleProperty(): BooleanProperty {
+        return perceptionCircleVisible
     }
 
-    public boolean isAllPathsVisible() {
-        return allPathsVisible.get();
+    fun isAllPathsVisible(): Boolean {
+        return allPathsVisible.get()
     }
 
-    public BooleanProperty allPathsVisibleProperty() {
-        return allPathsVisible;
+    fun allPathsVisibleProperty(): BooleanProperty {
+        return allPathsVisible
     }
 
-    public boolean isSelectedPathVisible() {
-        return selectedPathVisible.get();
+    fun isSelectedPathVisible(): Boolean {
+        return selectedPathVisible.get()
     }
 
-    public BooleanProperty selectedPathVisibleProperty() {
-        return selectedPathVisible;
+    fun selectedPathVisibleProperty(): BooleanProperty {
+        return selectedPathVisible
     }
 
-    public boolean isSelectedPerceptionCircleVisible() {
-        return selectedPerceptionCircleVisible.get();
+    fun isSelectedPerceptionCircleVisible(): Boolean {
+        return selectedPerceptionCircleVisible.get()
     }
 
-    public BooleanProperty selectedPerceptionCircleVisibleProperty() {
-        return selectedPerceptionCircleVisible;
+    fun selectedPerceptionCircleVisibleProperty(): BooleanProperty {
+        return selectedPerceptionCircleVisible
     }
 
-    public boolean isShowConnections() {
-        return showConnections.get();
+    fun isShowConnections(): Boolean {
+        return showConnections.get()
     }
 
-    public BooleanProperty showConnectionsProperty() {
-        return showConnections;
+    fun showConnectionsProperty(): BooleanProperty {
+        return showConnections
     }
 
-    public DoubleProperty maxVelocityProperty() {
-        return maxVelocity;
+    fun maxVelocityProperty(): DoubleProperty {
+        return maxVelocity
     }
 
-    public DoubleProperty maxAccelerationProperty() {
-        return maxAcceleration;
+    fun maxAccelerationProperty(): DoubleProperty {
+        return maxAcceleration
     }
 
-    public double getMaxBoidSize() {
-        return maxBoidSize.get();
+    fun getMaxBoidSize(): Double {
+        return maxBoidSize.get()
     }
 
-    public DoubleProperty maxBoidSizeProperty() {
-        return maxBoidSize;
+    fun maxBoidSizeProperty(): DoubleProperty {
+        return maxBoidSize
     }
 
-    public double getPerceptionRadiusRatio() {
-        return perceptionRadiusRatio.get();
+    fun getPerceptionRadiusRatio(): Double {
+        return perceptionRadiusRatio.get()
     }
 
-    public DoubleProperty perceptionRadiusRatioProperty() {
-        return perceptionRadiusRatio;
+    fun perceptionRadiusRatioProperty(): DoubleProperty {
+        return perceptionRadiusRatio
     }
 
-    public double getRepelRadiusRatio() {
-        return repelRadiusRatio.get();
+    fun getRepelRadiusRatio(): Double {
+        return repelRadiusRatio.get()
     }
 
-    public DoubleProperty repelRadiusRatioProperty() {
-        return repelRadiusRatio;
+    fun repelRadiusRatioProperty(): DoubleProperty {
+        return repelRadiusRatio
     }
 
-    public double getVelocityVectorLength() {
-        return velocityVectorLength.get();
+    fun getVelocityVectorLength(): Double {
+        return velocityVectorLength.get()
     }
 
-    public DoubleProperty velocityVectorLengthProperty() {
-        return velocityVectorLength;
+    fun velocityVectorLengthProperty(): DoubleProperty {
+        return velocityVectorLength
     }
 
-    public double getAccelerationVectorLength() {
-        return accelerationVectorLength.get();
+    fun getAccelerationVectorLength(): Double {
+        return accelerationVectorLength.get()
     }
 
-    public DoubleProperty accelerationVectorLengthProperty() {
-        return accelerationVectorLength;
+    fun accelerationVectorLengthProperty(): DoubleProperty {
+        return accelerationVectorLength
     }
 
-    public double getTailLength() {
-        return tailLength.get();
+    fun getTailLength(): Double {
+        return tailLength.get()
     }
 
-    public DoubleProperty tailLengthProperty() {
-        return tailLength;
+    fun tailLengthProperty(): DoubleProperty {
+        return tailLength
     }
 }

@@ -1,101 +1,81 @@
-package hzt.model.controls;
+package hzt.model.controls
 
-import javafx.event.EventHandler;
-import javafx.geometry.Point2D;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.event.EventHandler
+import javafx.geometry.Point2D
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
 
-public abstract class AbstractKeyFilter {
-
-    private static final Point2D X_POS_DIR = new Point2D(1, 0);
-    private static final Point2D Y_POS_DIR = new Point2D(0, 1);
-
-    private final KeyCode negXKeyCode;
-    private final KeyCode posXKeycode;
-    private final KeyCode negYKeyCode;
-    private final KeyCode posYKeyCode;
-
-    private boolean xNegPressed;
-    private boolean xPosPressed;
-    private boolean yNegPressed;
-    private boolean yPosPressed;
-
-    private double userInputSize = .1;
-
-    private final EventHandler<KeyEvent> keyPressed;
-    private final EventHandler<KeyEvent> keyReleased;
-
-
-    AbstractKeyFilter(
-            KeyCode negXKeyCode, KeyCode posXKeycode,
-            KeyCode negYKeyCode, KeyCode posYKeyCode) {
-        this.keyPressed = this::keyPressedAction;
-        this.keyReleased = this::keyReleasedAction;
-        this.negXKeyCode = negXKeyCode;
-        this.posXKeycode = posXKeycode;
-        this.negYKeyCode = negYKeyCode;
-        this.posYKeyCode = posYKeyCode;
+abstract class AbstractKeyFilter internal constructor(
+    negXKeyCode: KeyCode, posXKeycode: KeyCode,
+    negYKeyCode: KeyCode, posYKeyCode: KeyCode
+) {
+    private val negXKeyCode: KeyCode
+    private val posXKeycode: KeyCode
+    private val negYKeyCode: KeyCode
+    private val posYKeyCode: KeyCode
+    private var xNegPressed = false
+    private var xPosPressed = false
+    private var yNegPressed = false
+    private var yPosPressed = false
+    var userInputSize = .1
+    val keyPressed: EventHandler<KeyEvent>
+    val keyReleased: EventHandler<KeyEvent>
+    abstract fun pressedAction(point2D: Point2D?): Boolean
+    abstract fun releasedAction(point2D: Point2D?): Boolean
+    abstract fun allReleasedAction(allReleased: Boolean)
+    fun resetKeyPressed() {
+        yPosPressed = false
+        yNegPressed = yPosPressed
+        xPosPressed = yNegPressed
+        xNegPressed = xPosPressed
     }
 
-    private static boolean keyPressed(KeyEvent enteredKey, KeyCode comparedKey, boolean isPressed) {
-        return enteredKey.getCode() == comparedKey && !isPressed;
-    }
-
-    abstract boolean pressedAction(Point2D point2D);
-
-    abstract boolean releasedAction(Point2D point2D);
-
-    abstract void allReleasedAction(boolean allReleased);
-
-    public void resetKeyPressed() {
-        xNegPressed = xPosPressed = yNegPressed = yPosPressed = false;
-    }
-
-    public double getUserInputSize() {
-        return userInputSize;
-    }
-
-    public void setUserInputSize(double userInputSize) {
-        this.userInputSize = userInputSize;
-    }
-
-    public EventHandler<KeyEvent> getKeyPressed() {
-        return keyPressed;
-    }
-
-    public EventHandler<KeyEvent> getKeyReleased() {
-        return keyReleased;
-    }
-
-    private void keyReleasedAction(KeyEvent e) {
-        if (e.getCode() == posXKeycode) {
-            xPosPressed = releasedAction(X_POS_DIR.multiply(userInputSize));
+    private fun keyReleasedAction(e: KeyEvent) {
+        if (e.code == posXKeycode) {
+            xPosPressed = releasedAction(X_POS_DIR.multiply(userInputSize))
         }
-        if (e.getCode() == negXKeyCode) {
-            xNegPressed = releasedAction(X_POS_DIR.multiply(-userInputSize));
+        if (e.code == negXKeyCode) {
+            xNegPressed = releasedAction(X_POS_DIR.multiply(-userInputSize))
         }
-        if (e.getCode() == posYKeyCode) {
-            yPosPressed = releasedAction(Y_POS_DIR.multiply(userInputSize));
+        if (e.code == posYKeyCode) {
+            yPosPressed = releasedAction(Y_POS_DIR.multiply(userInputSize))
         }
-        if (e.getCode() == negYKeyCode) {
-            yNegPressed = releasedAction(Y_POS_DIR.multiply(-userInputSize));
+        if (e.code == negYKeyCode) {
+            yNegPressed = releasedAction(Y_POS_DIR.multiply(-userInputSize))
         }
-        boolean allReleased = !xNegPressed && !xPosPressed && !yNegPressed && !yPosPressed;
-        allReleasedAction(allReleased);
+        val allReleased = !xNegPressed && !xPosPressed && !yNegPressed && !yPosPressed
+        allReleasedAction(allReleased)
     }
 
-    private void keyPressedAction(KeyEvent e) {
+    private fun keyPressedAction(e: KeyEvent) {
         if (keyPressed(e, posXKeycode, xPosPressed)) {
-            xPosPressed = pressedAction(X_POS_DIR.multiply(userInputSize));
+            xPosPressed = pressedAction(X_POS_DIR.multiply(userInputSize))
         }
         if (keyPressed(e, negXKeyCode, xNegPressed)) {
-            xNegPressed = pressedAction(X_POS_DIR.multiply(-userInputSize));
+            xNegPressed = pressedAction(X_POS_DIR.multiply(-userInputSize))
         }
         if (keyPressed(e, posYKeyCode, yPosPressed)) {
-            yPosPressed = pressedAction(Y_POS_DIR.multiply(userInputSize));
+            yPosPressed = pressedAction(Y_POS_DIR.multiply(userInputSize))
         }
         if (keyPressed(e, negYKeyCode, yNegPressed)) {
-            yNegPressed = pressedAction(Y_POS_DIR.multiply(-userInputSize));
+            yNegPressed = pressedAction(Y_POS_DIR.multiply(-userInputSize))
         }
+    }
+
+    companion object {
+        private val X_POS_DIR = Point2D(1.0, 0.0)
+        private val Y_POS_DIR = Point2D(0.0, 1.0)
+        private fun keyPressed(enteredKey: KeyEvent, comparedKey: KeyCode, isPressed: Boolean): Boolean {
+            return enteredKey.code == comparedKey && !isPressed
+        }
+    }
+
+    init {
+        keyPressed = EventHandler { e: KeyEvent -> keyPressedAction(e) }
+        keyReleased = EventHandler { e: KeyEvent -> keyReleasedAction(e) }
+        this.negXKeyCode = negXKeyCode
+        this.posXKeycode = posXKeycode
+        this.negYKeyCode = negYKeyCode
+        this.posYKeyCode = posYKeyCode
     }
 }

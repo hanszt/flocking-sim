@@ -1,272 +1,189 @@
-package hzt.model.entity;
+package hzt.model.entity
 
-import hzt.model.FlockProperties;
-import hzt.model.entity.boid.Boid;
-import hzt.model.entity.boid.CircleBoid;
-import hzt.model.entity.boid.RectangleBoid;
-import hzt.model.utils.Engine;
-import javafx.collections.ObservableList;
-import javafx.geometry.Dimension2D;
-import javafx.geometry.Point2D;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.Slider;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import org.jetbrains.annotations.NotNull;
+import hzt.controller.scenes.MainSceneController
+import hzt.model.AppConstants
+import hzt.model.FlockProperties
+import hzt.model.entity.boid.Boid
+import hzt.model.entity.boid.CircleBoid
+import hzt.model.entity.boid.RectangleBoid
+import hzt.model.utils.Engine.FlockingSim
+import hzt.model.utils.RandomGenerator.getRandomDouble
+import hzt.model.utils.RandomGenerator.getRandomPositionOnParent
+import hzt.model.utils.RandomGenerator.randomColor
+import javafx.geometry.Dimension2D
+import javafx.geometry.Point2D
+import javafx.scene.Group
+import javafx.scene.Node
+import javafx.scene.Scene
+import javafx.scene.control.Slider
+import javafx.scene.input.MouseEvent
+import javafx.scene.paint.Color
+import java.util.*
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.sin
 
-import java.util.Iterator;
-import java.util.Random;
-
-import static hzt.controller.scenes.MainSceneController.MAX_NUMBER_OF_BOIDS;
-import static hzt.model.AppConstants.*;
-import static hzt.model.utils.RandomGenerator.*;
-
-public class Flock extends Group implements Iterable<Boid> {
-
-    private final FlockType randomRectangleFlock = new FlockType() {
-        @Override
-        Boid createBoid(double maxBoidSize) {
-            return new RectangleBoid(getRandomDouble(MIN_SIZE, maxBoidSize),
-                    getRandomDouble(MIN_SIZE, maxBoidSize), getRandomColor());
+class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
+    val randomRectangleFlock: FlockType = object : FlockType() {
+        override fun createBoid(maxBoidSize: Double): Boid {
+            return RectangleBoid(
+                getRandomDouble(AppConstants.MIN_SIZE.toDouble(), maxBoidSize),
+                getRandomDouble(AppConstants.MIN_SIZE.toDouble(), maxBoidSize), randomColor
+            )
         }
 
-        @Override
-        void setCenterPosition(Boid boid, Dimension2D dimension) {
-            boid.setBodyTranslate(getRandomPositionOnParent(dimension.getWidth(), dimension.getHeight()));
+        override fun setCenterPosition(boid: Boid, dimension: Dimension2D) {
+            boid.setBodyTranslate(getRandomPositionOnParent(dimension.width, dimension.height))
         }
 
-        @Override
-        public String toString() {
-            return "Random rectangle flock";
+        override fun toString(): String {
+            return "Random rectangle flock"
         }
-    };
-
-
-    private final FlockType uniformCircleFlock = new FlockType() {
-        @Override
-        Boid createBoid(double maxBoidSize) {
-            return new CircleBoid(maxBoidSize, uniformBallColor);
-        }
-
-        @Override
-        void setCenterPosition(Boid boid, Dimension2D dimension) {
-            boid.setBodyTranslate(getRandomPositionOnParent(dimension.getWidth(), dimension.getHeight()));
-        }
-
-        @Override
-        public String toString() {
-            return "Uniform circle flock";
-        }
-    };
-
-    private final FlockType randomCircleFlock = new FlockType() {
-        @Override
-        Boid createBoid(double maxBoidSize) {
-            return new CircleBoid(getRandomDouble(MIN_SIZE, maxBoidSize), getRandomColor());
-        }
-
-        @Override
-        void setCenterPosition(Boid boid, Dimension2D dimension) {
-            boid.setBodyTranslate(getRandomPositionOnParent(dimension.getWidth(), dimension.getHeight()));
-        }
-
-        @Override
-        public String toString() {
-            return "Random circle flock";
-        }
-    };
-    private final FlockProperties flockProperties = new FlockProperties();
-    private final Scene mainScene;
-
-    private Boid selectedBoid;
-    private Color uniformBallColor = INIT_UNIFORM_BALL_COLOR;
-    private Color selectedBallColor = INIT_SELECTED_BALL_COLOR;
-    private FlockType flockType;
-    private Engine.FlockingSim flockingSim;
-
-
-
-    public Flock(Scene mainScene) {
-        this.mainScene = mainScene;
     }
+    val uniformCircleFlock: FlockType = object : FlockType() {
+        override fun createBoid(maxBoidSize: Double): Boid {
+            return CircleBoid(maxBoidSize, uniformBallColor)
+        }
 
-    public void controlFlockSize(int numberOfBalls, Dimension2D parentDimension) {
-        while (this.getChildren().size() != numberOfBalls) {
-            if (this.getChildren().size() < numberOfBalls) {
-                addBoidToFlock(parentDimension);
+        override fun setCenterPosition(boid: Boid, dimension: Dimension2D) {
+            boid.setBodyTranslate(getRandomPositionOnParent(dimension.width, dimension.height))
+        }
+
+        override fun toString(): String {
+            return "Uniform circle flock"
+        }
+    }
+    val randomCircleFlock: FlockType = object : FlockType() {
+        override fun createBoid(maxBoidSize: Double): Boid {
+            return CircleBoid(getRandomDouble(AppConstants.MIN_SIZE.toDouble(), maxBoidSize), randomColor)
+        }
+
+        override fun setCenterPosition(boid: Boid, dimension: Dimension2D) {
+            boid.setBodyTranslate(getRandomPositionOnParent(dimension.width, dimension.height))
+        }
+
+        override fun toString(): String {
+            return "Random circle flock"
+        }
+    }
+    val flockProperties = FlockProperties()
+    var selectedBoid: Boid? = null
+    private var uniformBallColor = AppConstants.INIT_UNIFORM_BALL_COLOR
+    var selectedBallColor: Color = AppConstants.INIT_SELECTED_BALL_COLOR
+    var flockType: FlockType? = null
+    var flockingSim: FlockingSim? = null
+    fun controlFlockSize(numberOfBalls: Int, parentDimension: Dimension2D) {
+        while (children.size != numberOfBalls) {
+            if (children.size < numberOfBalls) {
+                addBoidToFlock(parentDimension)
             } else {
-                removeBoidFromFLock();
+                removeBoidFromFLock()
             }
         }
     }
 
-    private Boid addBoidToFlock(Dimension2D parentDimension) {
-        Boid boid = flockType.createBoid(flockProperties.getMaxBoidSize());
-        flockType.setCenterPosition(boid, parentDimension);
-
-        boid.setPerceptionRadius(boid.getDistanceFromCenterToOuterEdge() * flockProperties.getPerceptionRadiusRatio());
-        boid.setRepelRadius(boid.getDistanceFromCenterToOuterEdge() * flockProperties.getRepelRadiusRatio());
-        boid.addMouseFunctionality();
-        this.getChildren().add(boid);
-        boid.setVisibilityBoidComponents(flockProperties);
-        return boid;
+    private fun addBoidToFlock(parentDimension: Dimension2D): Boid {
+        val boid = flockType!!.createBoid(flockProperties.getMaxBoidSize())
+        flockType!!.setCenterPosition(boid, parentDimension)
+        boid.setPerceptionRadius(boid.distanceFromCenterToOuterEdge * flockProperties.getPerceptionRadiusRatio())
+        boid.setRepelRadius(boid.distanceFromCenterToOuterEdge * flockProperties.getRepelRadiusRatio())
+        boid.addMouseFunctionality()
+        children.add(boid)
+        boid.setVisibilityBoidComponents(flockProperties)
+        return boid
     }
 
-    private void removeBoidFromFLock() {
-        ObservableList<Node> list = this.getChildren();
-        Boid boid = (Boid) list.get(0);
-        this.getChildren().remove(boid);
-        for (Node node : this.getChildren()) {
-            Boid other = (Boid) node;
-            other.getPerceptionRadiusMap().remove(boid);
-            other.getChildren().removeIf(Connection.class::isInstance);
+    private fun removeBoidFromFLock() {
+        val list = children
+        val boid = list[0] as Boid
+        children.remove(boid)
+        for (node in children) {
+            val other = node as Boid
+            other.perceptionRadiusMap.remove(boid)
+            other.children.removeIf { obj: Node? -> Connection::class.java.isInstance(obj) }
         }
-        if (boid.equals(selectedBoid)) {
-            selectedBoid = !list.isEmpty() ? getRandomSelectedBoid() : null;
+        if (boid == selectedBoid) {
+            selectedBoid = if (!list.isEmpty()) randomSelectedBoid else null
         }
     }
 
-    public void addBoidToFlockAtMouseTip(MouseEvent mouseEvent, Dimension2D dimension2D, Slider numberOfBoidsSlider) {
-        int numberOfBoids = getChildren().size();
-        boolean isMiddleOrSecondary = mouseEvent.isMiddleButtonDown() || mouseEvent.isSecondaryButtonDown();
+    fun addBoidToFlockAtMouseTip(mouseEvent: MouseEvent, dimension2D: Dimension2D, numberOfBoidsSlider: Slider) {
+        val numberOfBoids = children.size
+        val isMiddleOrSecondary = mouseEvent.isMiddleButtonDown || mouseEvent.isSecondaryButtonDown
         if (isMiddleOrSecondary) {
-            if (numberOfBoids < MAX_NUMBER_OF_BOIDS) {
-                numberOfBoidsSlider.setValue(numberOfBoids);
-                Boid boid = addBoidToFlock(dimension2D);
-                boid.setBodyTranslate(new Point2D(mouseEvent.getX(), mouseEvent.getY()));
+            if (numberOfBoids < MainSceneController.MAX_NUMBER_OF_BOIDS) {
+                numberOfBoidsSlider.value = numberOfBoids.toDouble()
+                val boid = addBoidToFlock(dimension2D)
+                boid.setBodyTranslate(Point2D(mouseEvent.x, mouseEvent.y))
             } else {
-                removeBoidFromFLock();
-                Boid boid = addBoidToFlock(dimension2D);
-                boid.setBodyTranslate(new Point2D(mouseEvent.getX(), mouseEvent.getY()));
+                removeBoidFromFLock()
+                val boid = addBoidToFlock(dimension2D)
+                boid.setBodyTranslate(Point2D(mouseEvent.x, mouseEvent.y))
             }
         }
     }
 
-    public Boid getRandomSelectedBoid() {
-        Boid boid = (Boid) this.getChildren().get(new Random().nextInt(getChildren().size()));
-        boid.updatePaint(selectedBallColor);
-        boid.addKeyControlForAcceleration();
-        boid.toFront();
-        updateSelectedBoidComponentsVisibility(boid);
-        return boid;
-    }
-
-    @NotNull
-    @Override
-    public Iterator<Boid> iterator() {
-        return getChildren().stream()
-                .filter(Boid.class::isInstance)
-                .map(Boid.class::cast)
-                .iterator();
-    }
-
-    public void updateSelectedBoidComponentsVisibility(Boid selectedBoid) {
-        selectedBoid.getPerceptionCircle().setVisible(flockProperties.isSelectedPerceptionCircleVisible());
-        selectedBoid.getPath().setVisible(flockProperties.isSelectedPathVisible());
-    }
-
-    public void updateBoidComponentsVisibility(Boid boid) {
-        boid.getPerceptionCircle().setVisible(flockProperties.isPerceptionCircleVisible());
-        boid.getPath().setVisible(flockProperties.isAllPathsVisible());
-    }
-    public abstract static class FlockType {
-
-
-
-        abstract Boid createBoid(double maxBallSize);
-
-        abstract void setCenterPosition(Boid boid, Dimension2D dimension);
-
-        @Override
-        public String toString() {
-            return "FlockType";
+    val randomSelectedBoid: Boid
+        get() {
+            val boid = children[Random().nextInt(children.size)] as Boid
+            boid.updatePaint(selectedBallColor)
+            boid.addKeyControlForAcceleration()
+            boid.toFront()
+            updateSelectedBoidComponentsVisibility(boid)
+            return boid
         }
 
+    override fun iterator(): MutableIterator<Boid> {
+        return children.stream()
+            .filter { obj: Node? -> Boid::class.java.isInstance(obj) }
+            .map { obj: Node? -> Boid::class.java.cast(obj) }
+            .iterator()
     }
 
+    fun updateSelectedBoidComponentsVisibility(selectedBoid: Boid) {
+        selectedBoid.perceptionCircle.isVisible = flockProperties.isSelectedPerceptionCircleVisible()
+        selectedBoid.path.isVisible = flockProperties.isSelectedPathVisible()
+    }
 
-    public class CircleFlock extends FlockType {
-        @Override
-        Boid createBoid(double maxBoidSize) {
-            return new CircleBoid(maxBoidSize, uniformBallColor);
-        }
+    fun updateBoidComponentsVisibility(boid: Boid) {
+        boid.perceptionCircle.isVisible = flockProperties.isPerceptionCircleVisible()
+        boid.path.isVisible = flockProperties.isAllPathsVisible()
+    }
 
-        @Override
-        void setCenterPosition(Boid boid, Dimension2D dimension) {
-            int index = Boid.getNext() % MAX_NUMBER_OF_BOIDS;
-            boid.setBodyTranslate(getCirclePositionOnParent(dimension.getWidth(), dimension.getHeight(), index));
-        }
-
-        private Point2D getCirclePositionOnParent(double width, double height, int index) {
-            Point2D centerPosition = new Point2D(width / 2, height / 2);
-            double positionMultiplier = (width + height) / 8;
-            Point2D circularPosition = new Point2D(
-                    positionMultiplier * Math.cos((2 * index * Math.PI) / MAX_NUMBER_OF_BOIDS),
-                    positionMultiplier * Math.sin((2 * index * Math.PI) / MAX_NUMBER_OF_BOIDS));
-            return circularPosition.add(centerPosition);
-        }
-
-        @Override
-        public String toString() {
-            return "Uniform ordered circle flock";
+    abstract class FlockType {
+        abstract fun createBoid(maxBoidSize: Double): Boid
+        abstract fun setCenterPosition(boid: Boid, dimension: Dimension2D)
+        override fun toString(): String {
+            return "FlockType"
         }
     }
 
-    public FlockType getUniformCircleFlock() {
-        return uniformCircleFlock;
+    inner class CircleFlock : FlockType() {
+        override fun createBoid(maxBoidSize: Double): Boid {
+            return CircleBoid(maxBoidSize, uniformBallColor)
+        }
+
+        override fun setCenterPosition(boid: Boid, dimension: Dimension2D) {
+            val index: Int = Boid.next % MainSceneController.MAX_NUMBER_OF_BOIDS
+            boid.setBodyTranslate(getCirclePositionOnParent(dimension.width, dimension.height, index))
+        }
+
+        private fun getCirclePositionOnParent(width: Double, height: Double, index: Int): Point2D {
+            val centerPosition = Point2D(width / 2, height / 2)
+            val positionMultiplier = (width + height) / 8
+            val circularPosition = Point2D(
+                positionMultiplier * cos(2 * index * PI / MainSceneController.MAX_NUMBER_OF_BOIDS),
+                positionMultiplier * sin(2 * index * PI / MainSceneController.MAX_NUMBER_OF_BOIDS)
+            )
+            return circularPosition.add(centerPosition)
+        }
+
+        override fun toString(): String {
+            return "Uniform ordered circle flock"
+        }
     }
 
-    public FlockType getRandomCircleFlock() {
-        return randomCircleFlock;
-    }
-
-    public FlockType getRandomRectangleFlock() {
-        return randomRectangleFlock;
-    }
-
-    public FlockType getFlockType() {
-        return flockType;
-    }
-
-    public FlockProperties getFlockProperties() {
-        return flockProperties;
-    }
-
-    public Engine.FlockingSim getFlockingSim() {
-        return flockingSim;
-    }
-
-    public Scene getMainScene() {
-        return mainScene;
-    }
-
-    public Boid getSelectedBoid() {
-        return selectedBoid;
-    }
-
-    public void setSelectedBoid(Boid selectedBoid) {
-        this.selectedBoid = selectedBoid;
-    }
-
-    public void setUniformBallColor(Color uniformBallColor) {
-        this.uniformBallColor = uniformBallColor;
-    }
-
-    public Color getSelectedBallColor() {
-        return selectedBallColor;
-    }
-
-    public void setSelectedBallColor(Color selectedBallColor) {
-        this.selectedBallColor = selectedBallColor;
-    }
-
-    public void setFlockType(FlockType flockType) {
-        this.flockType = flockType;
-    }
-
-    public void setFlockingSim(Engine.FlockingSim flockingSim) {
-        this.flockingSim = flockingSim;
+    fun setUniformBallColor(uniformBallColor: Color) {
+        this.uniformBallColor = uniformBallColor
     }
 }

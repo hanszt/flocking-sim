@@ -1,55 +1,48 @@
-package hzt.model.entity;
+package hzt.model.entity
 
-import javafx.collections.ObservableList;
-import javafx.geometry.Point2D;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Line;
+import javafx.collections.ObservableList
+import javafx.geometry.Point2D
+import javafx.scene.Group
+import javafx.scene.Node
+import javafx.scene.paint.Paint
+import javafx.scene.shape.Line
+import java.util.function.Consumer
 
-public class Path extends Group {
-
-    private double lineWidth;
-    private Paint paint;
-
-    public Path() {
-        super();
-    }
-
-    public void addLine(Point2D currentPosition, Point2D prevPosition) {
-        if (!currentPosition.equals(Point2D.ZERO) && !prevPosition.equals(Point2D.ZERO)) {
-            Line line = new Line(prevPosition.getX(), prevPosition.getY(), currentPosition.getX(), currentPosition.getY());
-            line.setStroke(paint);
-            line.setStrokeWidth(lineWidth);
-            getChildren().add(line);
+class Path : Group() {
+    private var lineWidth = 0.0
+    private var paint: Paint? = null
+    fun addLine(currentPosition: Point2D, prevPosition: Point2D) {
+        if (currentPosition != Point2D.ZERO && prevPosition != Point2D.ZERO) {
+            val line = Line(prevPosition.x, prevPosition.y, currentPosition.x, currentPosition.y)
+            line.stroke = paint
+            line.strokeWidth = lineWidth
+            children.add(line)
         }
     }
 
-    public void setLineWidth(double lineWidth) {
-        this.lineWidth = lineWidth;
+    fun setLineWidth(lineWidth: Double) {
+        this.lineWidth = lineWidth
     }
 
-   public void fadeOut() {
-        ObservableList<Node> children = getChildren();
-        int size = children.size();
-        for (int i = 0; i < size; i++) {
-            Node node = children.get(i);
-            Line line = (Line) node;
-            line.setOpacity((float) i / size);
+    fun fadeOut() {
+        val children = children
+        val size = children.size
+        for (i in 0 until size) {
+            val node = children[i]
+            val line = node as Line
+            line.opacity = (i.toFloat() / size).toDouble()
         }
     }
 
-    public void removeLine(int index) {
-        getChildren().remove(index);
+    fun removeLine(index: Int) {
+        children.removeAt(index)
     }
 
-    public ObservableList<Node> getElements() {
-        return getChildren();
-    }
+    val elements: ObservableList<Node>
+        get() = children
 
-    public void setStroke(Paint paint) {
-        this.paint = paint;
-        getChildren().forEach(l -> ((Line) l).setStroke(paint));
+    fun setStroke(paint: Paint?) {
+        this.paint = paint
+        children.forEach(Consumer { l: Node -> (l as Line).stroke = paint })
     }
-
 }

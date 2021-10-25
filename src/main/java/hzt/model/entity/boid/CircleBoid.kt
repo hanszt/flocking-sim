@@ -1,26 +1,17 @@
-package hzt.model.entity.boid;
+package hzt.model.entity.boid
 
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
+import javafx.scene.paint.Paint
+import javafx.scene.shape.Circle
+import kotlin.math.pow
 
-public class CircleBoid extends Boid {
-
-    public CircleBoid(double radius, Paint paint) {
-        super("Circle Boid ", new Circle(radius), paint);
-    }
-
-    @Override
-    public double getDistanceFromCenterToOuterEdge() {
-        return ((Circle) getBody()).getRadius();
-    }
-
-    @Override
-    public double getMass() {
-        return getMassByDensityAndRadius();
-    }
-
-    private double getMassByDensityAndRadius() {
-        double volume = 4 * Math.PI * Math.pow(getDistanceFromCenterToOuterEdge(), 3) / 3;
-        return getDensityMaterial() * volume;
-    }
+class CircleBoid(radius: Double, paint: Paint) : Boid("Circle Boid ", Circle(radius), paint) {
+    override val distanceFromCenterToOuterEdge: Double
+        get() = (body as Circle).radius
+    override val mass: Double
+        get() = massByDensityAndRadius
+    private val massByDensityAndRadius: Double
+        get() {
+            val volume = 4 * Math.PI * distanceFromCenterToOuterEdge.pow(3.0) / 3
+            return getDensityMaterial() * volume
+        }
 }

@@ -1,40 +1,32 @@
-package hzt.model.controls;
+package hzt.model.controls
 
-import javafx.geometry.Point2D;
-import javafx.scene.input.KeyCode;
+import kotlin.jvm.JvmOverloads
+import javafx.scene.input.KeyCode
+import hzt.model.controls.AbstractKeyFilter
+import javafx.geometry.Point2D
 
-import static javafx.scene.input.KeyCode.*;
+class TranslationKeyFilter @JvmOverloads constructor(
+    left: KeyCode? = KeyCode.A, right: KeyCode? = KeyCode.D,
+    up: KeyCode? = KeyCode.W, down: KeyCode? = KeyCode.S
+) : AbstractKeyFilter(
+    left!!, right!!, up!!, down!!
+) {
+    var userInputAcceleration = Point2D.ZERO
+        private set
 
-public class TranslationKeyFilter extends AbstractKeyFilter {
-
-    private Point2D userInputAcceleration = Point2D.ZERO;
-
-    public TranslationKeyFilter() {
-        this(A, D, W, S);
+    override fun pressedAction(point2D: Point2D?): Boolean {
+        userInputAcceleration = userInputAcceleration.add(point2D)
+        return true
     }
 
-    public TranslationKeyFilter(KeyCode left, KeyCode right,
-                                KeyCode up, KeyCode down) {
-        super(left, right, up, down);
-    }
-    boolean pressedAction(Point2D point2D) {
-        userInputAcceleration = userInputAcceleration.add(point2D);
-        return true;
+    override fun releasedAction(point2D: Point2D?): Boolean {
+        userInputAcceleration = userInputAcceleration.subtract(point2D)
+        return false
     }
 
-    boolean releasedAction(Point2D point2D) {
-        userInputAcceleration = userInputAcceleration.subtract(point2D);
-        return false;
-    }
-
-    void allReleasedAction(boolean allReleased) {
+    override fun allReleasedAction(allReleased: Boolean) {
         if (allReleased) {
-            userInputAcceleration = Point2D.ZERO;
+            userInputAcceleration = Point2D.ZERO
         }
     }
-
-    public Point2D getUserInputAcceleration() {
-        return userInputAcceleration;
-    }
-
 }

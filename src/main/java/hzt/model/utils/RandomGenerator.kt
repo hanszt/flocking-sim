@@ -1,25 +1,22 @@
-package hzt.model.utils;
+package hzt.model.utils
 
-import javafx.geometry.Point2D;
-import javafx.scene.paint.Color;
+import javafx.geometry.Point2D
+import javafx.scene.paint.Color
 
-public class RandomGenerator {
-
-    private RandomGenerator() {
+object RandomGenerator {
+    @JvmStatic
+    fun getRandomDouble(min: Double, max: Double): Double {
+        return Math.random() * (max - min) + min
     }
 
-    public static double getRandomDouble(double min, double max) {
-        return Math.random() * (max - min) + min;
+    @JvmStatic
+    fun getRandomPositionOnParent(parentWidth: Double, parentHeight: Double): Point2D {
+        val xPos = getRandomDouble(0.0, parentWidth)
+        val yPos = getRandomDouble(0.0, parentHeight)
+        return Point2D(xPos, yPos)
     }
 
-    public static Point2D getRandomPositionOnParent(double parentWidth, double parentHeight) {
-        double xPos = getRandomDouble(0, parentWidth);
-        double yPos = getRandomDouble(0, parentHeight);
-        return new Point2D(xPos, yPos);
-    }
-
-    public static Color getRandomColor() {
-        return Color.color(Math.random(), Math.random(), Math.random());
-    }
-
+    @JvmStatic
+    val randomColor: Color
+        get() = Color.color(Math.random(), Math.random(), Math.random())
 }

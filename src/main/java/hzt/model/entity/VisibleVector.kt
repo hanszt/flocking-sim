@@ -1,6 +1,5 @@
-package hzt.model.entity;
+package hzt.model.entity
 
-import javafx.scene.shape.Line;
+import javafx.scene.shape.Line
 
-public class VisibleVector extends Line {
-}
+class VisibleVector : Line()

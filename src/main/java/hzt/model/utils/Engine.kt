@@ -1,16 +1,13 @@
-package hzt.model.utils;
+package hzt.model.utils
 
-import hzt.model.entity.boid.Boid;
-import javafx.beans.property.FloatProperty;
-import javafx.beans.property.SimpleFloatProperty;
-import javafx.geometry.Point2D;
+import javafx.beans.property.FloatProperty
+import javafx.beans.property.SimpleFloatProperty
+import hzt.model.entity.boid.Boid
+import javafx.geometry.Point2D
 
-public class Engine {
-
-    public static final double DENSITY = 100; // kg/m^3
-
-    private final FloatProperty pullFactor = new SimpleFloatProperty();
-    private final FloatProperty repelFactor = new SimpleFloatProperty();
+class Engine {
+    private val pullFactor: FloatProperty = SimpleFloatProperty()
+    private val repelFactor: FloatProperty = SimpleFloatProperty()
 
     /*
      * Fg = (G * m_self * m_other) / r^2
@@ -20,104 +17,84 @@ public class Engine {
      * <p>
      * a = (G * m_other) / r^2
      */
-    public abstract static class FlockingSim {
-
-        public Point2D getTotalAcceleration(Boid self, Iterable<Boid> boidSet) {
-            Point2D totalAcceleration = Point2D.ZERO;
-            for (Boid other : boidSet) {
-                Point2D acceleration = getAccelerationBetweenTwoBalls(self, other);
-                totalAcceleration = totalAcceleration.add(acceleration);
+    abstract class FlockingSim {
+        fun getTotalAcceleration(self: Boid, boidSet: Iterable<Boid>): Point2D {
+            var totalAcceleration = Point2D.ZERO
+            for (other in boidSet) {
+                val acceleration = getAccelerationBetweenTwoBalls(self, other)
+                totalAcceleration = totalAcceleration.add(acceleration)
             }
-            return totalAcceleration;
+            return totalAcceleration
         }
 
-        abstract Point2D getAccelerationBetweenTwoBalls(Boid self, Boid other);
-
-        @Override
-        public abstract String toString();
+        abstract fun getAccelerationBetweenTwoBalls(self: Boid, other: Boid): Point2D
+        abstract override fun toString(): String
     }
 
-    private final FlockingSim type1 = new FlockingSim() {
-
-        Point2D getAccelerationBetweenTwoBalls(Boid self, Boid other) {
-            Point2D vectorSelfToOther = other.getTranslation().subtract(self.getTranslation());
-            Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
-            float distance = (float) vectorSelfToOther.magnitude();
-            float part2Formula = (float) other.getMass() / (distance * distance);
-            float attractionMagnitude = pullFactor.get() * part2Formula;
-            float repelMagnitude = repelFactor.get() * part2Formula;
-
-            float repelDistance = self.getRepelRadius() + other.getRepelRadius();
-            return distance <= repelDistance ? unitVectorInAccDir.multiply(-repelMagnitude) :
-                    unitVectorInAccDir.multiply(attractionMagnitude);
+    val type1: FlockingSim = object : FlockingSim() {
+        override fun getAccelerationBetweenTwoBalls(self: Boid, other: Boid): Point2D {
+            val vectorSelfToOther = other.translation.subtract(self.translation)
+            val unitVectorInAccDir = vectorSelfToOther.normalize()
+            val distance = vectorSelfToOther.magnitude().toFloat()
+            val part2Formula = other.mass.toFloat() / (distance * distance)
+            val attractionMagnitude = pullFactor.get() * part2Formula
+            val repelMagnitude = repelFactor.get() * part2Formula
+            val repelDistance = self.repelRadius + other.repelRadius
+            return if (distance <= repelDistance) unitVectorInAccDir.multiply(-repelMagnitude.toDouble()) else unitVectorInAccDir.multiply(
+                attractionMagnitude.toDouble()
+            )
         }
 
-        @Override
-        public String toString() {
-            return "Engine type 1";
+        override fun toString(): String {
+            return "Engine type 1"
         }
-    };
-
-    private final FlockingSim type2 = new FlockingSim() {
-
-        Point2D getAccelerationBetweenTwoBalls(Boid self, Boid other) {
-            Point2D vectorSelfToOther = other.getTranslation().subtract(self.getTranslation());
-            Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
-            float distance = (float) vectorSelfToOther.magnitude();
-            float part2Formula = (float) other.getMass() / (distance * distance);
-            float repelDistance = self.getRepelRadius() + other.getRepelRadius();
-            float curveFitConstant = (float) (other.getMass() * (pullFactor.get() + repelFactor.get()) / (repelDistance * repelDistance));
-            float attractionMagnitude = pullFactor.get() * part2Formula;
-            float repelMagnitude = -repelFactor.get() * part2Formula + curveFitConstant;
-
-            return distance <= repelDistance ? unitVectorInAccDir.multiply(repelMagnitude) :
-                    unitVectorInAccDir.multiply(attractionMagnitude);
+    }
+    val type2: FlockingSim = object : FlockingSim() {
+        override fun getAccelerationBetweenTwoBalls(self: Boid, other: Boid): Point2D {
+            val vectorSelfToOther = other.translation.subtract(self.translation)
+            val unitVectorInAccDir = vectorSelfToOther.normalize()
+            val distance = vectorSelfToOther.magnitude().toFloat()
+            val part2Formula = other.mass.toFloat() / (distance * distance)
+            val repelDistance = self.repelRadius + other.repelRadius
+            val curveFitConstant =
+                (other.mass * (pullFactor.get() + repelFactor.get()) / (repelDistance * repelDistance)).toFloat()
+            val attractionMagnitude = pullFactor.get() * part2Formula
+            val repelMagnitude = -repelFactor.get() * part2Formula + curveFitConstant
+            return if (distance <= repelDistance) unitVectorInAccDir.multiply(repelMagnitude.toDouble()) else unitVectorInAccDir.multiply(
+                attractionMagnitude.toDouble()
+            )
         }
 
-        @Override
-        public String toString() {
-            return "Engine type 2";
+        override fun toString(): String {
+            return "Engine type 2"
         }
-    };
-
-    private final FlockingSim type3 = new FlockingSim() {
-
-        Point2D getAccelerationBetweenTwoBalls(Boid self, Boid other) {
-            final int MULTIPLIER = 10;
-            Point2D vectorSelfToOther = other.getTranslation().subtract(self.getTranslation());
-            Point2D unitVectorInAccDir = vectorSelfToOther.normalize();
-            float distance = (float) vectorSelfToOther.magnitude();
-            float repelDistance = self.getRepelRadius() + other.getRepelRadius();
-
-            return distance <= repelDistance ? unitVectorInAccDir.multiply(-repelFactor.get() * MULTIPLIER) :
-                    unitVectorInAccDir.multiply(pullFactor.get() * MULTIPLIER);
+    }
+    val type3: FlockingSim = object : FlockingSim() {
+        override fun getAccelerationBetweenTwoBalls(self: Boid, other: Boid): Point2D {
+            val multiplier = 10
+            val vectorSelfToOther = other.translation.subtract(self.translation)
+            val unitVectorInAccDir = vectorSelfToOther.normalize()
+            val distance = vectorSelfToOther.magnitude().toFloat()
+            val repelDistance = self.repelRadius + other.repelRadius
+            return if (distance <= repelDistance) unitVectorInAccDir.multiply((-repelFactor.get() * multiplier).toDouble()) else unitVectorInAccDir.multiply(
+                (pullFactor.get() * multiplier).toDouble()
+            )
         }
 
-        @Override
-        public String toString() {
-            return "Engine type 3";
+        override fun toString(): String {
+            return "Engine type 3"
         }
-    };
-
-    public FloatProperty pullFactorProperty() {
-        return pullFactor;
     }
 
-    public FloatProperty repelFactorProperty() {
-        return repelFactor;
+    fun pullFactorProperty(): FloatProperty {
+        return pullFactor
     }
 
-    public FlockingSim getType1() {
-        return type1;
+    fun repelFactorProperty(): FloatProperty {
+        return repelFactor
     }
 
-    public FlockingSim getType2() {
-        return type2;
+    companion object {
+        const val DENSITY = 100.0 // kg/m^3
     }
-
-    public FlockingSim getType3() {
-        return type3;
-    }
-
-
 }
