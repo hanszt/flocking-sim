@@ -6,6 +6,7 @@ import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
 
 class FlockProperties {
+
     private val velocityVectorVisible: BooleanProperty = SimpleBooleanProperty()
     private val accelerationVectorVisible: BooleanProperty = SimpleBooleanProperty()
     private val repelCircleVisible: BooleanProperty = SimpleBooleanProperty()
@@ -22,6 +23,7 @@ class FlockProperties {
     private val velocityVectorLength: DoubleProperty = SimpleDoubleProperty()
     private val accelerationVectorLength: DoubleProperty = SimpleDoubleProperty()
     private val tailLength: DoubleProperty = SimpleDoubleProperty()
+
     fun isVelocityVectorVisible(): Boolean {
         return velocityVectorVisible.get()
     }
