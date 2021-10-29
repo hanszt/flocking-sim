@@ -161,7 +161,7 @@ public class MainSceneController extends SceneController {
         engine.pullFactorProperty().bind(attractionSlider.valueProperty());
         engine.repelFactorProperty().bind(repelFactorSlider.valueProperty());
         animationService.addAnimationLoopToTimeline(this::animationLoop);
-        uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandomCircleFlock()));
+        uniformBallColorPicker.setDisable(flock.getFlockType() == flock.getRandomCircleFlock());
     }
 
     private void setupAppearancePane() {
@@ -341,7 +341,11 @@ public class MainSceneController extends SceneController {
     private void selectedBoidColorPickerAction(ActionEvent event) {
         Color color = ((ColorPicker) event.getSource()).getValue();
         flock.setSelectedBallColor(color);
-        flock.getSelectedBoid().updatePaint(color);
+
+        final var selectedBoid = flock.getSelectedBoid();
+        if (selectedBoid != null) {
+            selectedBoid.updatePaint(color);
+        }
     }
 
     @FXML
@@ -358,7 +362,10 @@ public class MainSceneController extends SceneController {
         configureControls();
         flock.controlFlockSize(numberOfBoidsSlider.valueProperty().intValue(), getAnimationWindowDimension());
         flock.forEach(boid -> boid.setVisibilityBoidComponents(flock.getFlockProperties()));
-        flock.updateSelectedBoidComponentsVisibility(flock.getSelectedBoid());
+        final var selectedBoid = flock.getSelectedBoid();
+        if (selectedBoid != null) {
+            flock.updateSelectedBoidComponentsVisibility(selectedBoid);
+        }
     }
 
     @FXML
@@ -398,7 +405,10 @@ public class MainSceneController extends SceneController {
     @FXML
     private void showPerceptionSelectedBallButtonAction(ActionEvent event) {
         boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        flock.getSelectedBoid().getPerceptionCircle().setVisible(visible);
+        final var selectedBoid = flock.getSelectedBoid();
+        if (selectedBoid != null) {
+            selectedBoid.getPerceptionCircle().setVisible(visible);
+        }
     }
 
     @FXML
@@ -429,7 +439,7 @@ public class MainSceneController extends SceneController {
     private void flockTypeDropdownAction() {
         flock.controlFlockSize(0, getAnimationWindowDimension());
         configureFlock(flock);
-        uniformBallColorPicker.setDisable(flock.getFlockType().equals(flock.getRandomCircleFlock()));
+        uniformBallColorPicker.setDisable(flock.getFlockType() == flock.getRandomCircleFlock());
     }
 
     @Override

@@ -12,6 +12,7 @@ import java.io.IOException
 import java.util.*
 
 object AppConstants {
+
     private val LOGGER = LogManager.getLogger(AppConstants::class.java)
     private val PROPS = configProperties()
 
@@ -32,10 +33,17 @@ object AppConstants {
     val INIT_BG_COLOR: Color = Color.NAVY
 
     @JvmField
-    var MIN_STAGE_DIMENSION: Dimension2D? = null
+    val MIN_STAGE_DIMENSION: Dimension2D = Dimension2D(
+        parsedIntAppProp("init_scene_width", 1200).toDouble(),
+        parsedIntAppProp("init_scene_height", 800).toDouble())
 
     @JvmField
-    var INIT_SCENE_DIMENSION: Dimension2D? = null
+    val INIT_SCENE_DIMENSION: Dimension2D = Dimension2D(
+        if (MIN_STAGE_DIMENSION.width < 750) MIN_STAGE_DIMENSION.width
+        else 750.toDouble(),
+        if (MIN_STAGE_DIMENSION.height < 500) MIN_STAGE_DIMENSION.height
+        else 500.toDouble()
+    )
 
     private const val ANSI_RESET = "\u001B[0m"
     private const val ANSI_BLUE = "\u001B[34m"
@@ -98,18 +106,6 @@ object AppConstants {
         return value
     }
 
-    private fun determineMinStageDimension(): Dimension2D {
-        val defaultMinStageWidth = 750
-        val defaultMinStageHeight = 500
-        val minStageWidth =
-            if (INIT_SCENE_DIMENSION!!.width < defaultMinStageWidth) INIT_SCENE_DIMENSION!!.width
-            else defaultMinStageWidth.toDouble()
-        val minStageHeight =
-            if (INIT_SCENE_DIMENSION!!.height < defaultMinStageHeight) INIT_SCENE_DIMENSION!!.height
-            else defaultMinStageHeight.toDouble()
-        return Dimension2D(minStageWidth, minStageHeight)
-    }
-
     private fun configProperties(): Properties {
         val properties = Properties()
         val pathName = "./src/main/resources/app.properties"
@@ -125,12 +121,5 @@ object AppConstants {
     enum class Scene(val fxmlFileName: String, val englishDescription: String) {
         MAIN_SCENE("mainScene.fxml", "Main Scene"),
         ABOUT_SCENE("aboutScene.fxml", "About Scene");
-    }
-
-    init {
-        val sceneWidthProp = parsedIntAppProp("init_scene_width", 1200)
-        val sceneHeightProp = parsedIntAppProp("init_scene_height", 800)
-        INIT_SCENE_DIMENSION = Dimension2D(sceneWidthProp.toDouble(), sceneHeightProp.toDouble())
-        MIN_STAGE_DIMENSION = determineMinStageDimension()
     }
 }
