@@ -60,8 +60,6 @@ public class MainSceneController extends SceneController {
     private static final int MAX_VECTOR_LENGTH = 80;
     private static final int INIT_NUMBER_OF_BOIDS = parsedIntAppProp("init_number_of_boids", 120);
 
-    public static final int MAX_NUMBER_OF_BOIDS = parsedIntAppProp("max_number_of_boids", 200);
-
     @FXML
     private Tab appearanceTab;
     @FXML
@@ -302,7 +300,7 @@ public class MainSceneController extends SceneController {
         boidVelocityVectorLengthSlider.setValue(MAX_VECTOR_LENGTH);
         boidAccelerationVectorLengthSlider.setValue(MAX_VECTOR_LENGTH);
         numberOfBoidsSlider.setValue(INIT_NUMBER_OF_BOIDS);
-        numberOfBoidsSlider.setMax(MAX_NUMBER_OF_BOIDS);
+        numberOfBoidsSlider.setMax(flock.getMaxNrOfBoids());
         accelerationSlider.setValue(INIT_ACCELERATION_USER_SELECTED_BALL);
         attractionSlider.setValue(INIT_ATTRACTION);
         repelDistanceSlider.setValue(INIT_REPEL_DISTANCE_FACTOR);

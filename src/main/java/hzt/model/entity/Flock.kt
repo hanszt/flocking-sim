@@ -1,7 +1,7 @@
 package hzt.model.entity
 
-import hzt.controller.scenes.MainSceneController
 import hzt.model.AppConstants
+import hzt.model.AppConstants.parsedIntAppProp
 import hzt.model.FlockProperties
 import hzt.model.entity.boid.Boid
 import hzt.model.entity.boid.CircleBoid
@@ -24,6 +24,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
+
     val randomRectangleFlock: FlockType = object : FlockType() {
         override fun createBoid(maxBoidSize: Double): Boid {
             return RectangleBoid(
@@ -40,6 +41,7 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
             return "Random rectangle flock"
         }
     }
+
     val uniformCircleFlock: FlockType = object : FlockType() {
         override fun createBoid(maxBoidSize: Double): Boid {
             return CircleBoid(maxBoidSize, uniformBallColor)
@@ -53,6 +55,7 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
             return "Uniform circle flock"
         }
     }
+
     val randomCircleFlock: FlockType = object : FlockType() {
         override fun createBoid(maxBoidSize: Double): Boid {
             return CircleBoid(getRandomDouble(AppConstants.MIN_SIZE.toDouble(), maxBoidSize), randomColor)
@@ -72,6 +75,7 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
     var selectedBallColor: Color = AppConstants.INIT_SELECTED_BALL_COLOR
     var flockType: FlockType? = null
     var flockingSim: FlockingSim? = null
+
     fun controlFlockSize(numberOfBalls: Int, parentDimension: Dimension2D) {
         while (children.size != numberOfBalls) {
             if (children.size < numberOfBalls) {
@@ -111,7 +115,7 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
         val numberOfBoids = children.size
         val isMiddleOrSecondary = mouseEvent.isMiddleButtonDown || mouseEvent.isSecondaryButtonDown
         if (isMiddleOrSecondary) {
-            if (numberOfBoids < MainSceneController.MAX_NUMBER_OF_BOIDS) {
+            if (numberOfBoids < maxNrOfBoids) {
                 numberOfBoidsSlider.value = numberOfBoids.toDouble()
                 val boid = addBoidToFlock(dimension2D)
                 boid.setBodyTranslate(Point2D(mouseEvent.x, mouseEvent.y))
@@ -121,6 +125,11 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
                 boid.setBodyTranslate(Point2D(mouseEvent.x, mouseEvent.y))
             }
         }
+    }
+
+    val maxNrOfBoids: Int
+    get() {
+        return parsedIntAppProp("max_number_of_boids", 200)
     }
 
     val randomSelectedBoid: Boid
@@ -164,7 +173,7 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
         }
 
         override fun setCenterPosition(boid: Boid, dimension: Dimension2D) {
-            val index: Int = Boid.next % MainSceneController.MAX_NUMBER_OF_BOIDS
+            val index: Int = Boid.next % maxNrOfBoids
             boid.setBodyTranslate(getCirclePositionOnParent(dimension.width, dimension.height, index))
         }
 
@@ -172,8 +181,8 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
             val centerPosition = Point2D(width / 2, height / 2)
             val positionMultiplier = (width + height) / 8
             val circularPosition = Point2D(
-                positionMultiplier * cos(2 * index * PI / MainSceneController.MAX_NUMBER_OF_BOIDS),
-                positionMultiplier * sin(2 * index * PI / MainSceneController.MAX_NUMBER_OF_BOIDS)
+                positionMultiplier * cos(2 * index * PI / maxNrOfBoids),
+                positionMultiplier * sin(2 * index * PI / maxNrOfBoids)
             )
             return circularPosition.add(centerPosition)
         }

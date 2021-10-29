@@ -140,7 +140,7 @@
                                     <Slider fx:id="numberOfBoidsSlider" majorTickUnit="10.0" max="200.0"
                                             min="1" minorTickCount="5" showTickLabels="true"
                                             showTickMarks="true"/>
-                                    <Label layoutX="15.0" layoutY="70.0" text="Max ball size"/>
+                                    <Label layoutX="15.0" layoutY="70.0" text="Max boid size"/>
                                     <Slider fx:id="maxBoidSizeSlider" layoutX="15.0" layoutY="87.0" max="50"
                                             min="1" showTickLabels="true" showTickMarks="true"/>
                                     <Label text="Perception radius"/>

@@ -1,4 +1,4 @@
-module FlockingSim2D {
+open module FlockingSim2D {
 
     requires org.apache.logging.log4j;
     requires javafx.base;
@@ -9,6 +9,4 @@ module FlockingSim2D {
     requires kotlin.stdlib;
 
     exports hzt.view to javafx.graphics;
-    opens hzt.controller.scenes to javafx.fxml;
-    opens hzt.controller.sub_pane to javafx.fxml;
 }
