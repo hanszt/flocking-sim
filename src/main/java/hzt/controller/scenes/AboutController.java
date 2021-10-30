@@ -34,7 +34,7 @@ public class AboutController extends SceneController {
 
     @FXML
     private void textComboboxAction() {
-        textArea.setText(textComboBox.getValue().getText());
+        textArea.setText(textComboBox.getValue().text());
     }
 
     @FXML

@@ -1,74 +1,57 @@
 package hzt.service;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
+import java.util.Optional;
 
-import static java.lang.String.format;
+import static java.util.stream.Collectors.*;
 
 public class AboutService {
 
     private static final Logger LOGGER = LogManager.getLogger(AboutService.class);
-    private static final String RELATIVE_TEXT_RESOURCE_DIR = "../../about";
+    private static final String RELATIVE_TEXT_RESOURCE_DIR = "/about";
 
     public List<AboutText> loadContent() {
-        List<AboutText> aboutTexts = new ArrayList<>();
-        try {
-            File fileDir = new File(getClass().getResource(RELATIVE_TEXT_RESOURCE_DIR).getFile());
-            if (fileDir.isDirectory()) {
-                for (String fileName : fileDir.list()) {
-                    String name = fileName.replace(".txt", "").replace("_", " ");
-                    AboutText aboutText = new AboutText(name, new SimpleStringProperty(loadTextContent(fileName)));
-                    aboutTexts.add(aboutText);
-                }
-            }
-        }catch (NullPointerException e) {
-            LOGGER.error("about folder not found...");
+        return Optional.ofNullable(getClass().getResource(RELATIVE_TEXT_RESOURCE_DIR))
+                .map(URL::getFile)
+                .map(File::new)
+                .filter(File::isDirectory)
+                .map(File::listFiles).stream()
+                .flatMap(Arrays::stream)
+                .map(AboutService::toAboutText)
+                .collect(collectingAndThen(toList(), AboutService::checkIfTextsLoaded));
+    }
+
+    private static List<AboutText> checkIfTextsLoaded(List<AboutText> aboutTexts) {
+        if (aboutTexts.isEmpty()) {
+            LOGGER.error("Could not load content from " + RELATIVE_TEXT_RESOURCE_DIR + "...");
+            aboutTexts.add(new AboutText("no content", ""));
         }
-        if (aboutTexts.isEmpty()) aboutTexts.add(new AboutText("no content", new SimpleStringProperty()));
         return aboutTexts;
     }
 
-    private String loadTextContent(String fileName) {
-        StringBuilder sb = new StringBuilder();
-        List<String> fileTextContent = readInputFileByLine(getClass().getResource(RELATIVE_TEXT_RESOURCE_DIR + "/" + fileName).getFile());
-        fileTextContent.forEach(str -> sb.append(str).append(format("%n")));
-        return sb.toString();
+    private static AboutText toAboutText(File file) {
+        String name = file.getName().replace(".txt", "").replace("_", " ");
+        return new AboutText(name, loadTextContent(file));
     }
 
-    private static List<String> readInputFileByLine(String path) {
-        List<String> inputList = new ArrayList<>();
-        File file = new File(path);
-        try (Scanner input = new Scanner(file)) {
-            while (input.hasNextLine()) {
-                inputList.add(input.nextLine());
-            }
-        } catch (FileNotFoundException e) {
-            LOGGER.error(() -> "File with path " + path + " not found...");
+    private static String loadTextContent(File file) {
+        try {
+            return Files.readString(file.toPath());
+        } catch (IOException e) {
+            LOGGER.error(() -> "File with path " + file.toPath() + " not found...", e);
+            return "";
         }
-        return inputList;
     }
 
-    public static class AboutText {
-
-        private final String title;
-        private final StringProperty text;
-
-        public AboutText(String title, StringProperty text) {
-            this.title = title;
-            this.text = text;
-        }
-
-        public String getText() {
-            return text.get();
-        }
+    public record AboutText(String title, String text) {
 
         @Override
         public String toString() {
