@@ -15,7 +15,6 @@ import javafx.geometry.Dimension2D
 import javafx.geometry.Point2D
 import javafx.scene.Cursor
 import javafx.scene.Group
-import javafx.scene.Node
 import javafx.scene.input.KeyEvent
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
@@ -24,9 +23,9 @@ import javafx.scene.shape.Line
 import javafx.scene.shape.Shape
 import javafx.scene.shape.StrokeType
 import javafx.util.Duration
-import java.util.function.Predicate
 
 abstract class Boid internal constructor(name: String, body: Shape, initPaint: Paint) : Group() {
+
     val name: String
     val body: Shape
     val perceptionCircle: Circle
@@ -37,14 +36,13 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
     val perceptionRadiusMap: MutableMap<Boid, Connection>
     private val initPaint: Paint
     private val densityMaterial: DoubleProperty = SimpleDoubleProperty() // kg/m^3
-    var velocity // pixel/s
-            : Point2D
-    var acceleration // pixel/s^2
-            : Point2D
-        private set
+    private val translationKeyFilter = TranslationKeyFilter()
+
+    var velocity : Point2D
+    var acceleration : Point2D
     private var prevCenterPosition = Point2D.ZERO
     private var maxAcceleration = 0.0
-    private val translationKeyFilter = TranslationKeyFilter()
+
     private fun configureComponents() {
         body.cursor = Cursor.HAND
         configureCircle(perceptionCircle)
@@ -58,6 +56,7 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
     }
 
     abstract val distanceFromCenterToOuterEdge: Double
+
     private fun configureCircle(circle: Circle) {
         circle.strokeType = StrokeType.OUTSIDE
         circle.isDisable = true //ignores user input
@@ -100,14 +99,9 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
             path.fadeOut()
         }
         if (flockProperties.isShowConnections()) {
-            perceptionRadiusMap.forEach { (otherBall: Boid?, lineToOther: Connection?) ->
-                strokeConnection(
-                    otherBall,
-                    lineToOther
-                )
-            }
+            perceptionRadiusMap.forEach(this::strokeConnection)
         } else {
-            children.removeIf { obj: Node? -> Connection::class.java.isInstance(obj) }
+            children.removeIf { Connection::class.java.isInstance(it) }
         }
     }
 
@@ -151,9 +145,9 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
     private fun updateBallsInPerceptionRadiusMap() {
         val flock = parent as Flock
         flock.childrenUnmodifiable.stream()
-            .filter(Predicate.not { obj: Node? -> this == obj })
-            .map { obj: Node? -> Boid::class.java.cast(obj) }
-            .forEach { other: Boid -> determineIfBoidInPerceptionRadius(other) }
+            .filter { this != it }
+            .map { Boid::class.java.cast(it) }
+            .forEach { determineIfBoidInPerceptionRadius(it) }
     }
 
     private fun determineIfBoidInPerceptionRadius(other: Boid) {
@@ -226,6 +220,7 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
     }
 
     abstract val mass: Double
+
     val translation: Point2D
         get() = Point2D(body.translateX, body.translateY)
 

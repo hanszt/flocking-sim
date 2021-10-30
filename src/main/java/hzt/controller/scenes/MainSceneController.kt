@@ -80,7 +80,7 @@ class MainSceneController(sceneManager: SceneManager?) : SceneController(MAIN_SC
     private lateinit var showAllPathsButton: ToggleButton
 
     @FXML
-    private lateinit var uniformBallColorPicker: ColorPicker
+    private lateinit var uniformFlockColorPicker: ColorPicker
 
     @FXML
     lateinit var backgroundColorPicker: ColorPicker
@@ -145,7 +145,7 @@ class MainSceneController(sceneManager: SceneManager?) : SceneController(MAIN_SC
         engine.pullFactorProperty().bind(attractionSlider.valueProperty())
         engine.repelFactorProperty().bind(repelFactorSlider.valueProperty())
         animationService.addAnimationLoopToTimeline { animationLoop() }
-        uniformBallColorPicker.isDisable = flock.flockType === flock.randomCircleFlock
+        uniformFlockColorPicker.isDisable = flock.flockType.random
     }
 
     private fun setupAppearancePane() {
@@ -194,7 +194,7 @@ class MainSceneController(sceneManager: SceneManager?) : SceneController(MAIN_SC
 
     private fun configureColorPickers() {
         backgroundColorPicker.value = INIT_BG_COLOR
-        uniformBallColorPicker.value = INIT_UNIFORM_BALL_COLOR
+        uniformFlockColorPicker.value = INIT_UNIFORM_BALL_COLOR
         selectedBallColorPicker.value = INIT_SELECTED_BALL_COLOR
     }
 
@@ -397,7 +397,7 @@ class MainSceneController(sceneManager: SceneManager?) : SceneController(MAIN_SC
     private fun flockTypeDropdownAction() {
         flock.controlFlockSize(0, animationWindowDimension)
         configureFlock(flock)
-        uniformBallColorPicker.isDisable = flock.flockType === flock.randomCircleFlock
+        uniformFlockColorPicker.isDisable = flock.flockType.random
     }
 
     override fun getController(): SceneController = this
