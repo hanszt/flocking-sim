@@ -1,5 +1,6 @@
 package hzt.controller;
 
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -9,14 +10,20 @@ import org.apache.logging.log4j.Logger;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.Timer;
 
-import static hzt.model.AppConstants.*;
+import static hzt.model.AppConstants.CLOSING_MESSAGE;
+import static hzt.model.AppConstants.DOTTED_LINE;
+import static hzt.model.AppConstants.MIN_STAGE_DIMENSION;
+import static hzt.model.AppConstants.Scene;
+import static hzt.model.AppConstants.TITLE;
+import static hzt.utils.TimerUtils.taskFor;
 
 public class AppManager {
 
     private static final Logger LOGGER = LogManager.getLogger(AppManager.class);
 
-    private static int instances = 0;
+    private static int instances;
     private final int instance;
     private final Stage stage;
     private final SceneManager sceneManager;
@@ -31,13 +38,16 @@ public class AppManager {
         sceneManager.setupScene(Scene.MAIN_SCENE);
         configureStage(stage);
         LOGGER.info(this::startingMessage);
-        stage.show();
+
+        new Timer().schedule(taskFor(() -> Platform.runLater(stage::show)), 1000);
+
         LOGGER.info(() -> String.format("instance %d started%n", instance));
     }
 
     private String startingMessage() {
+        final LocalTime startTimeSim = sceneManager.getCurSceneController().getStartTimeSim();
         return String.format("Starting instance %d of %s at %s...%n",
-                instance, TITLE, sceneManager.getCurSceneController().getStartTimeSim().format(DateTimeFormatter.ofPattern("hh:mm:ss")));
+                instance, TITLE, startTimeSim.format(DateTimeFormatter.ofPattern("hh:mm:ss")));
     }
 
     public void configureStage(Stage stage) {
@@ -45,8 +55,10 @@ public class AppManager {
         stage.setMinWidth(MIN_STAGE_DIMENSION.getWidth());
         stage.setMinHeight(MIN_STAGE_DIMENSION.getHeight());
         stage.setOnCloseRequest(e -> printClosingText());
+
         Optional.ofNullable(getClass().getResourceAsStream("/icons/fx-icon.png"))
-                .ifPresent(stream -> stage.getIcons().add(new Image(stream)));
+                .map(Image::new)
+                .ifPresent(stage.getIcons()::add);
     }
 
     private void printClosingText() {

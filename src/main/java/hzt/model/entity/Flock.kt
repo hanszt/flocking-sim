@@ -23,7 +23,7 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
+class Flock(val mainScene: Scene) : Group(), Iterable<Boid> {
 
     val randomRectangleFlock: FlockType = object : FlockType() {
         override fun createBoid(maxBoidSize: Double): Boid {
@@ -81,7 +81,7 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
             if (children.size < numberOfBalls) {
                 addBoidToFlock(parentDimension)
             } else {
-                removeBoidFromFLock()
+                removeBoidFromFlock()
             }
         }
     }
@@ -97,7 +97,7 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
         return boid
     }
 
-    private fun removeBoidFromFLock() {
+    private fun removeBoidFromFlock() {
         val list = children
         val boid = list[0] as Boid
         children.remove(boid)
@@ -120,7 +120,7 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
                 val boid = addBoidToFlock(dimension2D)
                 boid.setBodyTranslate(Point2D(mouseEvent.x, mouseEvent.y))
             } else {
-                removeBoidFromFLock()
+                removeBoidFromFlock()
                 val boid = addBoidToFlock(dimension2D)
                 boid.setBodyTranslate(Point2D(mouseEvent.x, mouseEvent.y))
             }
@@ -144,8 +144,8 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid?> {
 
     override fun iterator(): MutableIterator<Boid> {
         return children.stream()
-            .filter { obj: Node? -> Boid::class.java.isInstance(obj) }
-            .map { obj: Node? -> Boid::class.java.cast(obj) }
+            .filter(Boid::class.java::isInstance)
+            .map(Boid::class.java::cast)
             .iterator()
     }
 

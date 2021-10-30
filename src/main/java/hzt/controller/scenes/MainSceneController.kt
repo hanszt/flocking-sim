@@ -1,457 +1,448 @@
-package hzt.controller.scenes;
+package hzt.controller.scenes
 
-import hzt.controller.SceneManager;
-import hzt.controller.sub_pane.AppearanceController;
-import hzt.controller.sub_pane.StatisticsController;
-import hzt.model.FlockProperties;
-import hzt.model.entity.boid.Boid;
-import hzt.model.entity.Flock;
-import hzt.model.utils.Engine;
-import hzt.service.AnimationService;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.geometry.Dimension2D;
-import javafx.geometry.Insets;
-import javafx.scene.Camera;
-import javafx.scene.Group;
-import javafx.scene.ParallelCamera;
-import javafx.scene.SceneAntialiasing;
-import javafx.scene.SubScene;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Slider;
-import javafx.scene.control.Tab;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.stage.Stage;
-import javafx.util.Duration;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import hzt.controller.SceneManager
+import hzt.controller.sub_pane.AppearanceController
+import hzt.controller.sub_pane.StatisticsController
+import hzt.model.AppConstants.INIT_BG_COLOR
+import hzt.model.AppConstants.INIT_SELECTED_BALL_COLOR
+import hzt.model.AppConstants.INIT_UNIFORM_BALL_COLOR
+import hzt.model.AppConstants.STAGE_OPACITY
+import hzt.model.AppConstants.Scene.*
+import hzt.model.AppConstants.parsedIntAppProp
+import hzt.model.FlockProperties
+import hzt.model.entity.Flock
+import hzt.model.entity.Flock.FlockType
+import hzt.model.entity.boid.Boid
+import hzt.model.utils.Engine
+import hzt.model.utils.Engine.FlockingSim
+import hzt.service.AnimationService
+import javafx.event.ActionEvent
+import javafx.event.EventHandler
+import javafx.fxml.FXML
+import javafx.geometry.Dimension2D
+import javafx.geometry.Insets
+import javafx.scene.*
+import javafx.scene.control.*
+import javafx.scene.input.KeyCode
+import javafx.scene.input.KeyEvent
+import javafx.scene.layout.*
+import javafx.scene.paint.Color
+import javafx.stage.Stage
+import javafx.util.Duration
+import org.apache.logging.log4j.LogManager
+import java.io.IOException
+import java.time.LocalTime
 
-import java.io.IOException;
-import java.time.LocalTime;
-
-import static hzt.model.AppConstants.*;
-import static hzt.model.AppConstants.Scene.MAIN_SCENE;
-import static java.util.function.Predicate.not;
-
-public class MainSceneController extends SceneController {
-
-    private static final Logger LOGGER = LogManager.getLogger(MainSceneController.class);
-
-    private static final int INIT_ACCELERATION_USER_SELECTED_BALL = 50;
-    private static final int INIT_ATTRACTION = 3;
-    private static final int INIT_REPEL_FACTOR = 10;
-    private static final int INIT_REPEL_DISTANCE_FACTOR = 3;
-    private static final int INIT_MAX_BALL_SIZE = 5;
-    private static final int INIT_PERCEPTION_RADIUS = 25;
-    private static final int INIT_MAX_SPEED = 150;
-    private static final double INIT_FRICTION = 1;
-    private static final int MAX_PATH_SIZE_ALL = 200;
-
-    private static final int MAX_VECTOR_LENGTH = 80;
-    private static final int INIT_NUMBER_OF_BOIDS = parsedIntAppProp("init_number_of_boids", 120);
+class MainSceneController(sceneManager: SceneManager?) : SceneController(MAIN_SCENE.fxmlFileName, sceneManager) {
+    @FXML
+    private lateinit var appearanceTab: Tab
 
     @FXML
-    private Tab appearanceTab;
-    @FXML
-    private Tab statisticsTab;
-    @FXML
-    private AnchorPane animationPane;
-    @FXML
-    private ComboBox<Engine.FlockingSim> physicsEngineComboBox;
-    @FXML
-    private ComboBox<Flock.FlockType> flockSettingsComboBox;
+    private lateinit var statisticsTab: Tab
 
     @FXML
-    private ToggleButton showVelocityVectorButton;
-    @FXML
-    private ToggleButton showAccelerationVectorButton;
-    @FXML
-    private ToggleButton bounceWallsButton;
-    @FXML
-    private ToggleButton showPathSelectedButton;
-    @FXML
-    private ToggleButton showPerceptionButton;
-    @FXML
-    private ToggleButton showPerceptionSelectedBallButton;
-    @FXML
-    private ToggleButton showRepelCircleButton;
-    @FXML
-    private ToggleButton showConnectionsButton;
-    @FXML
-    private ToggleButton fullScreenButton;
-    @FXML
-    private ToggleButton showAllPathsButton;
+    lateinit var animationPane: AnchorPane
 
     @FXML
-    private ColorPicker uniformBallColorPicker;
-    @FXML
-    private ColorPicker backgroundColorPicker;
-    @FXML
-    private ColorPicker selectedBallColorPicker;
+    private lateinit var physicsEngineComboBox: ComboBox<FlockingSim>
 
     @FXML
-    private Slider numberOfBoidsSlider;
-    @FXML
-    private Slider perceptionRadiusSlider;
-    @FXML
-    private Slider frictionSlider;
-    @FXML
-    private Slider attractionSlider;
-    @FXML
-    private Slider repelFactorSlider;
-    @FXML
-    private Slider accelerationSlider;
-    @FXML
-    private Slider repelDistanceSlider;
-    @FXML
-    private Slider maxVelocitySlider;
-    @FXML
-    private Slider maxBoidSizeSlider;
+    private lateinit var flockSettingsComboBox: ComboBox<FlockType>
 
     @FXML
-    private Slider boidTailLengthSlider;
+    private lateinit var showVelocityVectorButton: ToggleButton
+
     @FXML
-    private Slider boidVelocityVectorLengthSlider;
+    private lateinit var showAccelerationVectorButton: ToggleButton
+
     @FXML
-    private Slider boidAccelerationVectorLengthSlider;
+    private lateinit var bounceWallsButton: ToggleButton
 
-    private Color backgroundColor = INIT_BG_COLOR;
+    @FXML
+    private lateinit var showPathSelectedButton: ToggleButton
 
-    private final SubScene subScene2D;
-    private final Flock flock;
-    private final AnimationService animationService;
-    private final Engine engine;
+    @FXML
+    private lateinit var showPerceptionButton: ToggleButton
 
-    private final StatisticsController statisticsController = new StatisticsController();
+    @FXML
+    private lateinit var showPerceptionSelectedBallButton: ToggleButton
 
-    public MainSceneController(SceneManager sceneManager) throws IOException {
-        super(MAIN_SCENE.getFxmlFileName(), sceneManager);
-        Group subSceneRoot = new Group();
-        this.subScene2D = new SubScene(subSceneRoot, 0, 0, true, SceneAntialiasing.BALANCED);
-        this.flock = new Flock(scene);
-        this.engine = new Engine();
-        this.animationService = new AnimationService();
-        subSceneRoot.getChildren().addAll(flock);
-        statisticsTab.setContent(statisticsController.getRoot());
-        this.animationPane.getChildren().add(subScene2D);
+    @FXML
+    private lateinit var showRepelCircleButton: ToggleButton
+
+    @FXML
+    private lateinit var showConnectionsButton: ToggleButton
+
+    @FXML
+    private lateinit var fullScreenButton: ToggleButton
+
+    @FXML
+    private lateinit var showAllPathsButton: ToggleButton
+
+    @FXML
+    private lateinit var uniformBallColorPicker: ColorPicker
+
+    @FXML
+    lateinit var backgroundColorPicker: ColorPicker
+
+    @FXML
+    private lateinit var selectedBallColorPicker: ColorPicker
+
+    @FXML
+    private lateinit var numberOfBoidsSlider: Slider
+
+    @FXML
+    private lateinit var perceptionRadiusSlider: Slider
+
+    @FXML
+    private lateinit var frictionSlider: Slider
+
+    @FXML
+    private lateinit var attractionSlider: Slider
+
+    @FXML
+    private lateinit var repelFactorSlider: Slider
+
+    @FXML
+    private lateinit var accelerationSlider: Slider
+
+    @FXML
+    private lateinit var repelDistanceSlider: Slider
+
+    @FXML
+    private lateinit var maxVelocitySlider: Slider
+
+    @FXML
+    private lateinit var maxBoidSizeSlider: Slider
+
+    @FXML
+    private lateinit var boidTailLengthSlider: Slider
+
+    @FXML
+    private lateinit var boidVelocityVectorLengthSlider: Slider
+
+    @FXML
+    private lateinit var boidAccelerationVectorLengthSlider: Slider
+    
+    private var backgroundColor: Color = INIT_BG_COLOR
+    private val subScene2D: SubScene
+    private val flock: Flock
+    private val animationService: AnimationService
+    private val engine: Engine
+    private val statisticsController = StatisticsController()
+
+    override fun setup() {
+        bindFullScreenButtonToFullScreen(fullScreenButton, sceneManager.stage)
+        configureAnimationPane(animationPane)
+        configureSubScene(subScene2D, animationPane)
+        configureComboBoxes()
+        configureControls()
+        configureColorPickers()
+        addListenersToSliders()
+        setupAppearancePane()
+        bindFlockPropertiesToControlsProperties(flock)
+        configureFlock(flock)
+        engine.pullFactorProperty().bind(attractionSlider.valueProperty())
+        engine.repelFactorProperty().bind(repelFactorSlider.valueProperty())
+        animationService.addAnimationLoopToTimeline { animationLoop() }
+        uniformBallColorPicker.isDisable = flock.flockType === flock.randomCircleFlock
     }
 
-    @Override
-    public void setup() {
-        bindFullScreenButtonToFullScreen(fullScreenButton, sceneManager.getStage());
-        configureAnimationPane(animationPane);
-        configureSubScene(subScene2D, animationPane);
-        configureComboBoxes();
-        configureControls();
-        configureColorPickers();
-        addListenersToSliders();
-        setupAppearancePane();
-        bindFlockPropertiesToControlsProperties(flock);
-        configureFlock(flock);
-        engine.pullFactorProperty().bind(attractionSlider.valueProperty());
-        engine.repelFactorProperty().bind(repelFactorSlider.valueProperty());
-        animationService.addAnimationLoopToTimeline(this::animationLoop);
-        uniformBallColorPicker.setDisable(flock.getFlockType() == flock.getRandomCircleFlock());
-    }
-
-    private void setupAppearancePane() {
+    private fun setupAppearancePane() {
         try {
-            AppearanceController appearanceController = new AppearanceController(this);
-            this.appearanceTab.setContent(appearanceController.getRoot());
-        } catch (IOException e) {
-            LOGGER.error("Appearance pane was not correctly loaded...", e);
+            val appearanceController = AppearanceController(this)
+            appearanceTab.content = appearanceController.root
+        } catch (e: IOException) {
+            LOGGER.error("Appearance pane was not correctly loaded...", e)
         }
     }
 
-    private void animationLoop(ActionEvent loop) {
-        double maxSpeed = maxVelocitySlider.getValue();
-        double friction = frictionSlider.getValue();
-        double accelerationMultiplier = accelerationSlider.getValue();
-        boolean bounce = bounceWallsButton.isSelected();
-        Duration runTimeSim = Duration.millis((LocalTime.now().toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
-        statisticsController.showStatists(flock.getSelectedBoid(), friction, flock.getChildren().size(), runTimeSim);
-        animationService.run(flock, getAnimationWindowDimension(), accelerationMultiplier, friction, bounce, maxSpeed);
+    private fun animationLoop() {
+        val maxSpeed = maxVelocitySlider.value
+        val friction = frictionSlider.value
+        val accelerationMultiplier = accelerationSlider.value
+        val bounce = bounceWallsButton.isSelected
+        val runTimeSim = Duration.millis((LocalTime.now().toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6)
+        statisticsController.showStatists(flock.selectedBoid, friction, flock.children.size, runTimeSim)
+        animationService.run(flock, animationWindowDimension, accelerationMultiplier, friction, bounce, maxSpeed)
     }
 
-    private void configureSubScene(SubScene subScene, Pane animationPane) {
-        subScene.widthProperty().bind(animationPane.widthProperty());
-        subScene.heightProperty().bind(animationPane.heightProperty());
-        subScene.setCamera(getConfiguredCamera());
-        animationPane.setOnMouseDragged(e -> flock.addBoidToFlockAtMouseTip(e, getAnimationWindowDimension(), numberOfBoidsSlider));
-    }
-
-    private static Camera getConfiguredCamera() {
-        Camera camera = new ParallelCamera();
-        camera.setFarClip(1000);
-        camera.setNearClip(.01);
-        return camera;
-    }
-
-    private void configureAnimationPane(AnchorPane animationPane) {
-        animationPane.setPrefSize(640, 400);
-        animationPane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
-    }
-
-    private static void bindFullScreenButtonToFullScreen(ToggleButton fullScreenButton, Stage stage) {
-        stage.fullScreenProperty().addListener((observableValue, curVal, isFullScreen) -> fullScreenButton.setSelected(isFullScreen));
-        stage.addEventFilter(KeyEvent.KEY_TYPED, key -> switchFullScreenIfF11Typed(stage, key));
-    }
-
-    private static void switchFullScreenIfF11Typed(Stage stage, KeyEvent key) {
-        if (key.getCode() == KeyCode.F11) {
-            stage.setFullScreen(!stage.isFullScreen());
+    private fun configureSubScene(subScene: SubScene, animationPane: Pane?) {
+        subScene.widthProperty().bind(animationPane?.widthProperty())
+        subScene.heightProperty().bind(animationPane?.heightProperty())
+        subScene.camera = configuredCamera
+        animationPane?.onMouseDragged = EventHandler {
+            flock.addBoidToFlockAtMouseTip(it, animationWindowDimension, numberOfBoidsSlider)
         }
     }
 
-    private void configureComboBoxes() {
-        flockSettingsComboBox.getItems().addAll(flock.getRandomCircleFlock(),
-                flock.getUniformCircleFlock(), flock.getRandomRectangleFlock(), flock.new CircleFlock());
-        flockSettingsComboBox.setValue(flock.getRandomCircleFlock());
-
-        physicsEngineComboBox.getItems().addAll(engine.getType1(), engine.getType2(), engine.getType3());
-        physicsEngineComboBox.setValue(engine.getType1());
+   private fun configureAnimationPane(animationPane: AnchorPane?) {
+        animationPane?.setPrefSize(640.0, 400.0)
+        animationPane?.background = Background(
+            BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)
+        )
     }
 
-    private void configureColorPickers() {
-        backgroundColorPicker.setValue(INIT_BG_COLOR);
-        uniformBallColorPicker.setValue(INIT_UNIFORM_BALL_COLOR);
-        selectedBallColorPicker.setValue(INIT_SELECTED_BALL_COLOR);
+    private fun configureComboBoxes() {
+        flockSettingsComboBox.items.addAll(
+            flock.randomCircleFlock, flock.uniformCircleFlock, flock.randomRectangleFlock, flock.CircleFlock()
+        )
+        flockSettingsComboBox.value = flock.randomCircleFlock
+        physicsEngineComboBox.items.addAll(engine.type1, engine.type2, engine.type3)
+        physicsEngineComboBox.value = engine.type1
     }
 
-    public Dimension2D getAnimationWindowDimension() {
-        if (subScene2D.getWidth() < 1 && subScene2D.getHeight() < 1) {
-            return new Dimension2D(animationPane.getPrefWidth(), animationPane.getPrefHeight());
+    private fun configureColorPickers() {
+        backgroundColorPicker.value = INIT_BG_COLOR
+        uniformBallColorPicker.value = INIT_UNIFORM_BALL_COLOR
+        selectedBallColorPicker.value = INIT_SELECTED_BALL_COLOR
+    }
+
+    private val animationWindowDimension: Dimension2D
+        get() = if (subScene2D.width < 1 && subScene2D.height < 1) {
+            Dimension2D(animationPane.prefWidth, animationPane.prefHeight)
         } else {
-            return new Dimension2D(subScene2D.getWidth(), subScene2D.getHeight());
+            Dimension2D(subScene2D.width, subScene2D.height)
         }
+
+    private fun configureFlock(flock: Flock) {
+        flock.flockType = flockSettingsComboBox.value
+        flock.controlFlockSize(numberOfBoidsSlider.valueProperty().intValue(), animationWindowDimension)
+        flock.flockingSim = physicsEngineComboBox.value
+        flock.selectedBoid = flock.randomSelectedBoid
     }
 
-    private void configureFlock(Flock flock) {
-        flock.setFlockType(flockSettingsComboBox.getValue());
-        flock.controlFlockSize(numberOfBoidsSlider.valueProperty().intValue(), getAnimationWindowDimension());
-        flock.setFlockingSim(physicsEngineComboBox.getValue());
-        flock.setSelectedBoid(flock.getRandomSelectedBoid());
+    private fun addListenersToSliders() {
+        numberOfBoidsSlider.valueProperty().addListener { _, _, n -> numberOfBoidsSliderChanged(n) }
+        perceptionRadiusSlider.valueProperty().addListener { _, _, n -> perceptionRadiusSliderChanged(n) }
+        repelDistanceSlider.valueProperty().addListener { _, _, n -> repelDistanceSliderChanged(n) }
     }
 
-    private void addListenersToSliders() {
-        numberOfBoidsSlider.valueProperty().addListener(this::numberOfBoidsSliderChanged);
-        perceptionRadiusSlider.valueProperty().addListener(this::perceptionRadiusSliderChanged);
-        repelDistanceSlider.valueProperty().addListener(this::repelDistanceSliderChanged);
+    private fun numberOfBoidsSliderChanged(n: Number?) =
+        flock.controlFlockSize(n?.toInt() ?: 0, animationWindowDimension)
+
+    private fun perceptionRadiusSliderChanged(n: Number?) =
+        flock.forEach { it.setPerceptionRadius(it.distanceFromCenterToOuterEdge * (n?.toDouble() ?: 0.0)) }
+
+    private fun repelDistanceSliderChanged(n: Number?) =
+        flock.forEach { it.setRepelRadius(it.distanceFromCenterToOuterEdge * (n?.toDouble() ?: 0.0)) }
+
+    private fun bindFlockPropertiesToControlsProperties(flock: Flock) {
+        val flockProperties = flock.flockProperties
+        bindFlockPropertiesToButtonProperties(flockProperties)
+        bindFlockPropertiesToSliderProperties(flockProperties)
     }
 
-    private void numberOfBoidsSliderChanged(ObservableValue<? extends Number> o, Number c, Number n) {
-        flock.controlFlockSize(n.intValue(), getAnimationWindowDimension());
+    private fun bindFlockPropertiesToButtonProperties(flockProperties: FlockProperties) {
+        flockProperties.velocityVectorVisibleProperty().bind(showVelocityVectorButton.selectedProperty())
+        flockProperties.accelerationVectorVisibleProperty().bind(showAccelerationVectorButton.selectedProperty())
+        flockProperties.perceptionCircleVisibleProperty().bind(showPerceptionButton.selectedProperty())
+        flockProperties.repelCircleVisibleProperty().bind(showRepelCircleButton.selectedProperty())
+        flockProperties.allPathsVisibleProperty().bind(showAllPathsButton.selectedProperty())
+        flockProperties.showConnectionsProperty().bind(showConnectionsButton.selectedProperty())
+        flockProperties.selectedPathVisibleProperty().bind(showPathSelectedButton.selectedProperty())
+        flockProperties.selectedPerceptionCircleVisibleProperty().bind(showPerceptionSelectedBallButton.selectedProperty())
     }
 
-    private void perceptionRadiusSliderChanged(ObservableValue<? extends Number> o, Number c, Number n) {
-        flock.forEach(boid -> boid.setPerceptionRadius(boid.getDistanceFromCenterToOuterEdge() * n.doubleValue()));
+    private fun bindFlockPropertiesToSliderProperties(flockProperties: FlockProperties) {
+        flockProperties.maxVelocityProperty().bind(maxVelocitySlider.valueProperty())
+        flockProperties.maxAccelerationProperty().bind(accelerationSlider.valueProperty())
+        flockProperties.maxBoidSizeProperty().bind(maxBoidSizeSlider.valueProperty())
+        flockProperties.perceptionRadiusRatioProperty().bind(perceptionRadiusSlider.valueProperty())
+        flockProperties.repelRadiusRatioProperty().bind(repelDistanceSlider.valueProperty())
+        flockProperties.velocityVectorLengthProperty().bind(boidVelocityVectorLengthSlider.valueProperty())
+        flockProperties.accelerationVectorLengthProperty().bind(boidAccelerationVectorLengthSlider.valueProperty())
+        flockProperties.tailLengthProperty().bind(boidTailLengthSlider.valueProperty())
     }
 
-    private void repelDistanceSliderChanged(ObservableValue<? extends Number> o, Number c, Number n) {
-        flock.forEach(boid -> boid.setRepelRadius(boid.getDistanceFromCenterToOuterEdge() * n.doubleValue()));
+    private fun configureControls() {
+        configureSliders()
+        setToggleButtons()
     }
 
-    private void bindFlockPropertiesToControlsProperties(Flock flock) {
-        FlockProperties flockProperties = flock.getFlockProperties();
-        bindFlockPropertiesToButtonProperties(flockProperties);
-        bindFlockPropertiesToSliderProperties(flockProperties);
+    private fun configureSliders() {
+        maxBoidSizeSlider.value = INIT_MAX_BALL_SIZE.toDouble()
+        boidTailLengthSlider.value = MAX_PATH_SIZE_ALL.toDouble()
+        boidVelocityVectorLengthSlider.value = MAX_VECTOR_LENGTH.toDouble()
+        boidAccelerationVectorLengthSlider.value = MAX_VECTOR_LENGTH.toDouble()
+        numberOfBoidsSlider.value = INIT_NUMBER_OF_BOIDS.toDouble()
+        numberOfBoidsSlider.max = flock.maxNrOfBoids.toDouble()
+        accelerationSlider.value = INIT_ACCELERATION_USER_SELECTED_BALL.toDouble()
+        attractionSlider.value = INIT_ATTRACTION.toDouble()
+        repelDistanceSlider.value = INIT_REPEL_DISTANCE_FACTOR.toDouble()
+        repelFactorSlider.value = INIT_REPEL_FACTOR.toDouble()
+        frictionSlider.value = INIT_FRICTION
+        perceptionRadiusSlider.value = INIT_PERCEPTION_RADIUS.toDouble()
+        maxVelocitySlider.value = INIT_MAX_SPEED.toDouble()
     }
 
-    private void bindFlockPropertiesToButtonProperties(FlockProperties flockProperties) {
-        flockProperties.velocityVectorVisibleProperty().bind(showVelocityVectorButton.selectedProperty());
-        flockProperties.accelerationVectorVisibleProperty().bind(showAccelerationVectorButton.selectedProperty());
-        flockProperties.perceptionCircleVisibleProperty().bind(showPerceptionButton.selectedProperty());
-        flockProperties.repelCircleVisibleProperty().bind(showRepelCircleButton.selectedProperty());
-        flockProperties.allPathsVisibleProperty().bind(showAllPathsButton.selectedProperty());
-        flockProperties.showConnectionsProperty().bind(showConnectionsButton.selectedProperty());
-        flockProperties.selectedPathVisibleProperty().bind(showPathSelectedButton.selectedProperty());
-        flockProperties.selectedPerceptionCircleVisibleProperty().bind(showPerceptionSelectedBallButton.selectedProperty());
-    }
-
-    private void bindFlockPropertiesToSliderProperties(FlockProperties flockProperties) {
-        flockProperties.maxVelocityProperty().bind(maxVelocitySlider.valueProperty());
-        flockProperties.maxAccelerationProperty().bind(accelerationSlider.valueProperty());
-        flockProperties.maxBoidSizeProperty().bind(maxBoidSizeSlider.valueProperty());
-        flockProperties.perceptionRadiusRatioProperty().bind(perceptionRadiusSlider.valueProperty());
-        flockProperties.repelRadiusRatioProperty().bind(repelDistanceSlider.valueProperty());
-        flockProperties.velocityVectorLengthProperty().bind(boidVelocityVectorLengthSlider.valueProperty());
-        flockProperties.accelerationVectorLengthProperty().bind(boidAccelerationVectorLengthSlider.valueProperty());
-        flockProperties.tailLengthProperty().bind(boidTailLengthSlider.valueProperty());
-    }
-
-    private void configureControls() {
-        configureSliders();
-        setToggleButtons();
-    }
-
-    private void configureSliders() {
-        maxBoidSizeSlider.setValue(INIT_MAX_BALL_SIZE);
-        boidTailLengthSlider.setValue(MAX_PATH_SIZE_ALL);
-        boidVelocityVectorLengthSlider.setValue(MAX_VECTOR_LENGTH);
-        boidAccelerationVectorLengthSlider.setValue(MAX_VECTOR_LENGTH);
-        numberOfBoidsSlider.setValue(INIT_NUMBER_OF_BOIDS);
-        numberOfBoidsSlider.setMax(flock.getMaxNrOfBoids());
-        accelerationSlider.setValue(INIT_ACCELERATION_USER_SELECTED_BALL);
-        attractionSlider.setValue(INIT_ATTRACTION);
-        repelDistanceSlider.setValue(INIT_REPEL_DISTANCE_FACTOR);
-        repelFactorSlider.setValue(INIT_REPEL_FACTOR);
-        frictionSlider.setValue(INIT_FRICTION);
-        perceptionRadiusSlider.setValue(INIT_PERCEPTION_RADIUS);
-        maxVelocitySlider.setValue(INIT_MAX_SPEED);
-    }
-
-    private void setToggleButtons() {
-        showConnectionsButton.setSelected(false);
-        showPathSelectedButton.setSelected(false);
-        showAllPathsButton.setSelected(false);
-        showVelocityVectorButton.setSelected(false);
-        showAccelerationVectorButton.setSelected(false);
-        showPerceptionButton.setSelected(false);
-        showRepelCircleButton.setSelected(false);
-        showPerceptionSelectedBallButton.setSelected(false);
-        bounceWallsButton.setSelected(true);
+    private fun setToggleButtons() {
+        showConnectionsButton.isSelected = false
+        showPathSelectedButton.isSelected = false
+        showAllPathsButton.isSelected = false
+        showVelocityVectorButton.isSelected = false
+        showAccelerationVectorButton.isSelected = false
+        showPerceptionButton.isSelected = false
+        showRepelCircleButton.isSelected = false
+        showPerceptionSelectedBallButton.isSelected = false
+        bounceWallsButton.isSelected = true
     }
 
     @FXML
-    private void backgroundColorPickerAction(ActionEvent event) {
-        backgroundColor = ((ColorPicker) event.getSource()).getValue();
-        animationPane.setBackground(new Background(new BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY)));
+    private fun backgroundColorPickerAction(event: ActionEvent) {
+        backgroundColor = (event.source as ColorPicker).value
+        animationPane.background = Background(BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY))
     }
 
     @FXML
-    private void uniformBoidColorPickerAction(ActionEvent event) {
-        Color color = ((ColorPicker) event.getSource()).getValue();
-        flock.setUniformBallColor(color);
-        flock.getChildren().stream().map(Boid.class::cast)
-                .filter(not(ball -> ball.equals(flock.getSelectedBoid())))
-                .forEach(ball2D -> ball2D.updatePaint(color));
+    private fun uniformBoidColorPickerAction(event: ActionEvent) {
+        val color = (event.source as ColorPicker).value
+        flock.setUniformBallColor(color)
+        flock.children.stream()
+            .map { Boid::class.java.cast(it) }
+            .filter { it != flock.selectedBoid }
+            .forEach { it.updatePaint(color) }
     }
 
     @FXML
-    private void selectedBoidColorPickerAction(ActionEvent event) {
-        Color color = ((ColorPicker) event.getSource()).getValue();
-        flock.setSelectedBallColor(color);
-
-        final var selectedBoid = flock.getSelectedBoid();
-        if (selectedBoid != null) {
-            selectedBoid.updatePaint(color);
-        }
+    private fun selectedBoidColorPickerAction(event: ActionEvent) {
+        val color = (event.source as ColorPicker).value
+        flock.selectedBallColor = color
+        flock.selectedBoid?.updatePaint(color)
     }
 
     @FXML
-    private void pauseSimButtonAction(ActionEvent actionEvent) {
-        if (((ToggleButton) actionEvent.getSource()).isSelected()) {
-            animationService.pauseTimeline();
+    private fun pauseSimButtonAction(actionEvent: ActionEvent) {
+        if ((actionEvent.source as ToggleButton).isSelected) {
+            animationService.pauseTimeline()
         } else {
-            animationService.startTimeline();
+            animationService.startTimeline()
         }
     }
 
     @FXML
-    private void resetButtonAction() {
-        configureControls();
-        flock.controlFlockSize(numberOfBoidsSlider.valueProperty().intValue(), getAnimationWindowDimension());
-        flock.forEach(boid -> boid.setVisibilityBoidComponents(flock.getFlockProperties()));
-        final var selectedBoid = flock.getSelectedBoid();
+    private fun resetButtonAction() {
+        configureControls()
+        flock.controlFlockSize(numberOfBoidsSlider.valueProperty().intValue(), animationWindowDimension)
+        flock.forEach { it.setVisibilityBoidComponents(flock.flockProperties) }
+        val selectedBoid = flock.selectedBoid
         if (selectedBoid != null) {
-            flock.updateSelectedBoidComponentsVisibility(selectedBoid);
+            flock.updateSelectedBoidComponentsVisibility(selectedBoid)
         }
     }
 
     @FXML
-    private void transparentButtonAction(ActionEvent actionEvent) {
-        boolean transparent = ((ToggleButton) actionEvent.getSource()).isSelected();
-        sceneManager.getStage().setOpacity(transparent ? STAGE_OPACITY : 1);
+    private fun transparentButtonAction(actionEvent: ActionEvent) {
+        val transparent = (actionEvent.source as ToggleButton).isSelected
+        sceneManager.stage.opacity = if (transparent) STAGE_OPACITY else 1.0
     }
 
     @FXML
-    private void showPathSelectedBallButtonAction(ActionEvent event) {
-        boolean showPath = ((ToggleButton) event.getSource()).isSelected();
-        Boid ball = flock.getSelectedBoid();
-        if (ball != null) {
-            ball.getPath().setVisible(showPath);
+    private fun showPathSelectedBallButtonAction(event: ActionEvent) {
+        val showPath = (event.source as ToggleButton).isSelected
+        flock.selectedBoid?.path?.isVisible = showPath
+    }
+
+    @FXML
+    private fun showPathsAllBoidsButtonAction(event: ActionEvent) {
+        val showPaths = (event.source as ToggleButton).isSelected
+        flock.forEach { it.path.isVisible = showPaths }
+        showPathSelectedButton.isSelected = showPaths
+    }
+
+    @FXML
+    private fun fullScreenButtonAction(actionEvent: ActionEvent) {
+        sceneManager.stage.isFullScreen = (actionEvent.source as ToggleButton).isSelected
+    }
+
+    @FXML
+    private fun showPerceptionRadiusButtonAction(event: ActionEvent) {
+        val visible = (event.source as ToggleButton).isSelected
+        flock.forEach { it.perceptionCircle.isVisible = visible }
+        showPerceptionSelectedBallButton.isSelected = visible
+    }
+
+    @FXML
+    private fun showPerceptionSelectedBallButtonAction(event: ActionEvent) {
+        val visible = (event.source as ToggleButton).isSelected
+        flock.selectedBoid?.perceptionCircle?.isVisible = visible
+    }
+
+    @FXML
+    fun showRepelCircleButtonAction(event: ActionEvent) {
+        val visible = (event.source as ToggleButton).isSelected
+        flock.forEach { it.repelCircle.isVisible = visible }
+    }
+
+    @FXML
+    fun showVelocitiesButtonAction(event: ActionEvent) {
+        val visible = (event.source as ToggleButton).isSelected
+        flock.children.stream()
+            .map { Boid::class.java.cast(it) }
+            .forEach { it.visibleVelocityVector.isVisible = visible }
+    }
+
+    @FXML
+    fun showAccelerationsButtonAction(event: ActionEvent) {
+        val visible = (event.source as ToggleButton).isSelected
+        flock.forEach { it.visibleAccelerationVector.isVisible = visible }
+    }
+
+    @FXML
+    private fun physicsEngineComboBoxAction(event: ActionEvent) {
+        flock.flockingSim = (event.source as ComboBox<*>).value as FlockingSim
+    }
+
+    @FXML
+    private fun flockTypeDropdownAction() {
+        flock.controlFlockSize(0, animationWindowDimension)
+        configureFlock(flock)
+        uniformBallColorPicker.isDisable = flock.flockType === flock.randomCircleFlock
+    }
+
+    override fun getController(): SceneController = this
+
+    companion object {
+        private val LOGGER = LogManager.getLogger(MainSceneController::class.java)
+        private const val INIT_ACCELERATION_USER_SELECTED_BALL = 50
+        private const val INIT_ATTRACTION = 3
+        private const val INIT_REPEL_FACTOR = 10
+        private const val INIT_REPEL_DISTANCE_FACTOR = 3
+        private const val INIT_MAX_BALL_SIZE = 5
+        private const val INIT_PERCEPTION_RADIUS = 25
+        private const val INIT_MAX_SPEED = 150
+        private const val INIT_FRICTION = 1.0
+        private const val MAX_PATH_SIZE_ALL = 200
+        private const val MAX_VECTOR_LENGTH = 80
+        private val INIT_NUMBER_OF_BOIDS = parsedIntAppProp("init_number_of_boids", 120)
+        private val configuredCamera: Camera
+            get() {
+                val camera: Camera = ParallelCamera()
+                camera.farClip = 1000.0
+                camera.nearClip = .01
+                return camera
+            }
+
+        private fun bindFullScreenButtonToFullScreen(fullScreenButton: ToggleButton?, stage: Stage) {
+            stage.fullScreenProperty().addListener { _, _, isFullScreen -> fullScreenButton?.isSelected = isFullScreen!! }
+            stage.addEventFilter(KeyEvent.KEY_TYPED) { switchFullScreenIfF11Typed(stage, it) }
+        }
+
+        private fun switchFullScreenIfF11Typed(stage: Stage, key: KeyEvent) {
+            if (key.code == KeyCode.F11) {
+                stage.isFullScreen = !stage.isFullScreen
+            }
         }
     }
 
-    @FXML
-    private void showPathsAllBoidsButtonAction(ActionEvent event) {
-        boolean showPaths = ((ToggleButton) event.getSource()).isSelected();
-        flock.forEach(ball2D -> ball2D.getPath().setVisible(showPaths));
-        showPathSelectedButton.setSelected(showPaths);
-    }
-
-    @FXML
-    private void fullScreenButtonAction(ActionEvent actionEvent) {
-        sceneManager.getStage().setFullScreen(((ToggleButton) actionEvent.getSource()).isSelected());
-    }
-
-    @FXML
-    private void showPerceptionRadiusButtonAction(ActionEvent event) {
-        boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        flock.forEach(ball2D -> ball2D.getPerceptionCircle().setVisible(visible));
-        showPerceptionSelectedBallButton.setSelected(visible);
-    }
-
-    @FXML
-    private void showPerceptionSelectedBallButtonAction(ActionEvent event) {
-        boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        final var selectedBoid = flock.getSelectedBoid();
-        if (selectedBoid != null) {
-            selectedBoid.getPerceptionCircle().setVisible(visible);
-        }
-    }
-
-    @FXML
-    public void showRepelCircleButtonAction(ActionEvent event) {
-        boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        flock.forEach(ball2D -> ball2D.getRepelCircle().setVisible(visible));
-    }
-
-    @FXML
-    public void showVelocitiesButtonAction(ActionEvent event) {
-        boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        flock.getChildren().stream().map(Boid.class::cast)
-                .forEach(ball2D -> ball2D.getVisibleVelocityVector().setVisible(visible));
-    }
-
-    @FXML
-    public void showAccelerationsButtonAction(ActionEvent event) {
-        boolean visible = ((ToggleButton) event.getSource()).isSelected();
-        flock.forEach(ball2D -> ball2D.getVisibleAccelerationVector().setVisible(visible));
-    }
-
-    @FXML
-    private void physicsEngineComboBoxAction(ActionEvent event) {
-        flock.setFlockingSim((Engine.FlockingSim) ((ComboBox<?>) event.getSource()).getValue());
-    }
-
-    @FXML
-    private void flockTypeDropdownAction() {
-        flock.controlFlockSize(0, getAnimationWindowDimension());
-        configureFlock(flock);
-        uniformBallColorPicker.setDisable(flock.getFlockType() == flock.getRandomCircleFlock());
-    }
-
-    @Override
-    protected SceneController getController() {
-        return this;
-    }
-
-    public AnchorPane getAnimationPane() {
-        return animationPane;
-    }
-
-    public ColorPicker getBackgroundColorPicker() {
-        return backgroundColorPicker;
+    init {
+        val subSceneRoot = Group()
+        subScene2D = SubScene(subSceneRoot, 0.0, 0.0, true, SceneAntialiasing.BALANCED)
+        flock = Flock(scene)
+        engine = Engine()
+        animationService = AnimationService()
+        subSceneRoot.children.addAll(flock)
+        statisticsTab.content = statisticsController.root
+        animationPane.children.add(subScene2D)
     }
 }

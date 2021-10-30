@@ -252,7 +252,7 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
         scene.removeEventFilter(KeyEvent.KEY_RELEASED, translationKeyFilter.keyReleased)
     }
 
-    fun updatePaint(paint: Paint?) {
+    fun updatePaint(paint: Paint) {
         body.fill = paint
         perceptionCircle.stroke = paint
         repelCircle.stroke = paint

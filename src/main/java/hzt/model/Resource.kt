@@ -1,45 +1,23 @@
-package hzt.model;
+package hzt.model
 
-import org.jetbrains.annotations.NotNull;
+import java.util.*
+import kotlin.jvm.JvmOverloads
 
-import java.util.Objects;
-
-public class Resource implements Comparable<Resource> {
-
-    private final String name;
-    private final String pathToResource;
-
-    public Resource(String name) {
-        this(name, "");
+class Resource @JvmOverloads constructor(private val name: String, val pathToResource: String = "") :
+    Comparable<Resource> {
+    override fun compareTo(other: Resource): Int {
+        return name.compareTo(other.name)
     }
 
-    public Resource(String name, String pathToResource) {
-        this.name = name;
-        this.pathToResource = pathToResource;
+    override fun equals(other: Any?): Boolean {
+        return this === other || other is Resource && name == other.name
     }
 
-    public String getPathToResource() {
-        return pathToResource;
+    override fun hashCode(): Int {
+        return Objects.hash(name)
     }
 
-    @Override
-    public int compareTo(@NotNull Resource o) {
-        return name.compareTo(o.name);
+    override fun toString(): String {
+        return name
     }
-
-    @Override
-    public boolean equals(Object o) {
-        return this == o || (o instanceof Resource resource && Objects.equals(name, resource.name));
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(name);
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
 }
