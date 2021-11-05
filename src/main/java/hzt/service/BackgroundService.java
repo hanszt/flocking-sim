@@ -3,9 +3,13 @@ package hzt.service;
 import hzt.model.Resource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -29,28 +33,38 @@ public class BackgroundService implements IBackgroundService {
         if (url != null) {
             File styleDirectory = new File(url.getFile());
             if (styleDirectory.isDirectory()) {
-                String[] fileNames = styleDirectory.list();
-                for (String fileName : fileNames) {
-                    String name = extractName(fileName);
-                    set.add(new Resource(name, RELATIVE_BG_IMAGES_RESOURCE_DIR + "/" + fileName));
+                var files = styleDirectory.listFiles();
+                for (var file : Objects.requireNonNull(files)) {
+                    set.add(getResource(file));
                 }
             }
-        } else LOGGER.error("Resource folder at " + RELATIVE_BG_IMAGES_RESOURCE_DIR + " not found...");
+        } else {
+            LOGGER.error("Resource folder at " + RELATIVE_BG_IMAGES_RESOURCE_DIR + " not found...");
+        }
         return set;
     }
 
-    private String extractName(String fileName) {
-        String parsedName = fileName
+    @NotNull
+    private static Resource getResource(File file) {
+        String name = extractName(file);
+        try {
+            return new Resource(name, file.toURI().toURL());
+        } catch (MalformedURLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    private static String extractName(File file) {
+        String parsedName = file.getName()
                 .replace('_', ' ')
                 .replace('-', ' ')
                 .replace(".jpg", "")
                 .replace(".png", "");
-        parsedName = parsedName.substring(0, 1).toUpperCase() + parsedName.substring(1).toLowerCase();
-        return parsedName;
+        return parsedName.substring(0, 1).toUpperCase() + parsedName.substring(1).toLowerCase();
     }
 
     public Set<Resource> getResources() {
-        return resources;
+        return Collections.unmodifiableSet(resources);
     }
 
 }

@@ -28,7 +28,7 @@ public class AboutController extends SceneController {
     public void setup() {
         textArea.setPrefSize(INIT_SCENE_DIMENSION.getWidth(), INIT_SCENE_DIMENSION.getHeight());
         textArea.setEditable(false);
-        aboutService.loadContent().forEach(aboutText -> textComboBox.getItems().add(aboutText));
+        textComboBox.getItems().addAll(aboutService.loadContent());
         textComboBox.setValue(textComboBox.getItems().get(0));
     }
 

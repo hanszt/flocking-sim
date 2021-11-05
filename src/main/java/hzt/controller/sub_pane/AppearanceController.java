@@ -87,12 +87,12 @@ public class AppearanceController extends FXMLController {
     }
 
     private void configureComboBoxes() {
-        themeService.getThemes().forEach(theme -> themeCombobox.getItems().add(theme));
+        themeCombobox.getItems().addAll(themeService.getThemes());
         themeService.currentThemeProperty().bind(themeCombobox.valueProperty());
         themeService.styleSheetProperty().addListener(this::changeStyle);
         themeCombobox.setValue(IThemeService.DEFAULT_THEME);
 
-        backgroundService.getResources().forEach(r -> backgroundCombobox.getItems().add(r));
+        backgroundCombobox.getItems().addAll(backgroundService.getResources());
         backgroundCombobox.setValue(BackgroundService.NO_PICTURE);
     }
 
@@ -113,8 +113,7 @@ public class AppearanceController extends FXMLController {
     private void backgroundComboBoxAction() {
         Optional.of(backgroundCombobox)
                 .map(ComboBoxBase::getValue)
-                .map(Resource::getPathToResource)
-                .map(path -> backgroundService.getClass().getResourceAsStream(path))
+                .map(Resource::getInputStream)
                 .map(Image::new)
                 .ifPresentOrElse(this::setBackgroundImage, this::backgroundColorPickerAction);
     }

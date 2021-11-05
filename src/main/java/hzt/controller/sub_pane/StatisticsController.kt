@@ -83,7 +83,7 @@ class StatisticsController : FXMLController("statisticsPane.fxml") {
     }
 
     init {
-        Timer().scheduleTask(this::startRuntimeLabelFillTransition, 10_000)
+        Timer().scheduleTask(this::startRuntimeLabelFillTransition, Duration.seconds(10.0))
     }
 
     private fun startRuntimeLabelFillTransition() {
