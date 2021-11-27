@@ -21,7 +21,6 @@ object AppConstants {
 
     @JvmField
     val INIT_FRAME_DURATION: Duration = Duration.seconds(1.0 / INIT_FRAME_RATE) // s/f
-    const val MIN_SIZE = 3
 
     @JvmField
     val INIT_UNIFORM_BALL_COLOR: Color = Color.ORANGE

@@ -7,7 +7,7 @@ import hzt.model.entity.Flock
 import hzt.model.entity.Path
 import hzt.model.entity.VisibleVector
 import hzt.model.utils.Engine
-import hzt.service.AnimationService
+import hzt.utils.*
 import javafx.beans.property.DoubleProperty
 import javafx.beans.property.SimpleDoubleProperty
 import javafx.event.EventHandler
@@ -38,17 +38,34 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
     private val densityMaterial: DoubleProperty = SimpleDoubleProperty() // kg/m^3
     private val translationKeyFilter = TranslationKeyFilter()
 
-    var velocity : Point2D
-    var acceleration : Point2D
+    var velocity: Point2D
+    var acceleration: Point2D
     private var prevCenterPosition = Point2D.ZERO
     private var maxAcceleration = 0.0
 
+    init {
+        this.name = name + " " + ++next
+        this.initPaint = initPaint
+        this.body = body
+        perceptionCircle = Circle()
+        repelCircle = Circle()
+        visibleVelocityVector = VisibleVector()
+        visibleAccelerationVector = VisibleVector()
+        path = Path()
+        densityMaterial.set(Engine.DENSITY)
+        perceptionRadiusMap = HashMap()
+        velocity = Point2D.ZERO
+        acceleration = Point2D.ZERO
+        configureComponents()
+        children.addAll(body, perceptionCircle, repelCircle, visibleVelocityVector, visibleAccelerationVector, path)
+    }
+
     private fun configureComponents() {
         body.cursor = Cursor.HAND
-        configureCircle(perceptionCircle)
-        configureCircle(repelCircle)
-        configureVisibleVector(visibleVelocityVector)
-        configureVisibleVector(visibleAccelerationVector)
+        perceptionCircle.configure()
+        repelCircle.configure()
+        visibleVelocityVector.configure()
+        visibleAccelerationVector.configure()
         updatePaint(initPaint)
         path.isVisible = false
         path.setLineWidth(distanceFromCenterToOuterEdge / 4)
@@ -57,18 +74,18 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
 
     abstract val distanceFromCenterToOuterEdge: Double
 
-    private fun configureCircle(circle: Circle) {
-        circle.strokeType = StrokeType.OUTSIDE
-        circle.isDisable = true //ignores user input
-        circle.fill = Color.TRANSPARENT
-        circle.centerXProperty().bind(body.translateXProperty())
-        circle.centerYProperty().bind(body.translateYProperty())
+    private fun Circle.configure() {
+        centerXProperty().bind(body.translateXProperty())
+        centerYProperty().bind(body.translateYProperty())
+        withFill(Color.TRANSPARENT)
+            .withStrokeType(StrokeType.OUTSIDE)
+            .isDisabled(true) //ignores user input
     }
 
-    private fun configureVisibleVector(line: Line) {
-        line.strokeWidth = AnimationService.LINE_STROKE_WIDTH.toDouble()
-        line.startXProperty().bind(body.translateXProperty())
-        line.startYProperty().bind(body.translateYProperty())
+    private fun VisibleVector.configure() {
+        strokeWidth = LINE_STROKE_WIDTH.toDouble()
+        startXProperty().bind(body.translateXProperty())
+        startYProperty().bind(body.translateYProperty())
     }
 
     fun update(deltaT: Duration, accelerationMultiplier: Double, frictionFactor: Double, maxVelocity: Double) {
@@ -92,8 +109,18 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
         val minVelVectorLength = 300
         val velocityCorrection =
             if (maxVelocity >= minVelVectorLength) maxVelocity else minVelVectorLength.toDouble()
-        updateVisibleVector(visibleVelocityVector, velocity, velocityCorrection, flockProperties.getVelocityVectorLength())
-        updateVisibleVector(visibleAccelerationVector, acceleration, 2000.0, flockProperties.getAccelerationVectorLength())
+        updateVisibleVector(
+            visibleVelocityVector,
+            velocity,
+            velocityCorrection,
+            flockProperties.getVelocityVectorLength()
+        )
+        updateVisibleVector(
+            visibleAccelerationVector,
+            acceleration,
+            2000.0,
+            flockProperties.getAccelerationVectorLength()
+        )
         updatePath(flockProperties.getTailLength())
         if (flockProperties.isAllPathsVisible()) {
             path.fadeOut()
@@ -121,15 +148,15 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
     }
 
     private fun strokeConnection(otherBall: Boid?, lineToOther: Connection?) {
-        val distance = otherBall!!.translation.subtract(translation).magnitude()
-        lineToOther!!.stroke = body.fill
-        lineToOther.strokeWidth = AnimationService.LINE_STROKE_WIDTH.toDouble()
-        lineToOther.isDisable = true // ignores user input
-        lineToOther.opacity = 1 - distance / perceptionCircle.radius
-        lineToOther.startX = body.translateX
-        lineToOther.startY = body.translateY
-        lineToOther.endX = otherBall.body.translateX
-        lineToOther.endY = otherBall.body.translateY
+        val distance = otherBall?.translation?.subtract(translation)?.magnitude() ?: 0.0
+        lineToOther?.apply {
+            stroke = body.fill
+            strokeWidth = LINE_STROKE_WIDTH.toDouble()
+            isDisable = true // ignores user input
+            opacity = 1 - distance / perceptionCircle.radius
+            withStart(body.translateX, body.translateY)
+            withEnd(otherBall?.body?.translateX ?: 0.0, otherBall?.body?.translateY ?: 0.0)
+        }
         if (!children.contains(lineToOther)) {
             children.add(lineToOther)
         }
@@ -160,10 +187,7 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
         }
     }
 
-    private fun addFriction(frictionFactor: Double): Point2D {
-        val decelerationDir = velocity.multiply(-1.0)
-        return decelerationDir.multiply(frictionFactor)
-    }
+    private fun addFriction(frictionFactor: Double): Point2D = velocity.multiply(-frictionFactor)
 
     private fun updatePositionAndVelocityBasedOnAcceleration(
         deltaT: Duration,
@@ -180,26 +204,20 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
         this.setBodyTranslate(position.x, position.y)
     }
 
-    fun limit(maxValue: Double, limitedVector: Point2D): Point2D {
-        if (limitedVector.magnitude() > maxValue) {
-            return limitedVector.normalize().multiply(maxValue)
-        }
-        return limitedVector
-    }
+    fun limit(maxValue: Double, limitedVector: Point2D): Point2D =
+        if (limitedVector.magnitude() > maxValue) limitedVector.normalize().multiply(maxValue) else limitedVector
 
     fun floatThroughEdges(dimension: Dimension2D) {
-        val width = dimension.width
-        val height = dimension.height
         val centerPosition = translation
-        if (body.translateX >= width) {
+        if (body.translateX >= dimension.width) {
             this.setBodyTranslate(0.0, centerPosition.y)
         } else if (body.translateX <= 0) {
-            this.setBodyTranslate(width, centerPosition.y)
+            this.setBodyTranslate(dimension.width, centerPosition.y)
         }
-        if (body.translateY >= height) {
+        if (body.translateY >= dimension.height) {
             this.setBodyTranslate(centerPosition.x, 0.0)
         } else if (body.translateY <= 0) {
-            this.setBodyTranslate(centerPosition.x, height)
+            this.setBodyTranslate(centerPosition.x, dimension.height)
         }
     }
 
@@ -224,27 +242,22 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
     val translation: Point2D
         get() = Point2D(body.translateX, body.translateY)
 
-    fun setBodyTranslate(point2D: Point2D) {
-        body.translateX = point2D.x
-        body.translateY = point2D.y
+    fun setBodyTranslate(point2D: Point2D) = setBodyTranslate(point2D.x, point2D.y)
+
+    private fun setBodyTranslate(x: Double, y: Double) = body.run {
+        translateX = x
+        translateY = y
     }
 
-    private fun setBodyTranslate(x: Double, y: Double) {
-        body.translateX = x
-        body.translateY = y
+    fun addKeyControlForAcceleration() = (parent as Flock).mainScene.apply {
+        addEventFilter(KeyEvent.KEY_PRESSED, translationKeyFilter.keyPressed)
+        addEventFilter(KeyEvent.KEY_RELEASED, translationKeyFilter.keyReleased)
     }
 
-    fun addKeyControlForAcceleration() {
-        val scene = (parent as Flock).mainScene
-        scene.addEventFilter(KeyEvent.KEY_PRESSED, translationKeyFilter.keyPressed)
-        scene.addEventFilter(KeyEvent.KEY_RELEASED, translationKeyFilter.keyReleased)
-    }
-
-    private fun removeKeyControlsForAcceleration() {
-        val scene = (parent as Flock).mainScene
+    private fun removeKeyControlsForAcceleration() = (parent as Flock).mainScene.apply {
+        removeEventFilter(KeyEvent.KEY_PRESSED, translationKeyFilter.keyPressed)
+        removeEventFilter(KeyEvent.KEY_RELEASED, translationKeyFilter.keyReleased)
         translationKeyFilter.resetKeyPressed()
-        scene.removeEventFilter(KeyEvent.KEY_PRESSED, translationKeyFilter.keyPressed)
-        scene.removeEventFilter(KeyEvent.KEY_RELEASED, translationKeyFilter.keyReleased)
     }
 
     fun updatePaint(paint: Paint) {
@@ -286,9 +299,7 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
         }
     }
 
-    fun getDensityMaterial(): Double {
-        return densityMaterial.get()
-    }
+    fun densityMaterial(): Double = densityMaterial.get()
 
     fun setPerceptionRadius(radius: Double) {
         perceptionCircle.radius = radius
@@ -302,25 +313,9 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
     }
 
     companion object {
+        const val LINE_STROKE_WIDTH = 2
         var next = 0
             private set
     }
 
-    init {
-        this.name = name + " " + ++next
-        this.initPaint = initPaint
-        this.body = body
-        perceptionCircle = Circle()
-        repelCircle = Circle()
-        visibleVelocityVector = VisibleVector()
-        visibleAccelerationVector = VisibleVector()
-        path = Path()
-        densityMaterial.set(Engine.DENSITY)
-        perceptionRadiusMap = HashMap()
-        velocity = Point2D.ZERO
-        acceleration = Point2D.ZERO
-        configureComponents()
-        super.getChildren()
-            .addAll(this.body, perceptionCircle, repelCircle, visibleVelocityVector, visibleAccelerationVector, path)
-    }
 }

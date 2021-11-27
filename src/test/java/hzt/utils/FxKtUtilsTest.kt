@@ -1,6 +1,5 @@
 package hzt.utils
 
-import hzt.utils.FxKtUtils.firstLetterUpperCase
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -8,9 +7,16 @@ import org.junit.jupiter.api.Assertions.*
 internal class FxKtUtilsTest {
 
     @Test
-    fun testFirstLetterUpperCase() {
-        assertEquals("", "".firstLetterUpperCase())
-        assertEquals("A", "a".firstLetterUpperCase())
-        assertEquals("Hallo", "hAllO".firstLetterUpperCase())
+    fun testFirstCharUpperCase() {
+        assertEquals("", "".firstCharUpperCase())
+        assertEquals("A", "a".firstCharUpperCase())
+        assertEquals("Hallo", "hAllO".firstCharUpperCase())
+    }
+
+    @Test
+    fun testReplaceFirstCharUpperCase() {
+        assertEquals("", "".replaceFirstChar(Char::uppercase))
+        assertEquals("A", "a".replaceFirstChar(Char::uppercase))
+        assertEquals("Hallo", "hAllO".lowercase().replaceFirstChar(Char::uppercase))
     }
 }

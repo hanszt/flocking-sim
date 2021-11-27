@@ -1,9 +1,8 @@
 package hzt.service
 
 import hzt.model.Resource
-import hzt.utils.FxKtUtils.collectAndThen
-import hzt.utils.FxKtUtils.firstLetterUpperCase
-import hzt.utils.FxKtUtils.onNewValue
+import hzt.utils.firstCharUpperCase
+import hzt.utils.onNewValue
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
@@ -13,7 +12,6 @@ import java.io.File
 import java.net.MalformedURLException
 import java.net.URL
 import java.util.*
-import java.util.stream.Collectors.toCollection
 
 class ThemeService : IThemeService {
 
@@ -27,15 +25,14 @@ class ThemeService : IThemeService {
     }
 
     private fun scanForThemeStyleSheets(): Set<Resource> {
-        return Optional.ofNullable(javaClass.getResource(RELATIVE_STYLE_SHEET_RESOURCE_DIR))
-            .map(URL::getFile)
-            .map(::File)
-            .filter(File::isDirectory)
-            .map(File::listFiles)
-            .stream()
-            .flatMap(Arrays::stream)
-            .map(::toThemeResource)
-            .collectAndThen((toCollection(::TreeSet)), ::checkNotEmpty)
+        return (javaClass.getResource(RELATIVE_STYLE_SHEET_RESOURCE_DIR)?.file
+            ?.let(::File)
+            ?.takeIf(File::isDirectory)
+            ?.let(File::listFiles)
+            ?.asSequence()
+            ?.map(::toThemeResource)
+            ?.toSortedSet() ?: sortedSetOf())
+            .checkNotEmpty()
     }
 
     private fun loadThemeStyleSheet(theme: Resource) {
@@ -53,22 +50,18 @@ class ThemeService : IThemeService {
     }
 
     override fun getThemes(): Set<Resource> {
-        return Collections.unmodifiableSet(themes)
+        return themes
     }
 
     companion object {
         private const val RELATIVE_STYLE_SHEET_RESOURCE_DIR = "/css"
         private val LOGGER = LogManager.getLogger(ThemeService::class.java)
-        private val DEFAULT_THEME = Resource("Light",
-            ThemeService::class.java.getResource("$RELATIVE_STYLE_SHEET_RESOURCE_DIR/style-light.css")
-        )
+        private val DEFAULT_THEME = Resource("Light")
 
-        private fun checkNotEmpty(set: MutableSet<Resource>): Set<Resource> {
-            if (set.isEmpty()) {
-                LOGGER.error("{} not found...", RELATIVE_STYLE_SHEET_RESOURCE_DIR)
-            }
-            set.add(DEFAULT_THEME)
-            return set
+        private fun MutableSet<Resource>.checkNotEmpty(): Set<Resource> {
+            if (this.isEmpty()) LOGGER.error("{} not found...", RELATIVE_STYLE_SHEET_RESOURCE_DIR)
+            add(DEFAULT_THEME)
+            return this
         }
 
         private fun toThemeResource(file: File): Resource {
@@ -81,10 +74,10 @@ class ThemeService : IThemeService {
 
         private fun extractThemeName(fileName: String): String {
             return fileName
+                .replace("style-", "")
                 .replace('-', ' ')
                 .replace(".css", "")
-                .replace("style-", "")
-                .firstLetterUpperCase()
+                .firstCharUpperCase()
         }
     }
 

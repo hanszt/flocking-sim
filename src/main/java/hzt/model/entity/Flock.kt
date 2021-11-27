@@ -13,7 +13,6 @@ import hzt.model.utils.RandomGenerator.randomColor
 import javafx.geometry.Dimension2D
 import javafx.geometry.Point2D
 import javafx.scene.Group
-import javafx.scene.Node
 import javafx.scene.Scene
 import javafx.scene.control.Slider
 import javafx.scene.input.MouseEvent
@@ -29,54 +28,42 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid> {
         override val random: Boolean
             get() = true
 
-        override fun createBoid(maxBoidSize: Double): Boid {
-            return RectangleBoid(
-                getRandomDouble(AppConstants.MIN_SIZE.toDouble(), maxBoidSize),
-                getRandomDouble(AppConstants.MIN_SIZE.toDouble(), maxBoidSize), randomColor
-            )
-        }
+        override fun createBoid(maxBoidSize: Double): Boid = RectangleBoid(
+            getRandomDouble(MIN_SIZE.toDouble(), maxBoidSize),
+            getRandomDouble(MIN_SIZE.toDouble(), maxBoidSize), randomColor
+        )
 
         override fun setCenterPosition(boid: Boid, dimension: Dimension2D) {
             boid.setBodyTranslate(getRandomPositionOnParent(dimension.width, dimension.height))
         }
 
-        override fun toString(): String {
-            return "Random rectangle flock"
-        }
+        override fun toString(): String = "Random rectangle flock"
     }
 
     val uniformCircleFlock: FlockType = object : FlockType() {
         override val random: Boolean
             get() = false
 
-        override fun createBoid(maxBoidSize: Double): Boid {
-            return CircleBoid(maxBoidSize, uniformBallColor)
-        }
+        override fun createBoid(maxBoidSize: Double): Boid = CircleBoid(maxBoidSize, uniformBallColor)
 
         override fun setCenterPosition(boid: Boid, dimension: Dimension2D) {
             boid.setBodyTranslate(getRandomPositionOnParent(dimension.width, dimension.height))
         }
 
-        override fun toString(): String {
-            return "Uniform circle flock"
-        }
+        override fun toString(): String = "Uniform circle flock"
     }
 
     val randomCircleFlock: FlockType = object : FlockType() {
         override val random: Boolean
             get() = true
 
-        override fun createBoid(maxBoidSize: Double): Boid {
-            return CircleBoid(getRandomDouble(AppConstants.MIN_SIZE.toDouble(), maxBoidSize), randomColor)
-        }
+        override fun createBoid(maxBoidSize: Double): Boid =
+            CircleBoid(getRandomDouble(MIN_SIZE.toDouble(), maxBoidSize), randomColor)
 
-        override fun setCenterPosition(boid: Boid, dimension: Dimension2D) {
+        override fun setCenterPosition(boid: Boid, dimension: Dimension2D) =
             boid.setBodyTranslate(getRandomPositionOnParent(dimension.width, dimension.height))
-        }
 
-        override fun toString(): String {
-            return "Random circle flock"
-        }
+        override fun toString(): String = "Random circle flock"
     }
 
     val flockProperties = FlockProperties()
@@ -88,36 +75,30 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid> {
 
     fun controlFlockSize(numberOfBalls: Int, parentDimension: Dimension2D) {
         while (children.size != numberOfBalls) {
-            if (children.size < numberOfBalls) {
-                addBoidToFlock(parentDimension)
-            } else {
-                removeBoidFromFlock()
-            }
+            if (children.size < numberOfBalls) addBoidToFlock(parentDimension) else removeBoidFromFlock()
         }
     }
 
-    private fun addBoidToFlock(parentDimension: Dimension2D): Boid {
-        val boid = flockType.createBoid(flockProperties.getMaxBoidSize())
-        flockType.setCenterPosition(boid, parentDimension)
-        boid.setPerceptionRadius(boid.distanceFromCenterToOuterEdge * flockProperties.getPerceptionRadiusRatio())
-        boid.setRepelRadius(boid.distanceFromCenterToOuterEdge * flockProperties.getRepelRadiusRatio())
-        boid.addMouseFunctionality()
-        children.add(boid)
-        boid.setVisibilityBoidComponents(flockProperties)
-        return boid
-    }
+    private fun addBoidToFlock(parentDimension: Dimension2D): Boid = flockType
+        .createBoid(flockProperties.getMaxBoidSize()).also {
+            flockType.setCenterPosition(it, parentDimension)
+            it.setPerceptionRadius(it.distanceFromCenterToOuterEdge * flockProperties.getPerceptionRadiusRatio())
+            it.setRepelRadius(it.distanceFromCenterToOuterEdge * flockProperties.getRepelRadiusRatio())
+            it.addMouseFunctionality()
+            children.add(it)
+            it.setVisibilityBoidComponents(flockProperties)
+        }
 
     private fun removeBoidFromFlock() {
-        val list = children
-        val boid = list[0] as Boid
+        val boid = children[0] as Boid
         children.remove(boid)
         for (node in children) {
             val other = node as Boid
             other.perceptionRadiusMap.remove(boid)
-            other.children.removeIf { obj: Node? -> Connection::class.java.isInstance(obj) }
+            other.children.removeIf(Connection::class.java::isInstance)
         }
         if (boid == selectedBoid) {
-            selectedBoid = if (!list.isEmpty()) randomSelectedBoid else null
+            selectedBoid = if (!children.isEmpty()) randomSelectedBoid else null
         }
     }
 
@@ -138,26 +119,20 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid> {
     }
 
     val maxNrOfBoids: Int
-    get() {
-        return parsedIntAppProp("max_number_of_boids", 200)
-    }
+        get() = parsedIntAppProp("max_number_of_boids", 200)
 
     val randomSelectedBoid: Boid
-        get() {
-            val boid = children[Random().nextInt(children.size)] as Boid
-            boid.updatePaint(selectedBallColor)
-            boid.addKeyControlForAcceleration()
-            boid.toFront()
-            updateSelectedBoidComponentsVisibility(boid)
-            return boid
+        get() = (children[Random().nextInt(children.size)] as Boid).apply {
+            updatePaint(selectedBallColor)
+            addKeyControlForAcceleration()
+            toFront()
+            updateSelectedBoidComponentsVisibility(this)
         }
 
-    override fun iterator(): MutableIterator<Boid> {
-        return children.stream()
-            .filter(Boid::class.java::isInstance)
-            .map(Boid::class.java::cast)
-            .iterator()
-    }
+    override fun iterator(): MutableIterator<Boid> = children.stream()
+        .filter(Boid::class.java::isInstance)
+        .map(Boid::class.java::cast)
+        .iterator()
 
     fun updateSelectedBoidComponentsVisibility(selectedBoid: Boid) {
         selectedBoid.perceptionCircle.isVisible = flockProperties.isSelectedPerceptionCircleVisible()
@@ -173,16 +148,12 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid> {
         abstract val random: Boolean
         abstract fun createBoid(maxBoidSize: Double): Boid
         abstract fun setCenterPosition(boid: Boid, dimension: Dimension2D)
-        override fun toString(): String {
-            return "FlockType"
-        }
+        override fun toString(): String = "FlockType"
     }
 
     inner class CircleFlock : FlockType() {
         override val random: Boolean = false
-        override fun createBoid(maxBoidSize: Double): Boid {
-            return CircleBoid(maxBoidSize, uniformBallColor)
-        }
+        override fun createBoid(maxBoidSize: Double): Boid = CircleBoid(maxBoidSize, uniformBallColor)
 
         override fun setCenterPosition(boid: Boid, dimension: Dimension2D) {
             val index: Int = Boid.next % maxNrOfBoids
@@ -199,12 +170,14 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid> {
             return circularPosition.add(centerPosition)
         }
 
-        override fun toString(): String {
-            return "Uniform ordered circle flock"
-        }
+        override fun toString(): String = "Uniform ordered circle flock"
     }
 
     fun setUniformBallColor(uniformBallColor: Color) {
         this.uniformBallColor = uniformBallColor
+    }
+
+    private companion object {
+        const val MIN_SIZE = 3
     }
 }

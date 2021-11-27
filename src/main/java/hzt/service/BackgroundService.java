@@ -13,6 +13,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
+import static hzt.utils.FxKtUtilsKt.firstCharUpperCase;
+
 public class BackgroundService implements IBackgroundService {
 
     public static final Resource NO_PICTURE = new Resource("No picture");
@@ -55,12 +57,11 @@ public class BackgroundService implements IBackgroundService {
     }
 
     private static String extractName(File file) {
-        String parsedName = file.getName()
+        return firstCharUpperCase(file.getName()
                 .replace('_', ' ')
                 .replace('-', ' ')
                 .replace(".jpg", "")
-                .replace(".png", "");
-        return parsedName.substring(0, 1).toUpperCase() + parsedName.substring(1).toLowerCase();
+                .replace(".png", ""));
     }
 
     public Set<Resource> getResources() {

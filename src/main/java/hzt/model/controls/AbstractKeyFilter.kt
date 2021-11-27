@@ -17,12 +17,15 @@ abstract class AbstractKeyFilter internal constructor(
     private var xPosPressed = false
     private var yNegPressed = false
     private var yPosPressed = false
+
     var userInputSize = .1
     val keyPressed: EventHandler<KeyEvent>
     val keyReleased: EventHandler<KeyEvent>
+
     abstract fun pressedAction(point2D: Point2D?): Boolean
     abstract fun releasedAction(point2D: Point2D?): Boolean
     abstract fun allReleasedAction(allReleased: Boolean)
+
     fun resetKeyPressed() {
         yPosPressed = false
         yNegPressed = yPosPressed
@@ -71,8 +74,8 @@ abstract class AbstractKeyFilter internal constructor(
     }
 
     init {
-        keyPressed = EventHandler { e: KeyEvent -> keyPressedAction(e) }
-        keyReleased = EventHandler { e: KeyEvent -> keyReleasedAction(e) }
+        keyPressed = EventHandler { keyPressedAction(it) }
+        keyReleased = EventHandler { keyReleasedAction(it) }
         this.negXKeyCode = negXKeyCode
         this.posXKeycode = posXKeycode
         this.negYKeyCode = negYKeyCode

@@ -7,7 +7,6 @@ import javafx.scene.Node
 import javafx.scene.paint.Color
 import javafx.scene.paint.Paint
 import javafx.scene.shape.Line
-import java.util.function.Consumer
 
 class Path : Group() {
 
@@ -16,10 +15,10 @@ class Path : Group() {
 
     fun addLine(currentPosition: Point2D, prevPosition: Point2D) {
         if (currentPosition != Point2D.ZERO && prevPosition != Point2D.ZERO) {
-            val line = Line(prevPosition.x, prevPosition.y, currentPosition.x, currentPosition.y)
-            line.stroke = paint
-            line.strokeWidth = lineWidth
-            children.add(line)
+            children.add(Line(prevPosition.x, prevPosition.y, currentPosition.x, currentPosition.y).apply {
+                stroke = paint
+                strokeWidth = lineWidth
+            })
         }
     }
 
@@ -46,6 +45,6 @@ class Path : Group() {
 
     fun setStroke(paint: Paint) {
         this.paint = paint
-        children.forEach(Consumer { l: Node -> (l as Line).stroke = paint })
+        children.forEach { (it as Line).stroke = paint }
     }
 }

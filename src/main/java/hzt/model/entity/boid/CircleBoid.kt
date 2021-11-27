@@ -13,8 +13,7 @@ class CircleBoid(radius: Double, paint: Paint) : Boid("Circle Boid ", Circle(rad
         get() = massByDensityAndRadius
 
     private val massByDensityAndRadius: Double
-        get() {
-            val volume = 4 * Math.PI * distanceFromCenterToOuterEdge.pow(3.0) / 3
-            return getDensityMaterial() * volume
-        }
+        get() = densityMaterial() * volume()
+
+    private fun volume() = 4 * Math.PI * distanceFromCenterToOuterEdge.pow(3.0) / 3
 }

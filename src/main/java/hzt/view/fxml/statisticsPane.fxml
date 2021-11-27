@@ -21,7 +21,7 @@
         </VBox>
         <VBox layoutX="10.0" layoutY="10.0">
             <Label fx:id="frictionStatsLabel" text="NaN"/>
-            <Label fx:id="frameRateStatsLabel" text="NaN"/>
+            <Label fx:id="frameRateLabel" text="NaN"/>
             <Label fx:id="numberOfBoidsLabel" text="NaN"/>
             <Text fx:id="runTimeLabel" text="NaN"/>
         </VBox>

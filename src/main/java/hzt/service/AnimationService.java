@@ -14,8 +14,6 @@ import static javafx.animation.Animation.INDEFINITE;
 
 public class AnimationService {
 
-    public static final int LINE_STROKE_WIDTH = 2;
-
     private final Timeline timeline;
 
     public AnimationService() {

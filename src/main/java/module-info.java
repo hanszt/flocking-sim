@@ -1,3 +1,6 @@
+import hzt.controller.FXMLController;
+import hzt.service.IThemeService;
+
 open module FlockingSim2D {
 
     requires org.apache.logging.log4j;
@@ -9,4 +12,8 @@ open module FlockingSim2D {
     requires kotlin.stdlib;
 
     exports hzt.view to javafx.graphics;
+
+    //These 'uses' clauses are necessary for the serviceloader tests
+    uses FXMLController;
+    uses IThemeService;
 }

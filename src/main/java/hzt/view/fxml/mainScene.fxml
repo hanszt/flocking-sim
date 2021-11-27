@@ -71,7 +71,7 @@
                                     <Button mnemonicParsing="false" onAction="#newInstance"
                                             prefWidth="1000.0" text="New instance"/>
                                     <ToggleButton fx:id="fullScreenButton" mnemonicParsing="false"
-                                                  onAction="#fullScreenButtonAction" prefWidth="1000.0"
+                                                  prefWidth="1000.0"
                                                   text="Full screen"/>
                                     <ToggleButton mnemonicParsing="false"
                                                   onAction="#transparentButtonAction" prefWidth="1000.0"
@@ -101,7 +101,7 @@
                                     </padding>
                                     <Label text="Background color"/>
                                     <ColorPicker fx:id="backgroundColorPicker"
-                                                 onAction="#backgroundColorPickerAction" prefHeight="30"
+                                                 prefHeight="30"
                                                  prefWidth="1000.0"/>
                                     <Label text="Selected boid color"/>
                                     <ColorPicker fx:id="selectedBallColorPicker"
