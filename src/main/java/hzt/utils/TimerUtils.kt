@@ -1,21 +1,16 @@
 package hzt.utils
 
 import javafx.util.Duration
-import java.lang.Runnable
 import java.util.*
 
-object TimerUtils {
-
-    @JvmStatic
-    fun taskFor(runnable: Runnable): TimerTask {
-        return object : TimerTask() {
-            override fun run() {
-                runnable.run()
-            }
+fun taskFor(runnable: Runnable): TimerTask {
+    return object : TimerTask() {
+        override fun run() {
+            runnable.run()
         }
     }
-
-    fun Timer.scheduleTask(runnable: Runnable, delay: Long) = schedule(taskFor(runnable), delay)
-
-    fun Timer.scheduleTask(runnable: Runnable, delay: Duration) = schedule(taskFor(runnable), delay.toMillis().toLong())
 }
+
+fun Timer.scheduleTask(runnable: Runnable, delay: Long) = schedule(taskFor(runnable), delay)
+
+fun Timer.scheduleTask(runnable: Runnable, delay: Duration) = schedule(taskFor(runnable), delay.toMillis().toLong())

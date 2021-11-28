@@ -3,7 +3,7 @@ package hzt.controller.sub_pane
 import hzt.controller.FXMLController
 import hzt.model.entity.boid.Boid
 import hzt.service.StatisticsService
-import hzt.utils.TimerUtils.scheduleTask
+import hzt.utils.scheduleTask
 import javafx.animation.Animation
 import javafx.animation.FillTransition
 import javafx.fxml.FXML

@@ -17,7 +17,7 @@ import static hzt.model.AppConstants.DOTTED_LINE;
 import static hzt.model.AppConstants.MIN_STAGE_DIMENSION;
 import static hzt.model.AppConstants.Scene;
 import static hzt.model.AppConstants.TITLE;
-import static hzt.utils.TimerUtils.taskFor;
+import static hzt.utils.TimerUtilsKt.taskFor;
 
 public class AppManager {
 
