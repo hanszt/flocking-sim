@@ -3,11 +3,14 @@ package hzt.model;
 import javafx.geometry.Dimension2D;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import static javafx.scene.paint.Color.NAVY;
@@ -57,8 +60,9 @@ public final class AppConstants {
                 LOGGER.warn(String.format("Property '%s' with value '%s' could not be parsed to a double... " +
                         "Falling back to default: %f...", property, propertyVal, defaultVal));
             }
-        } else LOGGER.warn(() -> String.format("Property '%s' not found. Falling back to default: %f",
-                property, defaultVal));
+        } else {
+            LOGGER.warn(() -> String.format("Property '%s' not found. Falling back to default: %f", property, defaultVal));
+        }
         return value;
     }
 
@@ -72,8 +76,9 @@ public final class AppConstants {
                 LOGGER.warn(String.format("Property '%s' with value '%s' could not be parsed to an int... " +
                         "Falling back to default: %d...", property, propertyVal, defaultVal));
             }
-        } else LOGGER.warn(() -> String.format("Property '%s' not found. Falling back to default: %d",
-                property, defaultVal));
+        } else {
+            LOGGER.warn(() -> String.format("Property '%s' not found. Falling back to default: %d", property, defaultVal));
+        }
         return value;
     }
 
@@ -90,17 +95,16 @@ public final class AppConstants {
 
     private static Properties configProperties() {
         Properties properties = new Properties();
-        String pathName = "./src/main/resources/app.properties";
+        String pathName = "src/main/resources/app.properties";
         File file = new File(pathName);
         try (InputStream stream = new BufferedInputStream(new FileInputStream(file))) {
             properties.load(stream);
         } catch (IOException e) {
-            LOGGER.warn(() -> pathName + " not found...");
+            LOGGER.warn(() -> pathName + " not found...", e);
         }
         return properties;
     }
 
-    @Getter
     public enum Scene {
 
         MAIN_SCENE("mainScene.fxml", "Main Scene"),
@@ -114,5 +118,12 @@ public final class AppConstants {
             this.englishDescription = englishDescription;
         }
 
+        public String getFxmlFileName() {
+            return fxmlFileName;
+        }
+
+        public String getEnglishDescription() {
+            return englishDescription;
+        }
     }
 }

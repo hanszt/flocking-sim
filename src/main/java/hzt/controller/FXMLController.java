@@ -8,7 +8,7 @@ import java.net.URL;
 
 public abstract class FXMLController {
 
-    private static final String FXML_FILE_LOCATION = "../../../fxml/";
+    private static final String FXML_FILE_LOCATION = "/fxml/";
 
     private final Parent root;
 

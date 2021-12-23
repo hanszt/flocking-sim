@@ -15,10 +15,12 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeType;
 import javafx.util.Duration;
-import lombok.Getter;
-import lombok.ToString;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static hzt.model.AppConstants.INIT_FRAME_DURATION;
 import static hzt.model.utils.Engine.DENSITY;
@@ -26,8 +28,6 @@ import static hzt.service.AnimationService.LINE_STROKE_WIDTH;
 import static java.util.function.Predicate.not;
 import static javafx.scene.paint.Color.TRANSPARENT;
 
-@ToString
-@Getter
 public class Boid extends Group {
 
     private static int next = 0;
@@ -142,8 +142,8 @@ public class Boid extends Group {
             lineToOther.setOpacity(1 - distance / this.perceptionCircle.getRadius());
             lineToOther.setStartX(this.body.getCenterX());
             lineToOther.setStartY(this.body.getCenterY());
-            lineToOther.setEndX(otherBall.getBody().getCenterX());
-            lineToOther.setEndY(otherBall.getBody().getCenterY());
+            lineToOther.setEndX(otherBall.body.getCenterX());
+            lineToOther.setEndY(otherBall.body.getCenterY());
             if (!this.getChildren().contains(lineToOther)) this.getChildren().add(lineToOther);
         });
     }
@@ -357,7 +357,7 @@ public class Boid extends Group {
                toFront();
                 if (selected != null) {
                     selected.removeKeyControlsForAcceleration();
-                    selected.updatePaint(selected.getInitPaint());
+                    selected.updatePaint(selected.initPaint);
                     flock.updateBoidComponentsVisibility(selected);
                 }
                 flock.setSelectedBoid(this);
@@ -388,5 +388,41 @@ public class Boid extends Group {
 
     public void setRepelRadius(double radius) {
         this.repelCircle.setRadius(radius);
+    }
+
+    public Circle getBody() {
+        return body;
+    }
+
+    public Circle getPerceptionCircle() {
+        return perceptionCircle;
+    }
+
+    public Map<Boid, Connection> getPerceptionRadiusMap() {
+        return perceptionRadiusMap;
+    }
+
+    public Circle getRepelCircle() {
+        return repelCircle;
+    }
+
+    public Path getPath() {
+        return path;
+    }
+
+    public VisibleVector getVisibleAccelerationVector() {
+        return visibleAccelerationVector;
+    }
+
+    public VisibleVector getVisibleVelocityVector() {
+        return visibleVelocityVector;
+    }
+
+    public Point2D getVelocity() {
+        return velocity;
+    }
+
+    public Point2D getAcceleration() {
+        return acceleration;
     }
 }

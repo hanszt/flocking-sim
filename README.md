@@ -12,7 +12,7 @@ Before you run the program, make sure you modify the following in Intellij:
 - Type the following in the VM Options section: --module-path ${PATH_TO_FX} --add-modules javafx.controls,javafx.fxml
 - Click Apply and Run the application. It should work now.
     
-source: https://openjfx.io/openjfx-docs/#IDE-Intellij
+source: [Getting Started with JavaFX](https://openjfx.io/openjfx-docs/#IDE-Intellij)
 
 ## Requirements
 
@@ -68,6 +68,7 @@ At the time of proposal, Reynolds' approach represented a giant step forward com
 The boids model has been used for other interesting applications. It has been applied to automatically program Internet multi-channel radio stations.[9] It has also been used for visualizing information[10] and for optimization tasks.[11] 
 ## Motivation
 I was curious about the workings of this kind of simulations. It was a lot of fun making it! Enjoy!
+
 ## Sources
 - [Flocking sim](https://en.wikipedia.org/wiki/Boids)
 - [Configuration of Log4j 2](https://logging.apache.org/log4j/log4j-2.7/manual/configuration.html)

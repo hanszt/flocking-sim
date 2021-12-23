@@ -2,37 +2,42 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
-    <artifactId>FlockingSim</artifactId>
+    <groupId>org.hzt.animations</groupId>
+    <artifactId>flocking-sim</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <openjfx.version>11</openjfx.version>
-        <log4j.version>2.13.3</log4j.version>
+        <openjfx.version>17.0.0.1</openjfx.version>
+        <log4j.version>2.17.0</log4j.version>
+        <annotations.version>22.0.0</annotations.version>
+        <archunit-junit5.version>0.22.0</archunit-junit5.version>
+        <commons-math3.version>3.6.1</commons-math3.version>
+        <javafx-maven-plugin.version>0.0.8</javafx-maven-plugin.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>RELEASE</version>
+            <version>5.8.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit-junit5</artifactId>
-            <version>0.13.1</version>
+            <version>${archunit-junit5.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
-            <version>17.0.0</version>
+            <version>${annotations.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -48,13 +53,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
-            <version>3.6.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
-            <optional>true</optional>
+            <version>${commons-math3.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
@@ -89,7 +88,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>hzt.view.Launcher</mainClass>
+                            <mainClass>hzt.view.FxLauncher</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -117,7 +116,7 @@
             <plugin>
                 <groupId>org.openjfx</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.3</version>
+                <version>${javafx-maven-plugin.version}</version>
                 <configuration>
                     <mainClass>hzt.view.Launcher</mainClass>
                 </configuration>
