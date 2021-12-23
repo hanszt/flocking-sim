@@ -16,11 +16,11 @@
         <kotlin-maven-plugin.jvmTarget>16</kotlin-maven-plugin.jvmTarget>
         <kotlin.code.style>official</kotlin.code.style>
         <!--        dependencies-->
-        <kotlin.version>1.6.0</kotlin.version>
+        <kotlin.version>1.6.10</kotlin.version>
         <openjfx.version>17.0.0.1</openjfx.version>
-        <log4j.version>2.14.1</log4j.version>
+        <log4j.version>2.17.0</log4j.version>
         <annotations.version>22.0.0</annotations.version>
-        <junit-jupiter-api.version>5.8.1</junit-jupiter-api.version>
+        <junit-jupiter-api.version>5.8.2</junit-jupiter-api.version>
         <archunit-junit5.version>0.22.0</archunit-junit5.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <error-prone.version>2.10.0</error-prone.version>
