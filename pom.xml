@@ -5,7 +5,7 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.example</groupId>
+    <groupId>org.hzt.animations</groupId>
     <artifactId>flocking-sim</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -14,6 +14,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <kotlin-maven-plugin.jvmTarget>16</kotlin-maven-plugin.jvmTarget>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.code.style>official</kotlin.code.style>
         <!--        dependencies-->
         <kotlin.version>1.6.10</kotlin.version>
@@ -123,7 +124,7 @@
 
         <plugins>
             <plugin>
-                <!--                Build an all inclusive Jar file for stand alone execution-->
+                <!--                Build an all-inclusive Jar file for stand-alone execution-->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>${maven-assembly-plugin.version}</version>
@@ -133,7 +134,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>hzt.view.Launcher</mainClass>
+                            <mainClass>hzt.view.FxLauncher</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
