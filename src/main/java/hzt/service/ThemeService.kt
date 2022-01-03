@@ -58,7 +58,7 @@ class ThemeService : IThemeService {
         private val LOGGER = LogManager.getLogger(ThemeService::class.java)
         private val DEFAULT_THEME = Resource("Light")
 
-        private fun MutableSet<Resource>.checkNotEmpty(): Set<Resource> {
+        private fun SortedSet<Resource>.checkNotEmpty(): Set<Resource> {
             if (this.isEmpty()) LOGGER.error("{} not found...", RELATIVE_STYLE_SHEET_RESOURCE_DIR)
             add(DEFAULT_THEME)
             return this

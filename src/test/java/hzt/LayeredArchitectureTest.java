@@ -23,7 +23,8 @@ class LayeredArchitectureTest {
 
             .whereLayer("view").mayNotBeAccessedByAnyLayer()
             .whereLayer("controller").mayOnlyBeAccessedByLayers("view")
-            .whereLayer("service").mayOnlyBeAccessedByLayers("controller", "view");
+            .whereLayer("service").mayOnlyBeAccessedByLayers("controller", "view")
+            .whereLayer("model").mayOnlyBeAccessedByLayers("model", "service", "controller");
 
     @Test
     void testServicesShouldOnlyBeAccessedByControllers() {
