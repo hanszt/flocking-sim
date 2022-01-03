@@ -11,49 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 class Ball2DTest {
 
     @Test
-    void update() {
+    void testLimitSpeedWhenMaxSpeedExceeded() {
         //arrange
-
-        //act
-
-        //assert
-        assertNull(null);
-    }
-
-    @Test
-    void addComponentToAcceleration() {
-        //arrange
-
-        //act
-
-        //assert
-        assertNull(null);
-    }
-
-    @Test
-    void setSpeedBasedOnMouseDrag() {
-        //arrange
-
-        //act
-
-        //assert
-        assertNull(null);
-    }
-
-    @Test
-    void bounceOfEdges() {
-        //arrange
-
-        //act
-
-        //assert
-        assertNull(null);
-    }
-
-    @Test
-    void limitSpeedWhenMaxSpeedExceeded() {
-        //arrange
-        final int nrOftestCases = 10000, maxValue = 100, decimalPlaces = 10;
+        final int nrOftestCases = 10000, maxValue = 100, decimalPlaces = 4;
         double[] expectedSpeeds = new double[nrOftestCases], actualSpeeds = new double[nrOftestCases];
         for (int caseNr = 0; caseNr < nrOftestCases; caseNr++) {
             Boid ball2D = new Boid(getRandomNumber(0, maxValue), BLACK);
@@ -62,8 +22,8 @@ class Ball2DTest {
             Point2D velocity = point2D.normalize().multiply(maxSpeed + getRandomNumber(0, maxValue));
             ball2D.setVelocity(velocity);
             //act
-            ball2D.limit(maxSpeed, velocity);
-            actualSpeeds[caseNr] = Precision.round(ball2D.getVelocity().magnitude(), decimalPlaces);
+            Point2D limitedVelocity = ball2D.limit(maxSpeed, velocity);
+            actualSpeeds[caseNr] = Precision.round(limitedVelocity.magnitude(), decimalPlaces);
             expectedSpeeds[caseNr] = Precision.round(maxSpeed, decimalPlaces);
         }
         //assert: expected, actual

@@ -185,9 +185,8 @@ public class Boid extends Group {
         this.setCenterPosition(position.getX(), position.getY());
     }
 
-    Point2D limit(double maxValue, Point2D limitedVector) {
-        if (limitedVector.magnitude() > maxValue) limitedVector = limitedVector.normalize().multiply(maxValue);
-        return limitedVector;
+    Point2D limit(double maxMagnitude, Point2D vector) {
+        return vector.magnitude() > maxMagnitude ? vector.normalize().multiply(maxMagnitude) : vector;
     }
 
     public void setSpeedBasedOnMouseDrag(Deque<Point2D> dragPoints, Duration duration) {

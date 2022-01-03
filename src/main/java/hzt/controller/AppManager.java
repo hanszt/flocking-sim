@@ -2,8 +2,8 @@ package hzt.controller;
 
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -12,7 +12,7 @@ import static hzt.model.AppConstants.*;
 
 public class AppManager {
 
-    private static final Logger LOGGER = LogManager.getLogger(AppManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppManager.class);
 
     private static int instances = 0;
     private final int instance;
@@ -28,9 +28,9 @@ public class AppManager {
     public void start() {
         sceneManager.setupScene(Scene.MAIN_SCENE);
         configureStage(stage);
-        LOGGER.info(this::startingMessage);
+        LOGGER.info("{}", startingMessage());
         stage.show();
-        LOGGER.info(() -> String.format("instance %d started%n", instance));
+        LOGGER.info("instance {} started", instance);
     }
 
     public void configureStage(Stage stage) {
@@ -44,7 +44,9 @@ public class AppManager {
         LocalTime startTimeSim = sceneManager.getCurSceneController().getStartTimeSim();
         LocalTime stopTimeSim = LocalTime.now();
         Duration runTimeSim = Duration.millis((stopTimeSim.toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
-        LOGGER.info(() -> closingMessage(runTimeSim));
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("{}", closingMessage(runTimeSim));
+        }
     }
 
     private String closingMessage(Duration runTimeSim) {

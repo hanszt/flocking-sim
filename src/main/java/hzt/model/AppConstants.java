@@ -3,8 +3,8 @@ package hzt.model;
 import javafx.geometry.Dimension2D;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -17,7 +17,7 @@ import static javafx.scene.paint.Color.NAVY;
 
 public final class AppConstants {
 
-    private static final Logger LOGGER = LogManager.getLogger(AppConstants.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AppConstants.class);
     private static final Properties PROPS = configProperties();
 
     public static final int INIT_FRAME_RATE = parsedIntAppProp("framerate", 30); // f/s
@@ -61,7 +61,7 @@ public final class AppConstants {
                         "Falling back to default: %f...", property, propertyVal, defaultVal));
             }
         } else {
-            LOGGER.warn(() -> String.format("Property '%s' not found. Falling back to default: %f", property, defaultVal));
+            LOGGER.warn("Property '{}' not found. Falling back to default: {}", property, defaultVal);
         }
         return value;
     }
@@ -77,7 +77,7 @@ public final class AppConstants {
                         "Falling back to default: %d...", property, propertyVal, defaultVal));
             }
         } else {
-            LOGGER.warn(() -> String.format("Property '%s' not found. Falling back to default: %d", property, defaultVal));
+            LOGGER.warn("Property '{}' not found. Falling back to default: {}", property, defaultVal);
         }
         return value;
     }
@@ -100,7 +100,7 @@ public final class AppConstants {
         try (InputStream stream = new BufferedInputStream(new FileInputStream(file))) {
             properties.load(stream);
         } catch (IOException e) {
-            LOGGER.warn(() -> pathName + " not found...", e);
+            LOGGER.warn("{} not found...", pathName, e);
         }
         return properties;
     }

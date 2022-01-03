@@ -5,8 +5,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
@@ -17,7 +17,7 @@ public class ThemeService implements IThemeService {
 
     private static final String RELATIVE_STYLE_SHEET_RESOURCE_DIR = "../../css";
 
-    private static final Logger LOGGER = LogManager.getLogger(ThemeService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ThemeService.class);
     public static final Resource DEFAULT_THEME = new Resource("Light",
             RELATIVE_STYLE_SHEET_RESOURCE_DIR + "/style-light.css");
 
@@ -59,10 +59,13 @@ public class ThemeService implements IThemeService {
     private void loadThemeStyleSheet(Resource theme) {
             URL styleSheetUrl = getClass().getResource(theme.getPathToResource());
             if (styleSheetUrl != null) {
-                LOGGER.debug(styleSheetUrl);
-                this.styleSheet.set(styleSheetUrl.toExternalForm());
-                LOGGER.debug(styleSheetUrl::toExternalForm);
-            }else LOGGER.error(() -> "stylesheet of " + theme.getPathToResource() + " could not be loaded...");
+                LOGGER.debug("{}", styleSheetUrl);
+                final var externalForm = styleSheetUrl.toExternalForm();
+                this.styleSheet.set(externalForm);
+                LOGGER.debug(externalForm);
+            }else {
+                LOGGER.error("stylesheet of {} could not be loaded...", theme.getPathToResource());
+            }
 
     }
 

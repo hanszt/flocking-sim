@@ -17,12 +17,13 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static hzt.controller.scenes.MainSceneController.MAX_NUMBER_OF_BOIDS;
 import static hzt.model.AppConstants.*;
 import static hzt.model.utils.RandomGenerator.*;
 import static java.lang.Math.*;
 
 public class Flock extends Group implements Iterable<Boid> {
+
+    public static final int MAX_NUMBER_OF_BOIDS = parsedIntAppProp("max_number_of_boids", 200);
 
     private final FlockProperties flockProperties = new FlockProperties();
     private final Scene mainScene;

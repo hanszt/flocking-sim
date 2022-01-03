@@ -39,9 +39,23 @@ import java.time.LocalTime;
 
 import static hzt.model.AppConstants.*;
 import static hzt.model.AppConstants.Scene.MAIN_SCENE;
+import static hzt.model.entity.Flock.MAX_NUMBER_OF_BOIDS;
 import static java.util.function.Predicate.not;
 
 public class MainSceneController extends SceneController {
+
+    private static final int INIT_ACCELERATION_USER_SELECTED_BALL = 50;
+    private static final int INIT_ATTRACTION = 3;
+    private static final int INIT_REPEL_FACTOR = 10;
+    private static final int INIT_REPEL_DISTANCE_FACTOR = 3;
+    private static final int INIT_MAX_BALL_SIZE = 5;
+    private static final int INIT_PERCEPTION_RADIUS = 25;
+    private static final int INIT_MAX_SPEED = 150;
+    private static final double INIT_FRICTION = 1;
+    private static final int MAX_PATH_SIZE_ALL = 200;
+
+    private static final int MAX_VECTOR_LENGTH = 80;
+    private static final int INIT_NUMBER_OF_BOIDS = parsedIntAppProp("init_number_of_boids", 120);
 
     @FXML
     private Tab appearanceTab;
@@ -276,21 +290,6 @@ public class MainSceneController extends SceneController {
         configureSliders();
         setToggleButtons();
     }
-
-    private static final int INIT_ACCELERATION_USER_SELECTED_BALL = 50;
-    private static final int INIT_ATTRACTION = 3;
-    private static final int INIT_REPEL_FACTOR = 10;
-    private static final int INIT_REPEL_DISTANCE_FACTOR = 3;
-    private static final int INIT_MAX_BALL_SIZE = 5;
-    private static final int INIT_PERCEPTION_RADIUS = 25;
-    private static final int INIT_MAX_SPEED = 150;
-    private static final double INIT_FRICTION = 1;
-    private static final int MAX_PATH_SIZE_ALL = 200;
-
-    private static final int MAX_VECTOR_LENGTH = 80;
-    private static final int INIT_NUMBER_OF_BOIDS = parsedIntAppProp("init_number_of_boids", 120);
-
-    public static final int MAX_NUMBER_OF_BOIDS = parsedIntAppProp("max_number_of_boids", 200);
 
     private void configureSliders() {
         maxBoidSizeSlider.setValue(INIT_MAX_BALL_SIZE);

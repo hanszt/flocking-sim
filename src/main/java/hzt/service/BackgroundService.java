@@ -1,8 +1,8 @@
 package hzt.service;
 
 import hzt.model.Resource;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
@@ -14,7 +14,7 @@ public class BackgroundService implements IBackgroundService {
     public static final Resource NO_PICTURE = new Resource("No picture");
     private static final String RELATIVE_BG_IMAGES_RESOURCE_DIR = "/images/backgrounds";
 
-    private static final Logger LOGGER = LogManager.getLogger(BackgroundService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(BackgroundService.class);
 
     private final Set<Resource> resources;
 

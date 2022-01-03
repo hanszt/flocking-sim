@@ -2,8 +2,8 @@ package hzt.service;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,7 +15,7 @@ import static java.lang.String.format;
 
 public class AboutService {
 
-    private static final Logger LOGGER = LogManager.getLogger(AboutService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(AboutService.class);
     private static final String RELATIVE_TEXT_RESOURCE_DIR = "../../about";
 
     public List<AboutText> loadContent() {
@@ -51,7 +51,7 @@ public class AboutService {
                 inputList.add(input.nextLine());
             }
         } catch (FileNotFoundException e) {
-            LOGGER.error(() -> "File with path " + path + " not found...");
+            LOGGER.error("File with path {} not found...", path, e);
         }
         return inputList;
     }
