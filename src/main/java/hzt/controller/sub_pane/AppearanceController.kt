@@ -3,7 +3,6 @@ package hzt.controller.sub_pane
 import hzt.controller.FXMLController
 import hzt.controller.scenes.MainSceneController
 import hzt.controller.scenes.SceneController
-import hzt.model.AppConstants.INIT_BG_COLOR
 import hzt.model.Resource
 import hzt.service.BackgroundService
 import hzt.service.IBackgroundService

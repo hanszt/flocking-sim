@@ -1,6 +1,8 @@
 package hzt.controller;
 
+import hzt.controller.scenes.Scene;
 import javafx.application.Platform;
+import javafx.geometry.Dimension2D;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -12,15 +14,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Timer;
 
-import static hzt.model.AppConstants.CLOSING_MESSAGE;
-import static hzt.model.AppConstants.DOTTED_LINE;
-import static hzt.model.AppConstants.MIN_STAGE_DIMENSION;
-import static hzt.model.AppConstants.Scene;
-import static hzt.model.AppConstants.TITLE;
+import static hzt.model.PropertyLoader.parsedIntAppProp;
 import static hzt.utils.TimerUtilsKt.taskFor;
 
 public class AppManager {
 
+    public static final Dimension2D MIN_STAGE_DIMENSION = new Dimension2D(
+            parsedIntAppProp("init_scene_width", 1200),
+    parsedIntAppProp("init_scene_height", 800));
+
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_BLUE = "\u001B[34m";
+    private static final String TITLE = "Flocking Simulation";
+    private static final String DOTTED_LINE = "----------------------------------------------------------------------------------------\n";
+    private static final String CLOSING_MESSAGE = ANSI_BLUE + "See you next Time! :)" + ANSI_RESET;
     private static final Logger LOGGER = LogManager.getLogger(AppManager.class);
 
     private static int instances;

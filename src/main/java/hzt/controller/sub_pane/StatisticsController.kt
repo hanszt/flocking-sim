@@ -2,7 +2,7 @@ package hzt.controller.sub_pane
 
 import hzt.controller.FXMLController
 import hzt.model.entity.boid.Boid
-import hzt.service.StatisticsService
+import hzt.service.SimpleFramerateMeter
 import hzt.utils.scheduleTask
 import javafx.animation.Animation
 import javafx.animation.FillTransition
@@ -38,7 +38,7 @@ class StatisticsController : FXMLController("statisticsPane.fxml") {
     @FXML
     private lateinit var nrOfBoidsInPerceptionRadiusLabel: Label
 
-    private val statisticsService = StatisticsService()
+    private val simpleFramerateMeter = SimpleFramerateMeter()
 
     fun showStatists(selected: Boid?, frictionFactor: Double, flockSize: Int, runTimeSim: Duration) {
         showGlobalStatistics(frictionFactor, flockSize, runTimeSim)
@@ -58,7 +58,7 @@ class StatisticsController : FXMLController("statisticsPane.fxml") {
 
     private fun showGlobalStatistics(friction: Double, flockSize: Int, runTimeSim: Duration) {
         frictionStatsLabel.text = String.format(TWO_DEC_DOUBLE, friction)
-        frameRateLabel.text = String.format("$TWO_DEC_DOUBLE f/s", statisticsService.simpleFrameRateMeter.frameRate)
+        frameRateLabel.text = String.format("$TWO_DEC_DOUBLE f/s", simpleFramerateMeter.frameRate)
         numberOfBoidsLabel.text = String.format("%-3d", flockSize)
         runTimeLabel.text = String.format("%-4.3f seconds", runTimeSim.toSeconds())
     }

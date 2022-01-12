@@ -8,10 +8,6 @@ import javafx.scene.control.TextArea;
 
 import java.io.IOException;
 
-import static hzt.model.AppConstants.INIT_SCENE_DIMENSION;
-import static hzt.model.AppConstants.Scene.ABOUT_SCENE;
-import static hzt.model.AppConstants.Scene.MAIN_SCENE;
-
 public class AboutController extends SceneController {
     @FXML
     private ComboBox<AboutService.AboutText> textComboBox;
@@ -21,7 +17,7 @@ public class AboutController extends SceneController {
     private final AboutService aboutService = new AboutService();
 
     public AboutController(SceneManager sceneManager) throws IOException {
-        super(ABOUT_SCENE.getFxmlFileName(), sceneManager);
+        super(Scene.ABOUT_SCENE.getFxmlFileName(), sceneManager);
     }
 
     @Override
@@ -39,7 +35,7 @@ public class AboutController extends SceneController {
 
     @FXML
     private void goBack() {
-        sceneManager.setupScene(MAIN_SCENE);
+        sceneManager.setupScene(Scene.MAIN_SCENE);
     }
 
     protected SceneController getController() {

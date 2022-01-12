@@ -1,7 +1,6 @@
 package hzt.model.entity
 
-import hzt.model.AppConstants
-import hzt.model.AppConstants.parsedIntAppProp
+import hzt.model.PropertyLoader.parsedIntAppProp
 import hzt.model.FlockProperties
 import hzt.model.entity.boid.Boid
 import hzt.model.entity.boid.CircleBoid
@@ -68,8 +67,8 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid> {
 
     val flockProperties = FlockProperties()
     var selectedBoid: Boid? = null
-    private var uniformBallColor = AppConstants.INIT_UNIFORM_BALL_COLOR
-    var selectedBallColor: Color = AppConstants.INIT_SELECTED_BALL_COLOR
+    private var uniformBallColor = INIT_UNIFORM_BALL_COLOR
+    var selectedBallColor: Color = INIT_SELECTED_BALL_COLOR
     var flockType: FlockType = randomCircleFlock
     var flockingSim: FlockingSim? = null
 
@@ -177,7 +176,9 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid> {
         this.uniformBallColor = uniformBallColor
     }
 
-    private companion object {
+    companion object {
+        val INIT_UNIFORM_BALL_COLOR: Color = Color.ORANGE
+        val INIT_SELECTED_BALL_COLOR: Color = Color.RED
         const val MIN_SIZE = 3
     }
 }

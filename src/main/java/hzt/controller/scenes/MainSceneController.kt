@@ -3,13 +3,9 @@ package hzt.controller.scenes
 import hzt.controller.SceneManager
 import hzt.controller.sub_pane.AppearanceController
 import hzt.controller.sub_pane.StatisticsController
-import hzt.model.AppConstants.INIT_BG_COLOR
-import hzt.model.AppConstants.INIT_SELECTED_BALL_COLOR
-import hzt.model.AppConstants.INIT_UNIFORM_BALL_COLOR
-import hzt.model.AppConstants.STAGE_OPACITY
-import hzt.model.AppConstants.Scene.MAIN_SCENE
-import hzt.model.AppConstants.parsedIntAppProp
 import hzt.model.FlockProperties
+import hzt.model.PropertyLoader
+import hzt.model.PropertyLoader.parsedIntAppProp
 import hzt.model.entity.Flock
 import hzt.model.entity.Flock.FlockType
 import hzt.model.entity.boid.Boid
@@ -35,7 +31,7 @@ import org.apache.logging.log4j.LogManager
 import java.io.IOException
 import java.time.LocalTime
 
-class MainSceneController(sceneManager: SceneManager) : SceneController(MAIN_SCENE.fxmlFileName, sceneManager) {
+class MainSceneController(sceneManager: SceneManager) : SceneController(Scene.MAIN_SCENE.fxmlFileName, sceneManager) {
     @FXML
     private lateinit var appearanceTab: Tab
     @FXML
@@ -147,7 +143,9 @@ class MainSceneController(sceneManager: SceneManager) : SceneController(MAIN_SCE
         val bounce = bounceWallsButton.isSelected
         val runTimeSim = Duration.millis((LocalTime.now().toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6)
         statisticsController.showStatists(flock.selectedBoid, friction, flock.children.size, runTimeSim)
-        animationService.run(flock, animationWindowDimension, accelerationMultiplier, friction, bounce, maxSpeed)
+        animationService.run(flock, accelerationMultiplier, friction, maxSpeed) {
+            if (bounce) it.bounceOfEdges(animationWindowDimension) else it.floatThroughEdges(animationWindowDimension)
+        }
     }
 
     private fun SubScene.configureBy(animationPane: Pane) {
@@ -178,8 +176,8 @@ class MainSceneController(sceneManager: SceneManager) : SceneController(MAIN_SCE
 
     private fun configureColorPickers() {
         backgroundColorPicker.value = INIT_BG_COLOR
-        uniformFlockColorPicker.value = INIT_UNIFORM_BALL_COLOR
-        selectedBallColorPicker.value = INIT_SELECTED_BALL_COLOR
+        uniformFlockColorPicker.value = Flock.INIT_UNIFORM_BALL_COLOR
+        selectedBallColorPicker.value = Flock.INIT_SELECTED_BALL_COLOR
     }
 
     private val animationWindowDimension: Dimension2D
@@ -366,6 +364,7 @@ class MainSceneController(sceneManager: SceneManager) : SceneController(MAIN_SCE
     companion object {
 
         private val LOGGER = LogManager.getLogger(MainSceneController::class.java)
+        private val STAGE_OPACITY = PropertyLoader.parsedDoubleAppProp("stage_opacity", .8)
         private const val INIT_ACCELERATION_USER_SELECTED_BALL = 50
         private const val INIT_ATTRACTION = 3
         private const val INIT_REPEL_FACTOR = 10

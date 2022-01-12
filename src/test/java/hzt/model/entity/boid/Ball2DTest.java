@@ -14,7 +14,7 @@ class Ball2DTest {
         //arrange
         final int nrOftestCases = 10000;
         final int maxValue = 100;
-        final int decimalPlaces = 10;
+        final int decimalPlaces = 5;
         double[] expectedSpeeds = new double[nrOftestCases], actualSpeeds = new double[nrOftestCases];
         for (int caseNr = 0; caseNr < nrOftestCases; caseNr++) {
             Boid ball2D = new CircleBoid(getRandomNumber(0, maxValue), BLACK);

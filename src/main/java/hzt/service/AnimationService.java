@@ -1,18 +1,22 @@
 package hzt.service;
 
+import hzt.model.entity.Flock;
 import hzt.model.entity.boid.Boid;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Dimension2D;
-import javafx.scene.Node;
-import javafx.scene.Parent;
+import javafx.util.Duration;
 
-import static hzt.model.AppConstants.INIT_FRAME_DURATION;
+import java.util.function.Consumer;
+
+import static hzt.model.PropertyLoader.parsedIntAppProp;
 import static javafx.animation.Animation.INDEFINITE;
 
 public class AnimationService {
+
+    private static final int INIT_FRAME_RATE = parsedIntAppProp("framerate", 30);// f/s
+    private static final Duration INIT_FRAME_DURATION = Duration.seconds(1.0 / INIT_FRAME_RATE); // s/f
 
     private final Timeline timeline;
 
@@ -32,15 +36,10 @@ public class AnimationService {
         timeline.play();
     }
 
-    public void run(Parent flock, Dimension2D animationWindowSize, double accelerationMultiplier,
-                    double frictionFactor, boolean bounce, double maxSpeed) {
-        for (Node node : flock.getChildrenUnmodifiable()) {
-            Boid boid = (Boid) node;
-            if (bounce) {
-                boid.bounceOfEdges(animationWindowSize);
-            } else {
-                boid.floatThroughEdges(animationWindowSize);
-            }
+    public void run(Flock flock, double accelerationMultiplier,
+                    double frictionFactor, double maxSpeed, Consumer<Boid> boidUpdater) {
+        for (Boid boid : flock) {
+            boidUpdater.accept(boid);
             boid.update(timeline.getCycleDuration(), accelerationMultiplier, frictionFactor, maxSpeed);
         }
     }
@@ -52,5 +51,4 @@ public class AnimationService {
     public void pauseTimeline() {
         timeline.pause();
     }
-
 }

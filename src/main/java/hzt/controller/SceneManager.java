@@ -2,6 +2,7 @@ package hzt.controller;
 
 import hzt.controller.scenes.AboutController;
 import hzt.controller.scenes.MainSceneController;
+import hzt.controller.scenes.Scene;
 import hzt.controller.scenes.SceneController;
 import javafx.stage.Stage;
 import org.apache.logging.log4j.LogManager;
@@ -10,10 +11,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.util.EnumMap;
 import java.util.Map;
-
-import static hzt.model.AppConstants.Scene;
-import static hzt.model.AppConstants.Scene.ABOUT_SCENE;
-import static hzt.model.AppConstants.Scene.MAIN_SCENE;
 
 public class SceneManager {
 
@@ -31,8 +28,8 @@ public class SceneManager {
 
     private void loadFrontend() {
         try {
-            sceneControllerMap.put(MAIN_SCENE, new MainSceneController(this));
-            sceneControllerMap.put(ABOUT_SCENE, new AboutController(this));
+            sceneControllerMap.put(Scene.MAIN_SCENE, new MainSceneController(this));
+            sceneControllerMap.put(Scene.ABOUT_SCENE, new AboutController(this));
         } catch (IOException e) {
             LOGGER.fatal("Something went wrong when loading fxml frontend...", e);
         }

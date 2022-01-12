@@ -11,9 +11,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.time.LocalTime;
 
-import static hzt.model.AppConstants.INIT_SCENE_DIMENSION;
-import static hzt.model.AppConstants.Scene.ABOUT_SCENE;
-
 public abstract class SceneController extends FXMLController {
 
     private boolean setup;
@@ -48,7 +45,7 @@ public abstract class SceneController extends FXMLController {
 
     @FXML
     void showAbout() {
-        sceneManager.setupScene(ABOUT_SCENE);
+        sceneManager.setupScene(hzt.controller.scenes.Scene.ABOUT_SCENE);
     }
 
     public boolean isSetup() {
