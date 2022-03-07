@@ -6,15 +6,15 @@ import org.junit.jupiter.api.Test;
 
 import static javafx.scene.paint.Color.BLACK;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 class Ball2DTest {
 
     @Test
     void testLimitSpeedWhenMaxSpeedExceeded() {
         //arrange
-        final int nrOftestCases = 10000, maxValue = 100, decimalPlaces = 4;
-        double[] expectedSpeeds = new double[nrOftestCases], actualSpeeds = new double[nrOftestCases];
+        final int nrOftestCases = 1_000, maxValue = 100, decimalPlaces = 4;
+        double[] expectedSpeeds = new double[nrOftestCases];
+        double[] actualSpeeds = new double[nrOftestCases];
         for (int caseNr = 0; caseNr < nrOftestCases; caseNr++) {
             Boid ball2D = new Boid(getRandomNumber(0, maxValue), BLACK);
             Point2D point2D = new Point2D(Math.random(), Math.random());
@@ -30,7 +30,8 @@ class Ball2DTest {
         assertArrayEquals(expectedSpeeds, actualSpeeds);
     }
 
-    public double getRandomNumber(int min, int max) {
+    @SuppressWarnings("SameParameterValue")
+    private static double getRandomNumber(int min, int max) {
         return Math.random() * (max - min) + min;
     }
 }

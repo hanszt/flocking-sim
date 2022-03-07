@@ -1,5 +1,6 @@
 package hzt.controller;
 
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import org.slf4j.Logger;
@@ -7,8 +8,13 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
-import static hzt.model.AppConstants.*;
+import static hzt.model.AppConstants.CLOSING_MESSAGE;
+import static hzt.model.AppConstants.DOTTED_LINE;
+import static hzt.model.AppConstants.MIN_STAGE_DIMENSION;
+import static hzt.model.AppConstants.Scene;
+import static hzt.model.AppConstants.TITLE;
 
 public class AppManager {
 
@@ -38,6 +44,9 @@ public class AppManager {
         stage.setMinWidth(MIN_STAGE_DIMENSION.getWidth());
         stage.setMinHeight(MIN_STAGE_DIMENSION.getHeight());
         stage.setOnCloseRequest(e -> printClosingText());
+        Optional.ofNullable(getClass().getResourceAsStream("../../icons/fx-icon.png"))
+                .map(Image::new)
+                .ifPresent(stage.getIcons()::add);
     }
 
     private void printClosingText() {
