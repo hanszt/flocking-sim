@@ -139,7 +139,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>hzt.view.FxLauncher</mainClass>
+                            <mainClass>hzt.view.Launcher</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
