@@ -28,8 +28,7 @@
             <padding>
                 <Insets bottom="4.0" left="4.0" right="4.0" top="4.0"/>
             </padding>
-            <ToggleButton fx:id="fullScreenButton" mnemonicParsing="false" prefWidth="1000.0"
-                          text="Full screen"/>
+            <ToggleButton fx:id="fullScreenButton" mnemonicParsing="false" prefWidth="1000.0" text="Full screen"/>
         </VBox>
     </HBox>
 
@@ -41,7 +40,7 @@
             </padding>
             <Label text="Background color"/>
             <ColorPicker fx:id="backgroundColorPicker"
-                         onAction="#backgroundColorPickerAction" prefHeight="30"
+                         prefHeight="30"
                          prefWidth="1000.0"/>
         </VBox>
     </HBox>

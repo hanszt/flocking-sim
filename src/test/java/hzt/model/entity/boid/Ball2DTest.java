@@ -1,4 +1,4 @@
-package hzt.model.entity;
+package hzt.model.entity.boid;
 
 import javafx.geometry.Point2D;
 import org.apache.commons.math3.util.Precision;
@@ -10,23 +10,20 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 class Ball2DTest {
 
     @Test
-    void testLimitSpeedWhenMaxSpeedExceeded() {
+    void limitSpeedWhenMaxSpeedExceeded() {
         //arrange
-        final int nrOftestCases = 1_000, maxValue = 100, decimalPlaces = 4;
-        double[] expectedSpeeds = new double[nrOftestCases];
-        double[] actualSpeeds = new double[nrOftestCases];
+        final int nrOftestCases = 10000, maxValue = 100, decimalPlaces = 10;
+        double[] expectedSpeeds = new double[nrOftestCases], actualSpeeds = new double[nrOftestCases];
         for (int caseNr = 0; caseNr < nrOftestCases; caseNr++) {
-            Boid ball2D = new Boid(getRandomNumber(0, maxValue), BLACK);
+            Boid ball2D = new CircleBoid(getRandomNumber(0, maxValue), BLACK);
             Point2D point2D = new Point2D(Math.random(), Math.random());
             double maxSpeed = getRandomNumber(0, maxValue);
             Point2D velocity = point2D.normalize().multiply(maxSpeed + getRandomNumber(0, maxValue));
-            ball2D.setVelocity(velocity);
             //act
-            Point2D limitedVelocity = ball2D.limit(maxSpeed, velocity);
-            actualSpeeds[caseNr] = Precision.round(limitedVelocity.magnitude(), decimalPlaces);
+            ball2D.limit(maxSpeed, velocity);
+            actualSpeeds[caseNr] = Precision.round(ball2D.getVelocity().magnitude(), decimalPlaces);
             expectedSpeeds[caseNr] = Precision.round(maxSpeed, decimalPlaces);
         }
-        //assert: expected, actual
         assertArrayEquals(expectedSpeeds, actualSpeeds);
     }
 
