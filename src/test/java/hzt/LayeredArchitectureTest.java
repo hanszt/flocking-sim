@@ -16,6 +16,7 @@ class LayeredArchitectureTest {
 
     @ArchTest
     static final ArchRule DEPENDENCY_RULE = layeredArchitecture()
+            .consideringAllDependencies()
             .layer("controller").definedBy("..controller..")
             .layer("service").definedBy("..service..")
             .layer("model").definedBy("..model..")
