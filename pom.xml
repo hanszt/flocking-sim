@@ -17,7 +17,7 @@
         <kotlin-maven-plugin.jvmTarget>17</kotlin-maven-plugin.jvmTarget>
         <kotlin.code.style>official</kotlin.code.style>
         <!--        dependencies-->
-        <kotlin.version>1.8.20-RC</kotlin.version>
+        <kotlin.version>1.8.10</kotlin.version>
         <openjfx.version>21-ea+5</openjfx.version>
         <annotations.version>24.0.1</annotations.version>
         <commons-math3.version>3.6.1</commons-math3.version>
