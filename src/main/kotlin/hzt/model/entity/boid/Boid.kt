@@ -24,17 +24,15 @@ import javafx.scene.shape.Shape
 import javafx.scene.shape.StrokeType
 import javafx.util.Duration
 
-abstract class Boid internal constructor(name: String, body: Shape, initPaint: Paint) : Group() {
+abstract class Boid internal constructor(name: String, val body: Shape, private val initPaint: Paint) : Group() {
 
-    val name: String
-    val body: Shape
-    val perceptionCircle: Circle
-    val repelCircle: Circle
-    val visibleAccelerationVector: VisibleVector
-    val visibleVelocityVector: VisibleVector
-    val path: Path
+    val name: String = name + " " + ++next
+    val perceptionCircle: Circle = Circle()
+    val repelCircle: Circle = Circle()
+    val visibleAccelerationVector: VisibleVector = VisibleVector()
+    val visibleVelocityVector: VisibleVector = VisibleVector()
+    val path: Path = Path()
     val perceptionRadiusMap: MutableMap<Boid, Connection>
-    private val initPaint: Paint
     private val densityMaterial: DoubleProperty = SimpleDoubleProperty() // kg/m^3
     private val translationKeyFilter = TranslationKeyFilter()
 
@@ -44,14 +42,6 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
     private var maxAcceleration = 0.0
 
     init {
-        this.name = name + " " + ++next
-        this.initPaint = initPaint
-        this.body = body
-        perceptionCircle = Circle()
-        repelCircle = Circle()
-        visibleVelocityVector = VisibleVector()
-        visibleAccelerationVector = VisibleVector()
-        path = Path()
         densityMaterial.set(Engine.DENSITY)
         perceptionRadiusMap = HashMap()
         velocity = Point2D.ZERO
@@ -128,7 +118,7 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
         if (flockProperties.isShowConnections()) {
             perceptionRadiusMap.forEach(this::strokeConnection)
         } else {
-            children.removeIf { Connection::class.java.isInstance(it) }
+            children.removeIf { it is Connection }
         }
     }
 
@@ -171,10 +161,10 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
 
     private fun updateBallsInPerceptionRadiusMap() {
         val flock = parent as Flock
-        flock.childrenUnmodifiable.stream()
+        flock.childrenUnmodifiable.asSequence()
             .filter { this != it }
-            .map { Boid::class.java.cast(it) }
-            .forEach { determineIfBoidInPerceptionRadius(it) }
+            .filterIsInstance<Boid>()
+            .forEach(::determineIfBoidInPerceptionRadius)
     }
 
     private fun determineIfBoidInPerceptionRadius(other: Boid) {
@@ -204,7 +194,7 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
         this.setBodyTranslate(position.x, position.y)
     }
 
-    fun limit(maxValue: Double, limitedVector: Point2D): Point2D =
+    private fun limit(maxValue: Double, limitedVector: Point2D): Point2D =
         if (limitedVector.magnitude() > maxValue) limitedVector.normalize().multiply(maxValue) else limitedVector
 
     fun floatThroughEdges(dimension: Dimension2D) {
@@ -226,14 +216,11 @@ abstract class Boid internal constructor(name: String, body: Shape, initPaint: P
         val height = dimension.height
         val bounds = body.boundsInParent
         val translation = translation
-        if (bounds.minX <= 0 && translation.x < prevCenterPosition.x) {
-            velocity = Point2D(-velocity.x, velocity.y)
-        } else if (bounds.minY <= 0 && translation.y < prevCenterPosition.y) {
-            velocity = Point2D(velocity.x, -velocity.y)
-        } else if (bounds.maxX >= width && translation.x > prevCenterPosition.x) {
-            velocity = Point2D(-velocity.x, velocity.y)
-        } else if (bounds.maxY >= height && translation.y > prevCenterPosition.y) {
-            velocity = Point2D(velocity.x, -velocity.y)
+        when {
+            bounds.minX <= 0 && translation.x < prevCenterPosition.x -> velocity = Point2D(-velocity.x, velocity.y)
+            bounds.minY <= 0 && translation.y < prevCenterPosition.y -> velocity = Point2D(velocity.x, -velocity.y)
+            bounds.maxX >= width && translation.x > prevCenterPosition.x -> velocity = Point2D(-velocity.x, velocity.y)
+            bounds.maxY >= height && translation.y > prevCenterPosition.y -> velocity = Point2D(velocity.x, -velocity.y)
         }
     }
 

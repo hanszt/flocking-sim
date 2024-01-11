@@ -11,23 +11,24 @@
     <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin-maven-plugin.jvmTarget>17</kotlin-maven-plugin.jvmTarget>
         <kotlin.code.style>official</kotlin.code.style>
         <!--        dependencies-->
-        <kotlin.version>1.8.10</kotlin.version>
-        <openjfx.version>21-ea+5</openjfx.version>
+        <kotlin.version>1.9.21</kotlin.version>
+        <openjfx.version>21</openjfx.version>
         <annotations.version>24.0.1</annotations.version>
         <commons-math3.version>3.6.1</commons-math3.version>
-        <archunit-junit5.version>1.0.0</archunit-junit5.version>
-        <junit-jupiter.version>5.9.2</junit-jupiter.version>
+        <archunit-junit5.version>1.2.1</archunit-junit5.version>
+        <junit-jupiter.version>5.10.0</junit-jupiter.version>
         <slf4j-api.version>2.0.5</slf4j-api.version>
-        <logback.version>1.4.6</logback.version>
+        <logback.version>1.4.14</logback.version>
         <!--        plugins-->
         <maven-surefire-plugin.version>3.0.0-M5</maven-surefire-plugin.version>
         <javafx-maven-plugin.version>0.0.8</javafx-maven-plugin.version>
+        <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
         <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
@@ -182,6 +183,37 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <version>${maven-failsafe-plugin.version}</version>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build-helper-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/main/kotlin</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-test-source</id>
+                        <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>add-test-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>src/test/kotlin</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.jetbrains.kotlin</groupId>

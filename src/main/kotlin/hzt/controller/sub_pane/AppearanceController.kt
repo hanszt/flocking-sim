@@ -10,6 +10,7 @@ import hzt.service.IThemeService
 import hzt.service.ThemeService
 import hzt.utils.inverseFullScreen
 import hzt.utils.onNewValue
+import java.util.Optional
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.geometry.Insets
@@ -19,10 +20,15 @@ import javafx.scene.control.ToggleButton
 import javafx.scene.image.Image
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
-import javafx.scene.layout.*
+import javafx.scene.layout.Background
+import javafx.scene.layout.BackgroundFill
+import javafx.scene.layout.BackgroundImage
+import javafx.scene.layout.BackgroundPosition
+import javafx.scene.layout.BackgroundRepeat
+import javafx.scene.layout.BackgroundSize
+import javafx.scene.layout.CornerRadii
 import javafx.scene.paint.Color
 import javafx.stage.Stage
-import java.util.*
 
 class AppearanceController(private val mainSceneController: MainSceneController) :
     FXMLController("appearancePane.fxml") {
@@ -94,11 +100,11 @@ class AppearanceController(private val mainSceneController: MainSceneController)
     }
 
     @FXML
-    private fun backgroundComboBoxAction() = Optional.of(backgroundCombobox)
-        .map { it.value }
-        .map(Resource::getInputStream)
-        .map(::Image)
-        .ifPresentOrElse(::setBackgroundImage) { backgroundColorPickerAction(backgroundColorPicker.value) }
+    private fun backgroundComboBoxAction() = backgroundCombobox.value
+        .useInputStream {
+            it.let(::Image)
+                .let(::setBackgroundImage)
+        } ?: backgroundColorPickerAction(backgroundColorPicker.value)
 
     private fun backgroundColorPickerAction(newColor: Color) {
         backgroundCombobox.value = BackgroundService.NO_PICTURE

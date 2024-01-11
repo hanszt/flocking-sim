@@ -1,8 +1,8 @@
 package hzt.model.utils
 
+import hzt.model.entity.boid.Boid
 import javafx.beans.property.FloatProperty
 import javafx.beans.property.SimpleFloatProperty
-import hzt.model.entity.boid.Boid
 import javafx.geometry.Point2D
 
 class Engine {

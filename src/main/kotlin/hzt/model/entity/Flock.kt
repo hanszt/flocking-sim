@@ -97,7 +97,7 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid> {
             other.children.removeIf(Connection::class.java::isInstance)
         }
         if (boid == selectedBoid) {
-            selectedBoid = if (!children.isEmpty()) randomSelectedBoid else null
+            selectedBoid = if (children.isNotEmpty()) randomSelectedBoid else null
         }
     }
 
@@ -128,9 +128,8 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid> {
             updateSelectedBoidComponentsVisibility(this)
         }
 
-    override fun iterator(): MutableIterator<Boid> = children.stream()
-        .filter(Boid::class.java::isInstance)
-        .map(Boid::class.java::cast)
+    override fun iterator(): Iterator<Boid> = children.asSequence()
+        .filterIsInstance<Boid>()
         .iterator()
 
     fun updateSelectedBoidComponentsVisibility(selectedBoid: Boid) {

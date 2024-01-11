@@ -3,7 +3,7 @@ package hzt.model
 import java.io.IOException
 import java.io.InputStream
 import java.net.URL
-import java.util.*
+import java.util.Objects
 import kotlin.jvm.Throws
 
 class Resource
@@ -18,12 +18,8 @@ class Resource
     }
 
     @Throws(exceptionClasses = [IllegalStateException::class])
-    fun getInputStream(): InputStream {
-        try {
-            return url?.openStream() ?: InputStream.nullInputStream()
-        } catch (e: IOException) {
-            throw IllegalStateException(e)
-        }
+    fun <R> useInputStream(useInputStream: (InputStream) -> R) = url?.openStream()?.use {
+        useInputStream(it)
     }
 
     override fun hashCode(): Int {

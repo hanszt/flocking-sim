@@ -3,15 +3,16 @@ package hzt.service
 import hzt.model.Resource
 import hzt.utils.firstCharUpperCase
 import hzt.utils.onNewValue
+import java.io.File
+import java.net.MalformedURLException
+import java.net.URL
+import java.util.Optional
+import java.util.SortedSet
 import javafx.beans.property.ObjectProperty
 import javafx.beans.property.SimpleObjectProperty
 import javafx.beans.property.SimpleStringProperty
 import javafx.beans.property.StringProperty
 import org.slf4j.LoggerFactory
-import java.io.File
-import java.net.MalformedURLException
-import java.net.URL
-import java.util.*
 
 class ThemeService : IThemeService {
 
