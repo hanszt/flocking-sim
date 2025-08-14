@@ -4,6 +4,8 @@ import hzt.controller.AppManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+import java.time.Clock;
+
 public final class Launcher extends Application {
 
     public static void main(String[] args) {
@@ -12,7 +14,7 @@ public final class Launcher extends Application {
 
     @Override
     public void start(Stage stage) {
-        new AppManager(stage).start();
+        new AppManager(Clock.systemDefaultZone(), stage).start();
     }
 
 }

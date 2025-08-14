@@ -2,45 +2,51 @@ package hzt.controller;
 
 import hzt.controller.scenes.AboutController;
 import hzt.controller.scenes.MainSceneController;
-import hzt.controller.scenes.Scene;
 import hzt.controller.scenes.SceneController;
+import hzt.controller.scenes.SceneType;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.time.Clock;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class SceneManager {
+public final class SceneManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SceneManager.class);
 
+    private final Clock clock;
     private final Stage stage;
-    private final Map<Scene, SceneController> sceneControllerMap;
-    private SceneController curSceneController;
+    private final Map<SceneType, SceneController> sceneControllerMap = new EnumMap<>(SceneType.class);
+    private final ObjectProperty<SceneController> curSceneController = new SimpleObjectProperty<>();
 
-    public SceneManager(Stage stage) {
+    public SceneManager(Clock clock, Stage stage) {
+        this.clock = clock;
         this.stage = stage;
-        this.sceneControllerMap = new EnumMap<>(Scene.class);
+        curSceneController.addListener((_, _, n) -> LOGGER.info("Current scene controller changed to {}...", n.getClass().getSimpleName()));
         loadFrontend();
     }
 
     private void loadFrontend() {
         try {
-            sceneControllerMap.put(Scene.MAIN_SCENE, new MainSceneController(this));
-            sceneControllerMap.put(Scene.ABOUT_SCENE, new AboutController(this));
+            sceneControllerMap.put(SceneType.MAIN_SCENE, new MainSceneController(this));
+            sceneControllerMap.put(SceneType.ABOUT_SCENE, new AboutController(this));
         } catch (IOException e) {
             LOGGER.error("Something went wrong when loading fxml frontend...", e);
         }
     }
 
-    public void setupScene(Scene scene) {
-        curSceneController = sceneControllerMap.get(scene);
-        stage.setScene(curSceneController.getScene());
-        if (!curSceneController.isSetup()) {
-            LOGGER.info("setting up {}...", scene.getEnglishDescription());
-            curSceneController.setup();
+    public void setupScene(SceneType sceneType) {
+        curSceneController.set(sceneControllerMap.get(sceneType));
+        final var sceneController = curSceneController.get();
+        stage.setScene(sceneController.getScene());
+        if (!sceneController.isSetup()) {
+            LOGGER.info("setting up {}...", sceneType.getEnglishDescription());
+            sceneController.setup();
         }
     }
 
@@ -48,11 +54,15 @@ public class SceneManager {
         return stage;
     }
 
-    public SceneController getCurSceneController() {
-        return curSceneController;
+    public Clock getClock() {
+        return clock;
     }
 
-    public Map<Scene, SceneController> getSceneControllerMap() {
+    public SceneController getCurSceneController() {
+        return curSceneController.get();
+    }
+
+    public Map<SceneType, SceneController> getSceneControllerMap() {
         return sceneControllerMap;
     }
 }

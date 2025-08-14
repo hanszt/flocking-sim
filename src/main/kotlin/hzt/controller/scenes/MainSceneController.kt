@@ -27,12 +27,12 @@ import javafx.scene.SubScene
 import javafx.scene.control.*
 import javafx.scene.layout.*
 import javafx.scene.paint.Color
-import javafx.util.Duration
 import org.slf4j.LoggerFactory
 import java.io.IOException
+import java.time.Duration
 import java.time.LocalTime
 
-class MainSceneController(sceneManager: SceneManager) : SceneController(Scene.MAIN_SCENE.fxmlFileName, sceneManager) {
+class MainSceneController(sceneManager: SceneManager) : SceneController(SceneType.MAIN_SCENE.fxmlFileName, sceneManager) {
     @FXML
     private lateinit var appearanceTab: Tab
     @FXML
@@ -142,7 +142,7 @@ class MainSceneController(sceneManager: SceneManager) : SceneController(Scene.MA
         val friction = frictionSlider.value
         val accelerationMultiplier = accelerationSlider.value
         val bounce = bounceWallsButton.isSelected
-        val runTimeSim = Duration.millis((LocalTime.now().toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6)
+        val runTimeSim = Duration.between(startTimeSim, sceneManager.clock.instant())
         statisticsController.showStatists(flock.selectedBoid, friction, flock.children.size, runTimeSim)
         animationService.run(flock, accelerationMultiplier, friction, maxSpeed) {
             if (bounce) it.bounceOfEdges(animationWindowDimension) else it.floatThroughEdges(animationWindowDimension)
@@ -359,8 +359,6 @@ class MainSceneController(sceneManager: SceneManager) : SceneController(Scene.MA
         flock.configure()
         uniformFlockColorPicker.isDisable = flock.flockType.random
     }
-
-    override fun getController(): SceneController = this
 
     companion object {
 

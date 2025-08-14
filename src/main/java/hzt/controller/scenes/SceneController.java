@@ -10,7 +10,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.time.LocalTime;
+import java.time.Instant;
 
 public abstract class SceneController extends FXMLController {
 
@@ -20,11 +20,11 @@ public abstract class SceneController extends FXMLController {
 
     protected final SceneManager sceneManager;
     protected final Scene scene;
-    protected final LocalTime startTimeSim;
+    protected final Instant startTimeSim;
 
     protected SceneController(String fxmlFileName, SceneManager sceneManager) throws IOException {
         super(fxmlFileName);
-        this.startTimeSim = LocalTime.now();
+        this.startTimeSim = sceneManager.getClock().instant();
         this.sceneManager = sceneManager;
         scene = new Scene(getRoot(), INIT_SCENE_DIMENSION.getWidth(), INIT_SCENE_DIMENSION.getHeight());
     }
@@ -33,7 +33,7 @@ public abstract class SceneController extends FXMLController {
 
     @FXML
     void newInstance() {
-        new AppManager(new Stage()).start();
+        new AppManager(sceneManager.getClock(), new Stage()).start();
     }
 
     @FXML
@@ -48,7 +48,7 @@ public abstract class SceneController extends FXMLController {
 
     @FXML
     void showAbout() {
-        sceneManager.setupScene(hzt.controller.scenes.Scene.ABOUT_SCENE);
+        sceneManager.setupScene(hzt.controller.scenes.SceneType.ABOUT_SCENE);
     }
 
     public boolean isSetup() {
@@ -61,7 +61,7 @@ public abstract class SceneController extends FXMLController {
         return scene;
     }
 
-    public LocalTime getStartTimeSim() {
+    public Instant getStartTimeSim() {
         return startTimeSim;
     }
 

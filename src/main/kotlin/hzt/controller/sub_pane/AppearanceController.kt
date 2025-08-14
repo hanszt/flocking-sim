@@ -10,7 +10,6 @@ import hzt.service.IThemeService
 import hzt.service.ThemeService
 import hzt.utils.inverseFullScreen
 import hzt.utils.onNewValue
-import java.util.Optional
 import javafx.event.EventHandler
 import javafx.fxml.FXML
 import javafx.geometry.Insets
@@ -20,15 +19,10 @@ import javafx.scene.control.ToggleButton
 import javafx.scene.image.Image
 import javafx.scene.input.KeyCode
 import javafx.scene.input.KeyEvent
-import javafx.scene.layout.Background
-import javafx.scene.layout.BackgroundFill
-import javafx.scene.layout.BackgroundImage
-import javafx.scene.layout.BackgroundPosition
-import javafx.scene.layout.BackgroundRepeat
-import javafx.scene.layout.BackgroundSize
-import javafx.scene.layout.CornerRadii
+import javafx.scene.layout.*
 import javafx.scene.paint.Color
 import javafx.stage.Stage
+import java.util.*
 
 class AppearanceController(private val mainSceneController: MainSceneController) :
     FXMLController("appearancePane.fxml") {
@@ -112,8 +106,6 @@ class AppearanceController(private val mainSceneController: MainSceneController)
             BackgroundFill(newColor, CornerRadii.EMPTY, Insets.EMPTY)
         )
     }
-
-    override fun getController(): FXMLController = this
 
     private fun setBackgroundImage(image: Image) {
         val animationPane = mainSceneController.animationPane

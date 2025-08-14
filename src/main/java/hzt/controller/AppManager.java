@@ -1,15 +1,15 @@
 package hzt.controller;
 
-import hzt.controller.scenes.Scene;
+import hzt.controller.scenes.SceneType;
 import javafx.application.Platform;
 import javafx.geometry.Dimension2D;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.LocalTime;
+import java.time.Clock;
+import java.time.Duration;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 import java.util.Timer;
@@ -17,7 +17,7 @@ import java.util.Timer;
 import static hzt.model.PropertyLoader.parsedIntAppProp;
 import static hzt.utils.TimerUtilsKt.taskFor;
 
-public class AppManager {
+public final class AppManager {
 
     public static final Dimension2D MIN_STAGE_DIMENSION = new Dimension2D(
             parsedIntAppProp("init_scene_width", 1200),
@@ -35,16 +35,16 @@ public class AppManager {
     private final Stage stage;
     private final SceneManager sceneManager;
 
-    public AppManager(Stage stage) {
+    public AppManager(Clock clock, Stage stage) {
         this.stage = stage;
-        this.sceneManager = new SceneManager(stage);
+        this.sceneManager = new SceneManager(clock, stage);
         this.instance = ++instances;
     }
 
     public void start() {
-        sceneManager.setupScene(Scene.MAIN_SCENE);
+        sceneManager.setupScene(SceneType.MAIN_SCENE);
         configureStage(stage);
-        LOGGER.info("{}", startingMessage());
+        LOGGER.atInfo().setMessage(this::startingMessage).log();
 
         new Timer().schedule(taskFor(() -> Platform.runLater(stage::show)), 1000);
 
@@ -52,16 +52,16 @@ public class AppManager {
     }
 
     private String startingMessage() {
-        final LocalTime startTimeSim = sceneManager.getCurSceneController().getStartTimeSim();
+        final var startTimeSim = sceneManager.getCurSceneController().getStartTimeSim();
         return String.format("Starting instance %d of %s at %s...%n",
-                instance, TITLE, startTimeSim.format(DateTimeFormatter.ofPattern("hh:mm:ss")));
+                instance, TITLE, DateTimeFormatter.ofPattern("hh:mm:ss").format(startTimeSim.atZone(sceneManager.getClock().getZone())));
     }
 
     public void configureStage(Stage stage) {
         stage.setTitle(String.format("%s (%d)", TITLE, instance));
         stage.setMinWidth(MIN_STAGE_DIMENSION.getWidth());
         stage.setMinHeight(MIN_STAGE_DIMENSION.getHeight());
-        stage.setOnCloseRequest(e -> printClosingText());
+        stage.setOnCloseRequest(_ -> printClosingText());
 
         Optional.ofNullable(getClass().getResourceAsStream("/icons/fx-icon.png"))
                 .map(Image::new)
@@ -69,16 +69,13 @@ public class AppManager {
     }
 
     private void printClosingText() {
-        LocalTime startTimeSim = sceneManager.getCurSceneController().getStartTimeSim();
-        LocalTime stopTimeSim = LocalTime.now();
-        Duration runTimeSim = Duration.millis((stopTimeSim.toNanoOfDay() - startTimeSim.toNanoOfDay()) / 1e6);
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("{}", closingMessage(runTimeSim));
-        }
+        final var startTimeSim = sceneManager.getCurSceneController().getStartTimeSim();
+        final var runTimeSim = java.time.Duration.between(startTimeSim, sceneManager.getClock().instant());
+        LOGGER.atInfo().setMessage(() -> closingMessage(runTimeSim)).log();
     }
 
     private String closingMessage(Duration runTimeSim) {
         return String.format("%s%nAnimation Runtime of instance %d: %.2f seconds%n%s%n", CLOSING_MESSAGE,
-                instance, runTimeSim.toSeconds(), DOTTED_LINE);
+                instance, runTimeSim.toMillis() / 1000.0, DOTTED_LINE);
     }
 }

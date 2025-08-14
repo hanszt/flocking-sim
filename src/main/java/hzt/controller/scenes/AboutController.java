@@ -8,7 +8,7 @@ import javafx.scene.control.TextArea;
 
 import java.io.IOException;
 
-public class AboutController extends SceneController {
+public final class AboutController extends SceneController {
     @FXML
     private ComboBox<AboutService.AboutText> textComboBox;
     @FXML
@@ -17,7 +17,7 @@ public class AboutController extends SceneController {
     private final AboutService aboutService = new AboutService();
 
     public AboutController(SceneManager sceneManager) throws IOException {
-        super(Scene.ABOUT_SCENE.getFxmlFileName(), sceneManager);
+        super(SceneType.ABOUT_SCENE.getFxmlFileName(), sceneManager);
     }
 
     @Override
@@ -25,7 +25,7 @@ public class AboutController extends SceneController {
         textArea.setPrefSize(INIT_SCENE_DIMENSION.getWidth(), INIT_SCENE_DIMENSION.getHeight());
         textArea.setEditable(false);
         textComboBox.getItems().addAll(aboutService.loadContent());
-        textComboBox.setValue(textComboBox.getItems().get(0));
+        textComboBox.setValue(textComboBox.getItems().getFirst());
     }
 
     @FXML
@@ -35,10 +35,6 @@ public class AboutController extends SceneController {
 
     @FXML
     private void goBack() {
-        sceneManager.setupScene(Scene.MAIN_SCENE);
-    }
-
-    protected SceneController getController() {
-        return this;
+        sceneManager.setupScene(SceneType.MAIN_SCENE);
     }
 }

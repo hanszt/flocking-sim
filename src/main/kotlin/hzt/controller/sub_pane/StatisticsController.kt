@@ -11,7 +11,7 @@ import javafx.fxml.FXML
 import javafx.scene.control.Label
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
-import javafx.util.Duration
+import java.time.Duration
 
 class StatisticsController : FXMLController("statisticsPane.fxml") {
 
@@ -60,17 +60,15 @@ class StatisticsController : FXMLController("statisticsPane.fxml") {
         frictionStatsLabel.text = String.format(TWO_DEC_DOUBLE, friction)
         frameRateLabel.text = String.format("$TWO_DEC_DOUBLE f/s", simpleFramerateMeter.frameRate)
         numberOfBoidsLabel.text = String.format("%-3d", flockSize)
-        runTimeLabel.text = String.format("%-4.3f seconds", runTimeSim.toSeconds())
+        runTimeLabel.text = String.format("%-4.3f seconds", runTimeSim.toMillis() / 1000.0)
     }
 
-    override fun getController(): FXMLController = this
-
     init {
-        Timer().scheduleTask(this::startRuntimeLabelFillTransition, Duration.seconds(10.0))
+        Timer().scheduleTask(this::startRuntimeLabelFillTransition, javafx.util.Duration.seconds(10.0))
     }
 
     private fun startRuntimeLabelFillTransition() =
-        FillTransition(Duration.seconds(1.0), runTimeLabel, Color.DARKRED, Color.DARKGREEN).apply {
+        FillTransition(javafx.util.Duration.seconds(1.0), runTimeLabel, Color.DARKRED, Color.DARKGREEN).apply {
             cycleCount = Animation.INDEFINITE
             isAutoReverse = true
         }.play()
