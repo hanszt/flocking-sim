@@ -2,21 +2,16 @@ package hzt.model.utils
 
 import javafx.geometry.Point2D
 import javafx.scene.paint.Color
+import kotlin.random.Random
 
-object RandomGenerator {
-    @JvmStatic
-    fun getRandomDouble(min: Double, max: Double): Double {
-        return Math.random() * (max - min) + min
-    }
+class RandomGenerator(private val random: Random) {
 
-    @JvmStatic
-    fun getRandomPositionOnParent(parentWidth: Double, parentHeight: Double): Point2D {
-        val xPos = getRandomDouble(0.0, parentWidth)
-        val yPos = getRandomDouble(0.0, parentHeight)
+    fun randomPosition(width: Double, height: Double): Point2D {
+        val xPos = random.nextDouble(0.0, width)
+        val yPos = random.nextDouble(0.0, height)
         return Point2D(xPos, yPos)
     }
 
-    @JvmStatic
     val randomColor: Color
-        get() = Color.color(Math.random(), Math.random(), Math.random())
+        get() = Color.color(random.nextDouble(), random.nextDouble(), random.nextDouble())
 }

@@ -6,9 +6,7 @@ import hzt.model.entity.boid.Boid
 import hzt.model.entity.boid.CircleBoid
 import hzt.model.entity.boid.RectangleBoid
 import hzt.model.utils.Engine.FlockingSim
-import hzt.model.utils.RandomGenerator.getRandomDouble
-import hzt.model.utils.RandomGenerator.getRandomPositionOnParent
-import hzt.model.utils.RandomGenerator.randomColor
+import hzt.model.utils.RandomGenerator
 import javafx.geometry.Dimension2D
 import javafx.geometry.Point2D
 import javafx.scene.Group
@@ -21,19 +19,22 @@ import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.sin
 
-class Flock(val mainScene: Scene) : Group(), Iterable<Boid> {
+class Flock(val mainScene: Scene, random: kotlin.random.Random) : Group(), Iterable<Boid> {
 
+    private val randomGenerator = RandomGenerator(random)
     val randomRectangleFlock: FlockType = object : FlockType() {
         override val random: Boolean
             get() = true
 
-        override fun createBoid(maxBoidSize: Double): Boid = RectangleBoid(
-            getRandomDouble(MIN_SIZE.toDouble(), maxBoidSize),
-            getRandomDouble(MIN_SIZE.toDouble(), maxBoidSize), randomColor
-        )
+        override fun createBoid(maxBoidSize: Double): Boid {
+            return RectangleBoid(
+                random.nextDouble(MIN_SIZE.toDouble(), maxBoidSize),
+                random.nextDouble(MIN_SIZE.toDouble(), maxBoidSize), randomGenerator.randomColor
+            )
+        }
 
         override fun setCenterPosition(boid: Boid, dimension: Dimension2D) {
-            boid.setBodyTranslate(getRandomPositionOnParent(dimension.width, dimension.height))
+            boid.setBodyTranslate(randomGenerator.randomPosition(dimension.width, dimension.height))
         }
 
         override fun toString(): String = "Random rectangle flock"
@@ -46,7 +47,7 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid> {
         override fun createBoid(maxBoidSize: Double): Boid = CircleBoid(maxBoidSize, uniformBallColor)
 
         override fun setCenterPosition(boid: Boid, dimension: Dimension2D) {
-            boid.setBodyTranslate(getRandomPositionOnParent(dimension.width, dimension.height))
+            boid.setBodyTranslate(randomGenerator.randomPosition(dimension.width, dimension.height))
         }
 
         override fun toString(): String = "Uniform circle flock"
@@ -57,10 +58,10 @@ class Flock(val mainScene: Scene) : Group(), Iterable<Boid> {
             get() = true
 
         override fun createBoid(maxBoidSize: Double): Boid =
-            CircleBoid(getRandomDouble(MIN_SIZE.toDouble(), maxBoidSize), randomColor)
+            CircleBoid(random.nextDouble(MIN_SIZE.toDouble(), maxBoidSize), randomGenerator.randomColor)
 
         override fun setCenterPosition(boid: Boid, dimension: Dimension2D) =
-            boid.setBodyTranslate(getRandomPositionOnParent(dimension.width, dimension.height))
+            boid.setBodyTranslate(randomGenerator.randomPosition(dimension.width, dimension.height))
 
         override fun toString(): String = "Random circle flock"
     }

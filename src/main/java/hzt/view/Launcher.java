@@ -3,6 +3,7 @@ package hzt.view;
 import hzt.controller.AppManager;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import kotlin.random.Random;
 
 import java.time.Clock;
 
@@ -14,7 +15,7 @@ public final class Launcher extends Application {
 
     @Override
     public void start(Stage stage) {
-        new AppManager(Clock.systemDefaultZone(), stage).start();
+        new AppManager(Clock.systemDefaultZone(), Random.Default, stage).start();
     }
 
 }

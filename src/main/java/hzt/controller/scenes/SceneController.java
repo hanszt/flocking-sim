@@ -33,7 +33,7 @@ public abstract class SceneController extends FXMLController {
 
     @FXML
     void newInstance() {
-        new AppManager(sceneManager.getClock(), new Stage()).start();
+        new AppManager(sceneManager.getClock(), sceneManager.getRandom(), new Stage()).start();
     }
 
     @FXML

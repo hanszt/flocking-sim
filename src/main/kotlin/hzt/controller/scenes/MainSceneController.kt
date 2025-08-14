@@ -104,7 +104,7 @@ class MainSceneController(sceneManager: SceneManager) : SceneController(SceneTyp
     init {
         val subSceneRoot = Group()
         subScene2D = SubScene(subSceneRoot, 0.0, 0.0, true, SceneAntialiasing.BALANCED)
-        flock = Flock(scene)
+        flock = Flock(scene, sceneManager.random)
         engine = Engine()
         animationService = AnimationService()
         subSceneRoot.children.addAll(flock)

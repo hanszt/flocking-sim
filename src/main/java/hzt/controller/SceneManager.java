@@ -7,6 +7,7 @@ import hzt.controller.scenes.SceneType;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.stage.Stage;
+import kotlin.random.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,12 +21,14 @@ public final class SceneManager {
     private static final Logger LOGGER = LoggerFactory.getLogger(SceneManager.class);
 
     private final Clock clock;
+    private final Random random;
     private final Stage stage;
     private final Map<SceneType, SceneController> sceneControllerMap = new EnumMap<>(SceneType.class);
     private final ObjectProperty<SceneController> curSceneController = new SimpleObjectProperty<>();
 
-    public SceneManager(Clock clock, Stage stage) {
+    public SceneManager(Clock clock, Random random, Stage stage) {
         this.clock = clock;
+        this.random = random;
         this.stage = stage;
         curSceneController.addListener((_, _, n) -> LOGGER.info("Current scene controller changed to {}...", n.getClass().getSimpleName()));
         loadFrontend();
@@ -56,6 +59,10 @@ public final class SceneManager {
 
     public Clock getClock() {
         return clock;
+    }
+
+    public Random getRandom() {
+        return random;
     }
 
     public SceneController getCurSceneController() {

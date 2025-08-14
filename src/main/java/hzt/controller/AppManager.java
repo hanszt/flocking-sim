@@ -5,6 +5,7 @@ import javafx.application.Platform;
 import javafx.geometry.Dimension2D;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import kotlin.random.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,9 +36,9 @@ public final class AppManager {
     private final Stage stage;
     private final SceneManager sceneManager;
 
-    public AppManager(Clock clock, Stage stage) {
+    public AppManager(Clock clock, Random random, Stage stage) {
         this.stage = stage;
-        this.sceneManager = new SceneManager(clock, stage);
+        this.sceneManager = new SceneManager(clock, random, stage);
         this.instance = ++instances;
     }
 
