@@ -15,8 +15,8 @@ import java.util.*
 
 class ThemeService : IThemeService {
 
-    private val styleSheet: StringProperty = SimpleStringProperty()
-    private val currentTheme: ObjectProperty<Resource> = SimpleObjectProperty()
+    private val styleSheet = SimpleStringProperty()
+    private val currentTheme = SimpleObjectProperty<Resource>()
     private val themes: Set<Resource>
 
     init {

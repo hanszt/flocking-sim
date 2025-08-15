@@ -14,7 +14,7 @@ import java.util.Optional;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toList;
 
-public class AboutService {
+public final class AboutService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AboutService.class);
     private static final String RELATIVE_TEXT_RESOURCE_DIR = "/about";

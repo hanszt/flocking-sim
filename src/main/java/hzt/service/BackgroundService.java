@@ -14,7 +14,7 @@ import java.util.TreeSet;
 
 import static hzt.utils.FxKtUtilsKt.firstCharUpperCase;
 
-public class BackgroundService implements IBackgroundService {
+public final class BackgroundService implements IBackgroundService {
 
     public static final Resource NO_PICTURE = new Resource("No picture");
     private static final String RELATIVE_BG_IMAGES_RESOURCE_DIR = "/images/backgrounds";

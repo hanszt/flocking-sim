@@ -2,7 +2,7 @@ package hzt.service;
 
 import javafx.animation.AnimationTimer;
 
-public class SimpleFramerateMeter {
+public final class SimpleFramerateMeter {
 
     private final long[] frameTimes = new long[100];
     private int frameTimeIndex = 0;

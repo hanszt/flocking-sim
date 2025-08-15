@@ -13,7 +13,7 @@ import java.util.function.Consumer;
 import static hzt.model.PropertyLoader.parsedIntAppProp;
 import static javafx.animation.Animation.INDEFINITE;
 
-public class AnimationService {
+public final class AnimationService {
 
     private static final int INIT_FRAME_RATE = parsedIntAppProp("framerate", 30);// f/s
     private static final Duration INIT_FRAME_DURATION = Duration.seconds(1.0 / INIT_FRAME_RATE); // s/f
