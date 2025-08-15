@@ -26,7 +26,7 @@ public final class SceneManager {
     private final Map<SceneType, SceneController> sceneControllerMap = new EnumMap<>(SceneType.class);
     private final ObjectProperty<SceneController> curSceneController = new SimpleObjectProperty<>();
 
-    public SceneManager(Clock clock, Random random, Stage stage) {
+    public SceneManager(final Clock clock, final Random random, final Stage stage) {
         this.clock = clock;
         this.random = random;
         this.stage = stage;
@@ -38,12 +38,12 @@ public final class SceneManager {
         try {
             sceneControllerMap.put(SceneType.MAIN_SCENE, new MainSceneController(this));
             sceneControllerMap.put(SceneType.ABOUT_SCENE, new AboutController(this));
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOGGER.error("Something went wrong when loading fxml frontend...", e);
         }
     }
 
-    public void setupScene(SceneType sceneType) {
+    public void setupScene(final SceneType sceneType) {
         curSceneController.set(sceneControllerMap.get(sceneType));
         final var sceneController = curSceneController.get();
         stage.setScene(sceneController.getScene());

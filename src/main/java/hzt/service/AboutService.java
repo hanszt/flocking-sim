@@ -30,7 +30,7 @@ public class AboutService {
                 .collect(collectingAndThen(toList(), AboutService::checkIfTextsLoaded));
     }
 
-    private static List<AboutText> checkIfTextsLoaded(List<AboutText> aboutTexts) {
+    private static List<AboutText> checkIfTextsLoaded(final List<AboutText> aboutTexts) {
         if (aboutTexts.isEmpty()) {
             LOGGER.error("Could not load content from " + RELATIVE_TEXT_RESOURCE_DIR + "...");
             aboutTexts.add(new AboutText("no content", ""));
@@ -38,15 +38,15 @@ public class AboutService {
         return aboutTexts;
     }
 
-    private static AboutText toAboutText(File file) {
-        String name = file.getName().replace(".txt", "").replace("_", " ");
+    private static AboutText toAboutText(final File file) {
+        final var name = file.getName().replace(".txt", "").replace("_", " ");
         return new AboutText(name, loadTextContent(file));
     }
 
-    private static String loadTextContent(File file) {
+    private static String loadTextContent(final File file) {
         try {
             return Files.readString(file.toPath());
-        } catch (IOException e) {
+        } catch (final IOException e) {
             LOGGER.error("File with path {} not found...", file.toPath(), e);
             return "";
         }

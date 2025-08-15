@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
@@ -29,14 +28,14 @@ public class BackgroundService implements IBackgroundService {
     }
 
     private Set<Resource> scanForResourceImages() {
-        Set<Resource> set = new TreeSet<>();
+        final Set<Resource> set = new TreeSet<>();
         set.add(NO_PICTURE);
-        URL url = getClass().getResource(RELATIVE_BG_IMAGES_RESOURCE_DIR);
+        final var url = getClass().getResource(RELATIVE_BG_IMAGES_RESOURCE_DIR);
         if (url != null) {
-            File styleDirectory = new File(url.getFile());
+            final var styleDirectory = new File(url.getFile());
             if (styleDirectory.isDirectory()) {
-                var files = styleDirectory.listFiles();
-                for (var file : Objects.requireNonNull(files)) {
+                final var files = styleDirectory.listFiles();
+                for (final var file : Objects.requireNonNull(files)) {
                     set.add(getResource(file));
                 }
             }
@@ -47,16 +46,16 @@ public class BackgroundService implements IBackgroundService {
     }
 
     @NotNull
-    private static Resource getResource(File file) {
-        String name = extractName(file);
+    private static Resource getResource(final File file) {
+        final var name = extractName(file);
         try {
             return new Resource(name, file.toURI().toURL());
-        } catch (MalformedURLException e) {
+        } catch (final MalformedURLException e) {
             throw new IllegalStateException(e);
         }
     }
 
-    private static String extractName(File file) {
+    private static String extractName(final File file) {
         return firstCharUpperCase(file.getName()
                 .replace('_', ' ')
                 .replace('-', ' ')

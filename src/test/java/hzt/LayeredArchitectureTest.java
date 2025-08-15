@@ -1,6 +1,5 @@
 package hzt;
 
-import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
@@ -29,9 +28,9 @@ class LayeredArchitectureTest {
 
     @Test
     void testServicesShouldOnlyBeAccessedByControllers() {
-        JavaClasses importedClasses = new ClassFileImporter().importPackages("hzt");
+        final var importedClasses = new ClassFileImporter().importPackages("hzt");
 
-        ArchRule myRule = classes()
+        final var myRule = classes()
                 .that().resideInAPackage("..service..")
                 .should().onlyBeAccessed().byAnyPackage("..controller..", "..service..");
 

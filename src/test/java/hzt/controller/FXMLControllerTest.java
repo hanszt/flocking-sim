@@ -10,7 +10,7 @@ class FXMLControllerTest {
 
     @Test
     void testServiceLoaderForFxmlController() {
-        ServiceLoader<FXMLController> fxmlControllerServiceLoader = ServiceLoader.load(FXMLController.class);
+        final var fxmlControllerServiceLoader = ServiceLoader.load(FXMLController.class);
 
         final var count = fxmlControllerServiceLoader.stream().count();
 

@@ -10,7 +10,7 @@ class IThemeServiceTest {
 
     @Test
     void testServiceLoaderForIThemeService() {
-        ServiceLoader<IThemeService> iThemeServices = ServiceLoader.load(IThemeService.class);
+        final var iThemeServices = ServiceLoader.load(IThemeService.class);
 
         final var count = iThemeServices.stream().count();
 

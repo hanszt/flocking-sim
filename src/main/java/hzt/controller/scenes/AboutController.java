@@ -16,7 +16,7 @@ public final class AboutController extends SceneController {
 
     private final AboutService aboutService = new AboutService();
 
-    public AboutController(SceneManager sceneManager) throws IOException {
+    public AboutController(final SceneManager sceneManager) throws IOException {
         super(SceneType.ABOUT_SCENE.getFxmlFileName(), sceneManager);
     }
 

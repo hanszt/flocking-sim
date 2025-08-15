@@ -22,7 +22,7 @@ public abstract class SceneController extends FXMLController {
     protected final Scene scene;
     protected final Instant startTimeSim;
 
-    protected SceneController(String fxmlFileName, SceneManager sceneManager) throws IOException {
+    protected SceneController(final String fxmlFileName, final SceneManager sceneManager) throws IOException {
         super(fxmlFileName);
         this.startTimeSim = sceneManager.getClock().instant();
         this.sceneManager = sceneManager;
@@ -52,7 +52,7 @@ public abstract class SceneController extends FXMLController {
     }
 
     public boolean isSetup() {
-        boolean temp = setup;
+        final var temp = setup;
         setup = true;
         return temp;
     }

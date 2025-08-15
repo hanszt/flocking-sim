@@ -9,12 +9,12 @@ import java.time.Clock;
 
 public final class Launcher extends Application {
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         launch();
     }
 
     @Override
-    public void start(Stage stage) {
+    public void start(final Stage stage) {
         new AppManager(Clock.systemDefaultZone(), Random.Default, stage).start();
     }
 

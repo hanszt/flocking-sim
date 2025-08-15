@@ -36,7 +36,7 @@ public final class AppManager {
     private final Stage stage;
     private final SceneManager sceneManager;
 
-    public AppManager(Clock clock, Random random, Stage stage) {
+    public AppManager(final Clock clock, final Random random, final Stage stage) {
         this.stage = stage;
         this.sceneManager = new SceneManager(clock, random, stage);
         this.instance = ++instances;
@@ -58,7 +58,7 @@ public final class AppManager {
                 instance, TITLE, DateTimeFormatter.ofPattern("hh:mm:ss").format(startTimeSim.atZone(sceneManager.getClock().getZone())));
     }
 
-    public void configureStage(Stage stage) {
+    public void configureStage(final Stage stage) {
         stage.setTitle(String.format("%s (%d)", TITLE, instance));
         stage.setMinWidth(MIN_STAGE_DIMENSION.getWidth());
         stage.setMinHeight(MIN_STAGE_DIMENSION.getHeight());
@@ -75,7 +75,7 @@ public final class AppManager {
         LOGGER.atInfo().setMessage(() -> closingMessage(runTimeSim)).log();
     }
 
-    private String closingMessage(Duration runTimeSim) {
+    private String closingMessage(final Duration runTimeSim) {
         return String.format("%s%nAnimation Runtime of instance %d: %.2f seconds%n%s%n", CLOSING_MESSAGE,
                 instance, runTimeSim.toMillis() / 1000.0, DOTTED_LINE);
     }

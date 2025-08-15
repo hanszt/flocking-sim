@@ -25,20 +25,20 @@ public class AnimationService {
     }
 
     private static Timeline setupTimeLine() {
-        Timeline t = new Timeline();
+        final var t = new Timeline();
         t.setCycleCount(INDEFINITE);
         return t;
     }
 
-    public void addAnimationLoopToTimeline(EventHandler<ActionEvent> animationLoop) {
-        KeyFrame animationLoopKeyFrame = new KeyFrame(INIT_FRAME_DURATION, "Ball sim", animationLoop);
+    public void addAnimationLoopToTimeline(final EventHandler<ActionEvent> animationLoop) {
+        final var animationLoopKeyFrame = new KeyFrame(INIT_FRAME_DURATION, "Ball sim", animationLoop);
         timeline.getKeyFrames().add(animationLoopKeyFrame);
         timeline.play();
     }
 
-    public void run(Flock flock, double accelerationMultiplier,
-                    double frictionFactor, double maxSpeed, Consumer<Boid> boidUpdater) {
-        for (Boid boid : flock) {
+    public void run(final Flock flock, final double accelerationMultiplier,
+                    final double frictionFactor, final double maxSpeed, final Consumer<Boid> boidUpdater) {
+        for (final var boid : flock) {
             boidUpdater.accept(boid);
             boid.update(timeline.getCycleDuration(), accelerationMultiplier, frictionFactor, maxSpeed);
         }

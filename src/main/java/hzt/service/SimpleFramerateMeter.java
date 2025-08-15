@@ -16,22 +16,22 @@ public class SimpleFramerateMeter {
     private void initialize() {
         new AnimationTimer() {
             @Override
-            public void handle(long now) {
+            public void handle(final long now) {
                 frameRateTimer(now);
             }
         }.start();
     }
 
-    private void frameRateTimer(long now) {
-        long oldFrameTime = frameTimes[frameTimeIndex];
+    private void frameRateTimer(final long now) {
+        final var oldFrameTime = frameTimes[frameTimeIndex];
         frameTimes[frameTimeIndex] = now;
         frameTimeIndex = (frameTimeIndex + 1) % frameTimes.length;
         if (frameTimeIndex == 0) {
             arrayFilled = true;
         }
         if (arrayFilled) {
-            long elapsedNanos = now - oldFrameTime;
-            long elapsedNanosPerFrame = elapsedNanos / frameTimes.length;
+            final var elapsedNanos = now - oldFrameTime;
+            final var elapsedNanosPerFrame = elapsedNanos / frameTimes.length;
             frameRate = 1e9 / elapsedNanosPerFrame;
         }
     }
