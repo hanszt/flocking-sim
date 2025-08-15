@@ -31,65 +31,95 @@ import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.time.Duration
 
-class MainSceneController(sceneManager: SceneManager) : SceneController(SceneType.MAIN_SCENE.fxmlFileName, sceneManager) {
+class MainSceneController(sceneManager: SceneManager) :
+    SceneController(SceneType.MAIN_SCENE.fxmlFileName, sceneManager) {
     @FXML
     private lateinit var appearanceTab: Tab
+
     @FXML
     private lateinit var statisticsTab: Tab
+
     @FXML
     lateinit var animationPane: AnchorPane
+
     @FXML
     private lateinit var physicsEngineComboBox: ComboBox<FlockingSim>
+
     @FXML
     private lateinit var flockSettingsComboBox: ComboBox<FlockType>
+
     @FXML
     private lateinit var showVelocityVectorButton: ToggleButton
+
     @FXML
     private lateinit var showAccelerationVectorButton: ToggleButton
+
     @FXML
     private lateinit var bounceWallsButton: ToggleButton
+
     @FXML
     private lateinit var showPathSelectedButton: ToggleButton
+
     @FXML
     private lateinit var showPerceptionButton: ToggleButton
+
     @FXML
     private lateinit var showPerceptionSelectedBallButton: ToggleButton
+
     @FXML
     private lateinit var showRepelCircleButton: ToggleButton
+
     @FXML
     private lateinit var showConnectionsButton: ToggleButton
+
     @FXML
     lateinit var fullScreenButton: ToggleButton
+
     @FXML
     private lateinit var showAllPathsButton: ToggleButton
+
     @FXML
     private lateinit var uniformFlockColorPicker: ColorPicker
+
     @FXML
     lateinit var backgroundColorPicker: ColorPicker
+
     @FXML
     private lateinit var selectedBallColorPicker: ColorPicker
+
     @FXML
     private lateinit var numberOfBoidsSlider: Slider
+
     @FXML
     private lateinit var perceptionRadiusSlider: Slider
+
     @FXML
     private lateinit var frictionSlider: Slider
+
     @FXML
     private lateinit var attractionSlider: Slider
+
     @FXML
     private lateinit var repelFactorSlider: Slider
+
     @FXML
     private lateinit var accelerationSlider: Slider
+
     @FXML
     private lateinit var repelDistanceSlider: Slider
+
     @FXML
     private lateinit var maxVelocitySlider: Slider
+
     @FXML
     private lateinit var maxBoidSizeSlider: Slider
+
     @FXML
     private lateinit var boidTailLengthSlider: Slider
+
     @FXML
     private lateinit var boidVelocityVectorLengthSlider: Slider
+
     @FXML
     private lateinit var boidAccelerationVectorLengthSlider: Slider
 
@@ -142,7 +172,12 @@ class MainSceneController(sceneManager: SceneManager) : SceneController(SceneTyp
         val accelerationMultiplier = accelerationSlider.value
         val bounce = bounceWallsButton.isSelected
         val runTimeSim = Duration.between(startTimeSim, sceneManager.clock.instant())
-        statisticsController.showStatists(flock.selectedBoid, friction, flock.children.size, runTimeSim)
+        statisticsController.showStatists(
+            selected = flock.selectedBoid,
+            frictionFactor = friction,
+            flockSize = flock.children.size,
+            runTimeSim = runTimeSim
+        )
         animationService.run(flock, accelerationMultiplier, friction, maxSpeed) {
             if (bounce) it.bounceOfEdges(animationWindowDimension) else it.floatThroughEdges(animationWindowDimension)
         }
@@ -160,7 +195,7 @@ class MainSceneController(sceneManager: SceneManager) : SceneController(SceneTyp
         }
     }
 
-   private fun AnchorPane.configure() {
+    private fun AnchorPane.configure() {
         setPrefSize(640.0, 400.0)
         background = Background(BackgroundFill(backgroundColor, CornerRadii.EMPTY, Insets.EMPTY))
     }
