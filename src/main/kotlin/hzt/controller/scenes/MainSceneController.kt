@@ -30,7 +30,6 @@ import javafx.scene.paint.Color
 import org.slf4j.LoggerFactory
 import java.io.IOException
 import java.time.Duration
-import java.time.LocalTime
 
 class MainSceneController(sceneManager: SceneManager) : SceneController(SceneType.MAIN_SCENE.fxmlFileName, sceneManager) {
     @FXML
@@ -275,8 +274,8 @@ class MainSceneController(sceneManager: SceneManager) : SceneController(SceneTyp
     private fun uniformBoidColorPickerAction(event: ActionEvent) {
         val color = (event.source as ColorPicker).value
         flock.setUniformBallColor(color)
-        flock.children.stream()
-            .map { Boid::class.java.cast(it) }
+        flock.children.asSequence()
+            .map { it as Boid }
             .filter { it != flock.selectedBoid }
             .forEach { it.updatePaint(color) }
     }

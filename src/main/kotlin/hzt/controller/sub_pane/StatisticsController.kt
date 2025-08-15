@@ -4,7 +4,6 @@ import hzt.controller.FXMLController
 import hzt.model.entity.boid.Boid
 import hzt.service.SimpleFramerateMeter
 import hzt.utils.scheduleTask
-import java.util.Timer
 import javafx.animation.Animation
 import javafx.animation.FillTransition
 import javafx.fxml.FXML
@@ -12,6 +11,7 @@ import javafx.scene.control.Label
 import javafx.scene.paint.Color
 import javafx.scene.text.Text
 import java.time.Duration
+import java.util.*
 
 class StatisticsController : FXMLController("statisticsPane.fxml") {
 

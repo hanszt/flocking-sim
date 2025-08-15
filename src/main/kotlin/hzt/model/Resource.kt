@@ -1,10 +1,8 @@
 package hzt.model
 
-import java.io.IOException
 import java.io.InputStream
 import java.net.URL
-import java.util.Objects
-import kotlin.jvm.Throws
+import java.util.*
 
 class Resource
 @JvmOverloads constructor(private val name: String, val url: URL? = null) : Comparable<Resource> {

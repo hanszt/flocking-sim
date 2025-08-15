@@ -3,11 +3,10 @@ package hzt.utils
 import javafx.beans.value.ObservableValue
 import javafx.scene.control.Slider
 import javafx.stage.Stage
-import java.util.function.Consumer
 
-fun <T> ObservableValue<T>.onNewValue(consumer: Consumer<T>) = addListener { _, _, new -> consumer.accept(new) }
+fun <T> ObservableValue<T>.onNewValue(consume: (T) -> Unit) = addListener { _, _, new -> consume(new) }
 
-fun Slider.onChange(consumer: Consumer<Number>) = valueProperty().onNewValue(consumer::accept)
+fun Slider.onChange(consume: (Number) -> Unit) = valueProperty().onNewValue(consume)
 
 fun Stage.inverseFullScreen() {
     isFullScreen = isFullScreen.not()

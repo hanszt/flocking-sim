@@ -1,7 +1,7 @@
 package hzt.model.entity
 
-import hzt.model.PropertyLoader.parsedIntAppProp
 import hzt.model.FlockProperties
+import hzt.model.PropertyLoader.parsedIntAppProp
 import hzt.model.entity.boid.Boid
 import hzt.model.entity.boid.CircleBoid
 import hzt.model.entity.boid.RectangleBoid

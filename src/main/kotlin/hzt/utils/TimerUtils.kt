@@ -11,6 +11,4 @@ fun taskFor(runnable: Runnable): TimerTask {
     }
 }
 
-fun Timer.scheduleTask(runnable: Runnable, delay: Long) = schedule(taskFor(runnable), delay)
-
 fun Timer.scheduleTask(runnable: Runnable, delay: Duration) = schedule(taskFor(runnable), delay.toMillis().toLong())

@@ -15,9 +15,3 @@ fun <T : Shape> T.isDisabled(disable: Boolean): T {
     this.isDisable = disable
     return this
 }
-
-fun <T : Shape> T.withTranslation(x: Double, y: Double): T {
-    this.translateX = x
-    this.translateY = y
-    return this
-}
