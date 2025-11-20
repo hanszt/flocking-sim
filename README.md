@@ -10,6 +10,11 @@ Made By Hans Zuidervaart.
 
 ## Requirements
 
+- Maven
+- Java 25
+
+Run the application using `mvn javafx:run`
+
 ---
 
 ## Screenshots

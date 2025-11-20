@@ -179,7 +179,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>${javafx-maven-plugin.version}</version>
                 <configuration>
-                    <mainClass>hzt.view.Launcher</mainClass>
+                    <mainClass>FlockingSim2D/hzt.view.Launcher</mainClass>
                 </configuration>
             </plugin>
             <plugin>
