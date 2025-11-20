@@ -11,27 +11,26 @@
     <packaging>jar</packaging>
 
     <properties>
-        <maven.compiler.source>24</maven.compiler.source>
-        <maven.compiler.target>24</maven.compiler.target>
+        <maven.compiler.source>25</maven.compiler.source>
+        <maven.compiler.target>25</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin-maven-plugin.jvmTarget>21</kotlin-maven-plugin.jvmTarget>
         <kotlin.code.style>official</kotlin.code.style>
         <!--        dependencies-->
-        <kotlin.version>2.2.10</kotlin.version>
-        <openjfx.version>21.0.2</openjfx.version>
+        <kotlin.version>2.2.21</kotlin.version>
+        <openjfx.version>25</openjfx.version>
         <annotations.version>24.0.1</annotations.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <slf4j-api.version>2.0.5</slf4j-api.version>
         <logback.version>1.5.18</logback.version>
         <!--        test dependencies-->
-        <junit-platform.version>1.13.4</junit-platform.version>
-        <junit-jupiter.version>5.13.4</junit-jupiter.version>
+        <junit.version>6.0.1</junit.version>
         <archunit-junit5.version>1.4.1</archunit-junit5.version>
         <!--        plugins-->
         <maven-surefire-plugin.version>3.5.3</maven-surefire-plugin.version>
         <javafx-maven-plugin.version>0.0.8</javafx-maven-plugin.version>
         <build-helper-maven-plugin.version>3.4.0</build-helper-maven-plugin.version>
-        <maven-assembly-plugin.version>3.3.0</maven-assembly-plugin.version>
+        <maven-assembly-plugin.version>3.7.1</maven-assembly-plugin.version>
         <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
         <maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
     </properties>
@@ -41,19 +40,19 @@
         <dependency>
             <groupId>org.junit.platform</groupId>
             <artifactId>junit-platform-launcher</artifactId>
-            <version>${junit-platform.version}</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit-jupiter.version}</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
-            <version>${junit-jupiter.version}</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
