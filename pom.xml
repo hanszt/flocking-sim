@@ -18,7 +18,7 @@
         <kotlin.code.style>official</kotlin.code.style>
         <!--        dependencies-->
         <kotlin.version>2.2.21</kotlin.version>
-        <openjfx.version>25</openjfx.version>
+        <openjfx.version>25.0.1</openjfx.version>
         <annotations.version>24.0.1</annotations.version>
         <commons-math3.version>3.6.1</commons-math3.version>
         <slf4j-api.version>2.0.5</slf4j-api.version>
