@@ -64,9 +64,10 @@ public final class AppManager {
         stage.setMinHeight(MIN_STAGE_DIMENSION.getHeight());
         stage.setOnCloseRequest(_ -> printClosingText());
 
-        Optional.ofNullable(getClass().getResourceAsStream("/icons/fx-icon.png"))
+        final var iconLocation = "/icons/fx-icon.png";
+        Optional.ofNullable(getClass().getResourceAsStream(iconLocation))
                 .map(Image::new)
-                .ifPresent(stage.getIcons()::add);
+                .ifPresentOrElse(stage.getIcons()::add, () -> LOGGER.error("failed to load icon from {}", iconLocation));
     }
 
     private void printClosingText() {

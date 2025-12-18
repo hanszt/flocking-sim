@@ -7,11 +7,8 @@ import kotlin.random.Random;
 
 import java.time.Clock;
 
+/// The main entry-point for the app.
 public final class Launcher extends Application {
-
-    public static void main(final String[] args) {
-        launch();
-    }
 
     @Override
     public void start(final Stage stage) {

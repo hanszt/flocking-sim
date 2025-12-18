@@ -12,6 +12,20 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.time.Instant;
 
+/// An abstract controller class that manages a specific scene in a JavaFX application
+/// using an associated FXML file. It serves as a base class for defining the behavior
+/// and lifecycle of individual scenes and their controllers.
+///
+/// Responsibilities include:
+/// - Loading and managing the FXML layout of the scene.
+/// - Providing a way to interact with the `SceneManager` to manage scene transitions.
+/// - Implementing lifecycle events like setup for the scene.
+/// - Handling user interactions and triggering specific behaviors such as quitting
+///   the application or navigating to other scenes.
+///
+/// The class also maintains state for the initial dimensions of scenes, along with
+/// metadata like the simulation start time and references to the associated
+/// `Scene` and `SceneManager`.
 public abstract class SceneController extends FXMLController {
 
     public static final Dimension2D INIT_SCENE_DIMENSION = new Dimension2D(600, 800);

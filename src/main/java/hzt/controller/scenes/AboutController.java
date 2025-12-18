@@ -8,6 +8,7 @@ import javafx.scene.control.TextArea;
 
 import java.io.IOException;
 
+/// A controller that manages the about-pane
 public final class AboutController extends SceneController {
     @FXML
     private ComboBox<AboutService.AboutText> textComboBox;

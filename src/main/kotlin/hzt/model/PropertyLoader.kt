@@ -8,6 +8,12 @@ import java.io.FileInputStream
 import java.io.IOException
 import java.util.*
 
+/**
+ * Utility object responsible for loading and managing application properties from a configuration file.
+ *
+ * Provides methods to read and parse property values, falling back to default values if the property is missing
+ * or cannot be parsed.
+ */
 object PropertyLoader {
 
     private val LOGGER: Logger = LoggerFactory.getLogger(PropertyLoader::class.java)

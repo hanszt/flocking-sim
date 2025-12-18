@@ -5,6 +5,7 @@ import javafx.scene.Parent;
 
 import java.io.IOException;
 
+/// Loads the fxml file controlled by this controller.
 public abstract class FXMLController {
 
     private static final String FXML_FILE_LOCATION = "/fxml/";
