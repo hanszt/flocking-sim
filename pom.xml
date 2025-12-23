@@ -180,6 +180,9 @@
                 <version>${javafx-maven-plugin.version}</version>
                 <configuration>
                     <mainClass>FlockingSim2D/hzt.view.Launcher</mainClass>
+                    <options>
+                        <option>--enable-native-access=javafx.graphics</option>
+                    </options>
                 </configuration>
             </plugin>
             <plugin>
