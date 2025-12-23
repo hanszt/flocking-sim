@@ -2,7 +2,7 @@
 
 ---
 
-A program to visualize flocking behaviour of a group of fish or birds
+A program to visualize flocking behavior of a group of fish or birds
 
 Made By Hans Zuidervaart.
 
@@ -13,7 +13,13 @@ Made By Hans Zuidervaart.
 - Maven
 - Java 25
 
-Run the application using `mvn javafx:run`
+Run the application using the provided maven wrapper, make sure you are using the correct java version:
+
+```bash
+./mvnw javafx:run
+```
+
+
 
 ---
 
